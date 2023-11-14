@@ -1,0 +1,146 @@
+{% extends "base/adminbase.html" %}
+{% load static %}
+{% block title %}Add Product{% endblock  %}
+{% block content %}
+<main class="main-wrap">
+    {% include "base/adminheader.html" %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <section class="content-main">
+            <div class="row">
+                <div class="col-9">
+                    <div class="content-header">
+                        <h2 class="content-title">Edit Product</h2>
+                        <div>
+                            <button type="submit" class="btn btn-md rounded font-sm hover-up" name="publish">Save</button>
+                        </div>
+                        
+                    </div>
+                    {% for m in messages %}
+                    <div class="alert alert-danger px-1" id="error">{{m}}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-lg-9">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Product title</label>
+                                <input type="text" placeholder="Type here" class="form-control" name="product_name" id="product_name" value="{{product.product_name}}" required>
+                            </div>
+                            <div class="row gx-3">
+                                <div class="col-md-4  mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name="price" id="price" value="{{product.price}}" required>
+                                </div>
+                                <div class="col-md-4  mb-3">
+                                    <label for="selling_price" class="form-label">Selling Price</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name="selling_price" id="selling_price" value="{{product.selling_price}}" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" name="category">
+                                        {% for category in categories %}
+                                        <option value="{{ category.category_name }}">{{ category.category_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="col md-3 mb-3">
+                                <label for="product_title" class="form-label">Available Stock</label>
+                            </div>
+                            <div class="row gx-3">
+                                <div class="col-md-3 mb-3">
+                                    <label for="s_stock" class="form-label">S</label>
+                                    <input type="text" placeholder="0" class="form-control" name="s_stock" id="s_stock" value="{{stock_s}}" required>
+                                </div>
+                                <div class="col-md-3  mb-3">
+                                    <label for="m_stock" class="form-label">M</label>
+                                    <input type="text" placeholder="0" class="form-control" name="m_stock" id="m_stock" value="{{stock_m}}" required>
+                                </div>
+                                <div class="col-md-3  mb-3">
+                                    <label for="l_stock" class="form-label">L</label>
+                                    <input type="text" placeholder="0" class="form-control" name="l_stock" id="l_stock" value="{{stock_l}}" required>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="xl_stock" class="form-label">XL</label>
+                                    <input type="text" placeholder="0" class="form-control" name="xl_stock" id="xl_stock" value="{{stock_xl}}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" name="description" rows="4" value="" required>{{product.description}}</textarea>
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Image Front</label>
+                                <input class="form-control" type="file" name="image_front" required>
+                                {% if product.image_front %}
+                                <img src="{{ product.image_front.url }}" alt="Main Image" width="150">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Image Back</label>
+                                <input class="form-control" type="file" name="image_back" required>
+                                {% if image.image_back %}
+                                <img src="{{ image.image_back.url }}" alt="Main Image" width="150">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Image 2</label>
+                                <input class="form-control" type="file" name="extra_image_one" required>
+                                {% if image.extra_image_one %}
+                                <img src="{{ image.extra_image_one.url }}" alt="Main Image" width="150">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Image 3</label>
+                                <input class="form-control" type="file" name="extra_image_two" required>
+                                {% if image.extra_image_two %}
+                                <img src="{{ image.extra_image_two.url }}" alt="Main Image" width="150">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+                </div>
+        </section>
+    </form>
+    
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script> ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+{% endblock  %}

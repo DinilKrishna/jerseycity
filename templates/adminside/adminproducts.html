@@ -1,0 +1,128 @@
+{% extends "base/adminbase.html" %}
+{% load static %}
+{% block title %}Products{% endblock  %}
+{% block content %}
+<main class="main-wrap">
+    {% include "base/adminheader.html" %}
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Products List</h2>
+                <p>Lorem ipsum dolor sit amet.</p>
+            </div>
+            <div>
+                {% comment %} <a href="#" class="btn btn-light rounded font-md">Export</a>
+                <a href="#" class="btn btn-light rounded  font-md">Import</a> {% endcomment %}
+                <a href="{% url "add_product" %}" class="btn btn-primary btn-sm rounded">Add Product</a>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-5 col-12 me-auto mb-md-0 mb-3">
+                        <form class="searchform" method="GET" action="{% url 'admin_products' %}">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Search products" value="{{ search_query }}">
+                                <button class="btn btn-light bg" type="submit"><i class="material-icons md-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                        <select class="form-select">
+                            <option selected>All category</option>
+                            <option>Home</option>
+                            <option>Away</option>
+                            <option>International</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <input type="date" value="02.05.2022" class="form-control">
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <select class="form-select">
+                            <option selected>Status</option>
+                            <option>Active</option>
+                            <option>Disabled</option>
+                            <option>Show all</option>
+                        </select>
+                    </div>
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Availability</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>
+                                    <img src="{{ product.image_front.url }}" class="img-sm img-thumbnail align-items-center" alt="Item">
+                                </td>
+                                <td>{{ product.product_name }}</td>
+                                <td>${{ product.selling_price }}</td>
+                                <td>
+                                    {% if product.is_selling %}
+                                    <span class="badge rounded-pill alert-success">Available</span>
+                                    {% else %}
+                                    <span class="badge rounded-pill alert-danger">Not available</span>
+                                    {% endif %}
+                                
+                                </td>
+                                <td>
+                                    <a href="/adminpanel/edit_product/{{ product.uid }}" class="btn btn-sm font-sm rounded btn-brand">
+                                        <i class="material-icons md-edit"></i> Edit
+                                    </a>
+                                    {% if product.is_selling %}
+                                    <a href="/adminpanel/delete_product/{{ product.uid }}" class="btn btn-sm font-sm btn-light rounded">
+                                        <i class="material-icons md-delete"></i> Unlist
+                                    </a>
+                                    {% else %}
+                                    <a href="/adminpanel/delete_product/{{ product.uid }}" class="btn btn-sm font-sm btn-light rounded">
+                                        <i class="material-icons md-refresh"></i> List
+                                    </a>
+                                    {% endif %}
+                                    
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                    <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+       
+    </section> <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script> ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+{% endblock  %}

@@ -1,0 +1,63 @@
+{% extends "base/adminbase.html" %}
+{% load static %}
+{% block title %}Categories{% endblock  %}
+{% block content %}
+<main class="main-wrap">
+    {% include "base/adminheader.html" %}
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Categories </h2>
+                <p>Edit category</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" name="category_name" value="{{categories.category_name}}" required/>
+                            </div>
+                            <div class="mb-4">
+                                <label for="product_slug" class="form-label">Slug</label>
+                                <input type="text" placeholder="Type here" class="form-control" name="category_slug" value="{{categories.category_slug}}" required/>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" name="category_description" value="" required>{{categories.category_description}}</textarea>
+                            </div>
+                            {% for x in messages %}
+                            <div class="alert alert-danger px-3" id="error">{{x}}</div>
+                            {% endfor %}
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-brand hover-up" name="edit_category">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script> ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+{% endblock  %}

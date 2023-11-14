@@ -1,0 +1,272 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/favicon.jpg' %}">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+    <style>
+        .header-action-icon-2 button {
+            padding: 8px 5px; /* Adjust the padding to make the button smaller */
+            font-size: 13px;  /* Adjust the font size if needed */
+        }
+    </style>
+
+</head>
+<body>
+    <header class="header-area header-style-5">
+        <div class="header-top header-top-ptb-1 d-none d-lg-block">
+            <div class="container align-items-center">
+                <div class="row align-items-center">
+                    
+                    <div class="col-xl-12 col-lg-4">
+                        <div class="text-center">
+                            <div id="news-flash" class="d-inline-block">
+                                <ul>
+                                    <li>Get great products up to 50% off <a href="{% static 'shop-grid-right.html' %}">View details</a></li>
+                                    <li>Super Value Deals - Save more with coupons</li>
+                                    <li>Trendy new first team kits, save up to 35% off today <a href="{% static 'shop-grid-right.html' %}">Shop now</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="header-bottom sticky-bar sticky-white-bg">
+            <div class="container">
+                <div class="header-wrap header-space-between position-relative">
+                    <div class="logo logo-width-1">
+                        <a href="{% url "home_page" %}"><img src="{% static 'assets/imgs/theme/logo2.jpg' %}" alt="logo"></a>
+                    </div>
+                    <div class="main-menu main-menu-grow main-menu-padding-1 main-menu-lh-1 main-menu-mrg-1 hm3-menu-padding d-none d-lg-block hover-border">
+                        <nav>
+                            <ul>
+                                <li><a  href="{% url 'home_page' %}">Home </i></a>
+                                    
+                                </li>
+                                <li><a href="{% url 'shop_page' %}">Shop </i></a>
+                                    
+                                <li class="position-static"><a href="{% url "about_page" %}">About </i></a>
+                                    
+                                <li><a href="{% url 'contact_page' %}">Contact </i></a>
+                                    
+                                </li>
+                                <li>
+                                    <a class="text-black">
+                                        {% if user.is_authenticated %}
+                                            {{ user.first_name }} <i class="fi-rs-angle-down"></i>
+                                        {% else %}
+                                            Account <i class="fi-rs-angle-down"></i>
+                                        {% endif %}
+                                    </a>
+                                    <ul class="sub-menu">
+                                        {% if user.is_authenticated %}
+                                            <li><a href="{% url "user_profile" %}">My Account</a></li>
+                                            <li><a href="{% url "log_out" %}">Logout</a></li>
+                                        {% else %}
+                                            <li><a href="{% url "login_page" %}">Login</a></li>
+                                            {% comment %} <li><a href="{% url "signup_page" %}">Register</a></li> {% endcomment %}
+                                        {% endif %}
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <form method="get" action="{% url 'shop_page' %}">
+                    <div class="header-action-right">
+                        <div class="search-style-2">                            
+                                <input type="text" name="q" placeholder="Search for items..." value="{{ request.GET.q }}" required>
+                                
+                            
+                        </div>
+                        <div class="header-action-2">
+                            <div class="header-action-icon-2">
+                                <button type="submit">Search</button>
+                            </div>
+                            <div class="header-action-icon-2">
+                                <a href="shop-wishlist.html">
+                                    <img class="svgInject" alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}">
+                                    <span class="pro-count blue">4</span>
+                                </a>
+                            </div>
+                            <div class="header-action-icon-2">
+                                <a class="mini-cart-icon" href="shop-cart.html">
+                                    <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}">
+                                    <span class="pro-count blue">2</span>
+                                </a>
+                                {% comment %} <div class="cart-dropdown-wrap cart-dropdown-hm2"> {% endcomment %}
+                                    {% comment %} <ul>
+                                        <li>
+                                            <div class="shopping-cart-img">
+                                                <a href="shop-product-right.html"><img alt="Evara" src="{% static 'assets/imgs/shop/thumbnail-3.jpg' %}"></a>
+                                            </div>
+                                            <div class="shopping-cart-title">
+                                                <h4><a href="shop-product-right.html">Plain Striola Shirts</a></h4>
+                                                <h3><span>1 × </span>$800.00</h3>
+                                            </div>
+                                            <div class="shopping-cart-delete">
+                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="shopping-cart-img">
+                                                <a href="shop-product-right.html"><img alt="Evara" src="{% static 'assets/imgs/shop/thumbnail-1.jpg' %}"></a>
+                                            </div>
+                                            <div class="shopping-cart-title">
+                                                <h4><a href="shop-product-right.html">Macbook Pro 2022</a></h4>
+                                                <h3><span>1 × </span>$3200.00</h3>
+                                            </div>
+                                            <div class="shopping-cart-delete">
+                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul> {% endcomment %}
+                                    {% comment %} <div class="shopping-cart-footer">
+                                        <div class="shopping-cart-total">
+                                            <h4>Total <span>$4000.00</span></h4>
+                                        </div>
+                                        <div class="shopping-cart-button">
+                                            <a href="shop-cart.html">View cart</a>
+                                            <a href="shop-checkout.html">Checkout</a>
+                                        </div>
+                                    </div> {% endcomment %}
+                                {% comment %} </div> {% endcomment %}
+                            </div>
+                            <div class="header-action-icon d-block d-lg-none">
+                                <div class="burger-icon">
+                                    <span class="burger-icon-top"></span>
+                                    <span class="burger-icon-mid"></span>
+                                    <span class="burger-icon-bottom"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer class="main bg-dark">
+        
+        <section class="section-padding footer-mid">
+            <div class="container pt-15 pb-20">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="widget-about font-md mb-md-5 mb-lg-0">
+                            <div class="logo logo-width-1 wow fadeIn animated">
+                                <a href="index.html"><img src="{% static "assets/imgs/theme/logo2.jpg" %}" alt="logo"></a>
+                            </div>
+                            <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
+                            <p class="wow fadeIn animated">
+                                <br>
+                                <form class="form-subcriber d-flex wow fadeIn animated">
+                                    <input type="email" class="form-control bg-white font-small" placeholder="Enter your email">
+                                </form>
+                                <br>
+                            </p>
+                            
+                            <p class="text-secondary wow fadeIn animated">
+                                <strong>Address: </strong>North Paravur, Kochi, Kerala, India<br>
+                            </p>
+                            <p class="text-secondary wow fadeIn animated">
+                                <strong>Phone: </strong>+91 88484 72281 /+91 85475 08783<br>
+                            </p>
+                            
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-md-3">
+                    </div>
+                    <div class="col-lg-3 col-md-3 ">
+                        <h5 class="widget-title text-white fw-b wow fadeIn animated">Custom Services</h5>
+                        <ul class="footer-list wow fadeIn animated mb-sm-5 mb-md-0">
+                            <li><a class="text-secondary" href="#">Cart</a></li>
+                            <li><a class="text-secondary" href="#">My Account</a></li>
+                            <li><a class="text-secondary" href="#">Login</a></li>
+                            <li><a class="text-secondary" href="#">Register</a></li>
+                            <li><a class="text-secondary"href="#">Support</a></li>
+                            <li><a class="text-secondary" href="#">Track</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-1  col-md-3">
+                    </div>
+                    <div class="col-lg-3  col-md-3">
+                        <h5 class="widget-title text-white wow fadeIn animated">Categories</h5>
+                        <ul class="footer-list wow fadeIn animated">
+                            <li><a class="text-secondary" href="#">International Kits</a></li>
+                            <li><a class="text-secondary" href="#">Away Kits</a></li>
+                            <li><a class="text-secondary" href="#">Home Kits</a></li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        <div class="container pb-20 wow fadeIn animated">
+            <div class="row d-flex">
+                
+                <div class="col-12 text-center">
+                    <p class="font-sm text-muted mb-0">&copy; 2023, All rights reserved | <strong class="text-brand">JERSEY<span class="text-white">CITY</span></strong> </p>
+                </div>
+                
+            </div>
+        </div>
+    </footer>
+    <!-- Preloader Start -->
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-5">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static "assets/js/vendor/modernizr-3.6.0.min.js" %}"></script>
+    <script src="{% static "assets/js/vendor/jquery-3.6.0.min.js" %}"></script>
+    <script src="{% static "assets/js/vendor/jquery-migrate-3.3.0.min.js" %}"></script>
+    <script src="{% static "assets/js/vendor/bootstrap.bundle.min.js" %}"></script>
+    <script src="{% static "assets/js/plugins/slick.js" %}"></script>
+    <script src="{% static "assets/js/plugins/jquery.syotimer.min.js" %}"></script>
+    <script src="{% static "assets/js/plugins/wow.js" %}"></script>
+    <script src="{% static "assets/js/plugins/jquery-ui.js" %}"></script>
+    <script src="{% static "assets/js/plugins/perfect-scrollbar.js" %}"></script>
+    <script src="{% static "assets/js/plugins/magnific-popup.js" %}"></script>
+    <script src="{% static "assets/js/plugins/select2.min.js" %}"></script>
+    <script src="{% static "assets/js/plugins/waypoints.js" %}"></script>
+    <script src="{% static "assets/js/plugins/counterup.js" %}"></script>
+    <script src="{% static "assets/js/plugins/jquery.countdown.min.js" %}"></script>
+    <script src="{% static "assets/js/plugins/images-loaded.js" %}"></script>
+    <script src="{% static "assets/js/plugins/isotope.js" %}"></script>
+    <script src="{% static "assets/js/plugins/scrollup.js" %}"></script>
+    <script src="{% static "assets/js/plugins/jquery.vticker-min.js" %}"></script>
+    <script src="{% static "assets/js/plugins/jquery.theia.sticky.j" %}s"></script>
+    
+    <script src="{% static "assets/js/main.js" %}"></script>
+    <script src="{% static "assets/js/plugins/jquery.elevatezoom.js" %}"></script>
+    
+    <script src="{% static "/assets/js/shop.js" %}"></script>
+</body>
+
+</html>
