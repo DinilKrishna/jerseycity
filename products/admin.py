@@ -6,5 +6,4 @@ from .models import *
 admin.site.register(Category)
 admin.site.register(Size)
 admin.site.register(Product)
-admin.site.register(Product_Variant)
 admin.site.register(Product_Image)

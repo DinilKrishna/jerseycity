@@ -1,0 +1,174 @@
+{% extends "base/userbase.html" %}
+{% load static %}
+{% block title %}User Profile{% endblock  %}
+
+{% block content %}
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Checkout
+            </div>
+        </div>
+    </div>
+    <section class=" mb-50">
+        <div class="container">
+            
+            <form method="post">
+            <div class="row">
+                <div class="col-12">
+                    <div class="divider mt-50 mb-50"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-25">
+                        <h4>Select Address</h4>
+                    </div>
+                    
+                    
+                        {% csrf_token %}
+                    
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Address</th>
+                                    <th>City</th>
+                                    <th>Pincode</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for address in addresses %}
+                                    <tr>
+                                        <td><input type="radio" class="form-check-input" name="selected_address" value="{{ address.uid }}" required></td>
+                                        <td>{{ address.address }}</td>
+                                        <td>{{ address.city }}</td>
+                                        <td>{{ address.pincode }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table> <br>
+                        <div class="col-md-5 text-center">{% include "base/messages.html" %}</div>  
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <a href="{% url "add_new_address" %}" class="btn">Add new address</a>
+                                </div>
+                            </div>
+                                <br>
+                        </div>                   
+                        
+                        
+                        <div class="row">
+                
+                            <div class="col-lg-12">
+                                <div class="toggle_info">
+                                    <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
+                                </div>
+                                <div class="panel-collapse collapse coupon_form " id="coupon">
+                                    <div class="panel-body">
+                                        <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                                        <form action="#" method="post">
+                                            <div class="form-group">
+                                                <input type="text" placeholder="Enter Coupon Code...">
+                                            </div>
+                                            <div class="form-group">
+                                                <button class="btn  btn-md" name="login">Apply Coupon</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+                
+                <div class="col-md-6">
+                    {% comment %} <div class="order_review"> {% endcomment %}
+                        <div class="mb-25">
+                            <h4>Your Orders</h4>
+                        </div>
+                        <div class="table-responsive order_table text-center">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">Product</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    {% for product in products %}
+                                    <tr>
+                                        
+                                        <td class="image product-thumbnail"><img src="{{ product.product.image_front.url }}" alt="#"></td>
+                                        <td>
+                                            <h5><a href="shop-product-full.html">{{product.product.product_name}}</a></h5><span>Size:{{product.size.size}}</span> <br> <span class="product-qty">x{{ product.quantity }}</span>
+                                        </td>
+                                        <td>${{product.calculate_sub_total}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="cart_total_label font-lg fw-900 text-brand">Total Payable</td>
+                                        <td class="cart_total_amount"><span class="font-md fw-700">$<span id = "cart-total">{{grand_total}}</span></span></td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                        <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                        <div class="payment_method">
+                            <div class="mb-25">
+                                <h5>Payment</h5>
+                            </div>
+                            <div class="payment_option">
+                                    <input class="form-check-input" type="radio" name="payment_option" id="direct_bank_transfer" value="direct_bank_transfer" required>
+                                    <label class="form-check-label" for="directBankTransfer">Direct Bank Transfer</label><br>
+                                    <input class="form-check-input" type="radio" name="payment_option" id="razorpay" value="razorpay" required>
+                                    <label class="form-check-label" for="razorpay">RazorPay</label><br>
+                                    <input class="form-check-input" type="radio" name="payment_option" id="cash_on_delivery" value="cash_on_delivery" required>
+                                    <label class="form-check-label" for="cashOnDelivery">Cash on Delivery</label>
+                            </div>
+                        </div><br>
+                        <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Place Order</button>
+                    </div>
+                
+                </div>
+            </div>
+        </form>
+        </div>
+    </section>
+</main>
+
+<script>
+    function validateForm() {
+        var checkboxes = document.getElementsByName("selected_address");
+        var checkedCount = 0;
+
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                checkedCount++;
+            }
+        }
+
+        if (checkedCount === 0) {
+            alert("Please select at least one address.");
+            return false;
+        } else if (checkedCount > 1) {
+            alert("Please select only one address.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{% endblock %}

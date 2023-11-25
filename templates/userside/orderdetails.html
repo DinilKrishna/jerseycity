@@ -1,0 +1,100 @@
+{% extends "base/userbase.html" %}
+{% load static %}
+{% block title %}User Profile{% endblock  %}
+
+{% block content %}
+<style>
+
+    .o_id{
+        font-size: 1.7vh;
+        color: gray;
+    }
+
+</style>
+
+    <div class="container mb-100">
+        <div class="box-container d-flex justify-content-between">
+            <!-- Box 1 -->
+            <div class="box rounded shadow row p-3 col-md-4 mb-4 mt-4">
+                <div class="col-md-4"><br><br>
+                    <img src="{{user.profile_image.url}}" alt="Icon 1" class="img-fluid rounded-circle">
+                </div>
+                <div class="col-md-8">
+                    <h4>Customer</h4><br>
+                    
+                    <p>{{user.user.first_name}}</p>
+                    <p>{{user.user.email}}</p>
+                    <p>{{order.phone_number}}</p>
+                    <a href="/userauth/userprofile/{{user.uid}}">View Profile</a>
+                </div>
+            </div>
+
+            <!-- Box 2 -->
+            <div class="box rounded shadow row p-3 col-md-4 mb-4 mt-4">
+                <div class="col-md-12">
+                    <h4>Order Info</h4><br>
+                    <p>Status: {{order.status}}</p>
+                    <p>Payment Method:
+                        {% if order.payment_method.method == 'cash_on_delivery' %}
+                        Cash On Delivery
+                        {% elif order.payment_method.method == 'razorpay' %}
+                        RazorPay
+                        {% elif order.payment_method.method == 'direct_bank_transfer' %}
+                        Bank Transfer
+                        {% else %}
+                        None
+                        {% endif %}</p>
+                    <p class="text-truncate">Order Id: {{order.uid}}</p>
+                    <a href="#">Download Info</a>
+                </div>
+            </div>
+
+            <!-- Box 3 -->
+            <div class="box rounded shadow row p-3 col-md-4 mb-4 mt-4">
+                <div class="col-md-12">
+                    <h4>Deliver To</h4><br>
+                    <p>{{order.address.address}}</p>
+                    <p>{{order.city}}, {{order.district}}</p>
+                    <p>{{order.state}} - {{order.pincode}}</p>
+                    
+                    <a href="#">Profile Link</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container mt-50">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Image</th>
+                        <th>Listed Price</th>
+                        <th>Selling Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td class="image product-thumbnail"><img src="{{item.product.image_front.url}}" alt="Product 1"></td>
+                        <td>$<span class="text-decoration-line-through fw-200">{{item.product.price}}</span></td>
+                        <td>${{item.product.selling_price}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td>${{item.sub_total}}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td ></td>
+                        <td></span></td>
+                        <td></td>
+                        <td><span class="fw-600 ">Grand Total:</span></td>
+                        <td><span class="fw-600 ">${{order.amount_to_pay}}</span></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+{% endblock %}

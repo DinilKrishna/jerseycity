@@ -40,7 +40,9 @@
                                     <label class="form-label">Category</label>
                                     <select class="form-select" name="category">
                                         {% for category in categories %}
-                                        <option value="{{ category.category_name }}">{{ category.category_name }}</option>
+                                            <option value="{{ category.category_name }}" {% if category.category_name == product.category.category_name %}selected{% endif %}>
+                                                {{ category.category_name }}
+                                            </option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -84,9 +86,12 @@
                         <div class="card-body">
                             <div>
                                 <label class="form-label">Image Front</label>
-                                <input class="form-control" type="file" name="image_front" required>
+                                
                                 {% if product.image_front %}
-                                <img src="{{ product.image_front.url }}" alt="Main Image" width="150">
+                                    <img src="{{ product.image_front.url }}" alt="Main Image" width="150">
+                                    <input class="form-control" type="file" name="image_front" value="{{ product.image_front.url }}">
+                                {% else %}
+                                    <input class="form-control" type="file" name="image_front">
                                 {% endif %}
                             </div>
                         </div>
@@ -95,31 +100,46 @@
                         <div class="card-body">
                             <div>
                                 <label class="form-label">Image Back</label>
-                                <input class="form-control" type="file" name="image_back" required>
+                                {% if image.image_back %}
+                                    <img src="{{ image.image_back.url }}" alt="Back Image" width="150">
+                                    <input class="form-control" type="file" name="image_back" value="{{ image.image_back.url }}">
+                                {% else %}
+                                    <input class="form-control" type="file" name="image_back">
+                                {% endif %}
+                                {% comment %} <input class="form-control" type="file" name="image_back" required>
                                 {% if image.image_back %}
                                 <img src="{{ image.image_back.url }}" alt="Main Image" width="150">
-                                {% endif %}
+                                {% endif %} {% endcomment %}
                             </div>
                         </div>
                     </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <div>
-                                <label class="form-label">Image 2</label>
+                                <label class="form-label">Image Back</label>
+                                {% if image.extra_image_one %}
+                                    <img src="{{ image.extra_image_one.url }}" alt="Extra Image 1" width="150">
+                                    <input class="form-control" type="file" name="extra_image_one" value="{{ image.extra_image_one.url }}">
+                                {% else %}
+                                    <input class="form-control" type="file" name="extra_image_one">
+                                {% endif %}
+                                {% comment %} <label class="form-label">Image 2</label>
                                 <input class="form-control" type="file" name="extra_image_one" required>
                                 {% if image.extra_image_one %}
                                 <img src="{{ image.extra_image_one.url }}" alt="Main Image" width="150">
-                                {% endif %}
+                                {% endif %} {% endcomment %}
                             </div>
                         </div>
                     </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <div>
-                                <label class="form-label">Image 3</label>
-                                <input class="form-control" type="file" name="extra_image_two" required>
+                                <label class="form-label">Image Back</label>
                                 {% if image.extra_image_two %}
-                                <img src="{{ image.extra_image_two.url }}" alt="Main Image" width="150">
+                                    <img src="{{ image.extra_image_two.url }}" alt="Extra Image 2" width="150">
+                                    <input class="form-control" type="file" name="extra_image_two" value="{{ image.extra_image_two.url }}">
+                                {% else %}
+                                    <input class="form-control" type="file" name="extra_image_two">
                                 {% endif %}
                             </div>
                         </div>

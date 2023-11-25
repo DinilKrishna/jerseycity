@@ -12,5 +12,5 @@ urlpatterns = [
     path('about/',views.about_page, name='about_page'),
     path('contact/',views.contact_page, name='contact_page'),
     path('product_details/<uid>',views.product_details, name='product_details'),
-    # path('otp/<uid>',views.otp,name='otp'),
+    path('404error/', views.error, name="404"),
 ]

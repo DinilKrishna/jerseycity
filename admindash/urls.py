@@ -22,5 +22,8 @@ urlpatterns = [
     path('users/',views.users, name='users'),
     path('block_user/<uid>',views.block_user, name='block_user'),
     path('user_details/',views.user_details, name='user_details'),
+
+    path('orders/',views.orders, name='orders'),
+    path('order_info/<uid>',views.order_info, name='order_info'),
     
 ]

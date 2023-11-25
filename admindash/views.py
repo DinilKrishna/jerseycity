@@ -1,3 +1,4 @@
+import re
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -8,15 +9,20 @@ from django.urls import reverse
 from . decorators import admin_required
 from userauth.models import UserProfile
 from django.db.models import Q
+from django.views.decorators.cache import never_cache
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render, redirect
+from checkout.models import *
 
 # Create your views here.
 
-
+@never_cache
 def admin_login_page(request):
     if request.user.is_authenticated and request.user.is_staff:
         return redirect ('admin_dashboard')
     return render (request, 'adminside/adminlogin.html')
 
+@never_cache
 def admin_log_out(request):
     if request.user.is_authenticated:
         logout(request)  
@@ -40,27 +46,120 @@ def admin_products(request):
             products = Product.objects.filter(
                 Q(product_name__icontains=search_query) |
                 Q(description__icontains=search_query)
-            )
+            ).order_by('-created_at')
         else:
-            products = Product.objects.all()
+            products = Product.objects.all().order_by('-created_at')
 
         categories = Category.objects.all()
         sizes = Size.objects.all()
         context['categories'] = categories
-        context['products'] = products
         context['sizes'] = sizes
+
+        # Pagination
+        items_per_page = 5
+        paginator = Paginator(products, items_per_page)
+        
+        page = request.GET.get('page')
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            # If the page parameter is not an integer, deliver the first page.
+            products = paginator.page(1)
+        except EmptyPage:
+            # If the page is out of range (e.g., 9999), deliver the last page of results.
+            products = paginator.page(paginator.num_pages)
+
+        # Get the current page number
+        current_page = products.number
+
+        # Calculate the range of page numbers to display
+        start_page = max(1, current_page - 1)
+        end_page = min(paginator.num_pages, current_page + 1)
+
+        # Adjust the start and end page if there are not enough pages to display
+        if end_page - start_page < 2:
+            if start_page == 1:
+                end_page = min(3, paginator.num_pages)
+            else:
+                start_page = max(1, paginator.num_pages - 2)
+
+        # Create a list of page numbers to display
+        page_numbers = range(start_page, end_page + 1)
+
+        context['products'] = products
         context['search_query'] = search_query
-        return render (request, 'adminside/adminproducts.html',context)
+        context['page_numbers'] = page_numbers
+        return render(request, 'adminside/adminproducts.html', context)
     return redirect('admin_login_page')
 
 
+# def users(request):
+#     context = {}
+#     if  request.user.is_authenticated and request.user.is_staff is True:
+#         user_obj = User.objects.all().order_by('-date_joined')
+#         profile_obj = UserProfile.objects.all()
+#         context['users'] = user_obj
+#         context['profiles'] = profile_obj
+#         return render(request, 'adminside/users.html', context)
+#     else:
+#         return redirect('admin_login_page')
+
 def users(request):
     context = {}
-    if  request.user.is_authenticated and request.user.is_staff is True:
-        user_obj = User.objects.all().order_by('-date_joined')
-        profile_obj = UserProfile.objects.all()
-        context['users'] = user_obj
+    if request.user.is_authenticated and request.user.is_staff:
+        # user_obj = User.objects.all().order_by('-date_joined')
+        profile_obj = UserProfile.objects.all().order_by('-created_at')
+
+        # Get the search query from the form
+        search_query = request.GET.get('search', '')
+
+        # Filter users based on the search query
+        if search_query:
+            profile_obj = profile_obj.filter(
+                Q(user__first_name__icontains=search_query) |
+                Q(user__last_name__icontains=search_query) |
+                Q(user__email__icontains=search_query)
+            ).order_by('-created_at')
+
+        paginator = Paginator(profile_obj, 5)
+        page = request.GET.get('page')
+
+        try:
+            profile_obj = paginator.page(page)
+        except PageNotAnInteger:
+            # If the page parameter is not an integer, deliver the first page.
+            profile_obj = paginator.page(1)
+        except EmptyPage:
+            # If the page is out of range (e.g., 9999), deliver the last page of results.
+            profile_obj = paginator.page(paginator.num_pages)
+
+        current_page = profile_obj.number
+
+        # Calculate the range of page numbers to display
+        start_page = max(1, current_page - 1)
+        end_page = min(paginator.num_pages, current_page + 1)
+        if current_page < paginator.num_pages and len(profile_obj) <= paginator.num_pages:
+            next_page = paginator.page(current_page + 1)
+            profile_obj.object_list = list(profile_obj.object_list)
+            profile_obj.object_list.extend(next_page.object_list[:5 - len(profile_obj)])
+            paginator.count += len(profile_obj.object_list)
+
+        
+
+        # Adjust the start and end page if there are not enough pages to display
+        if end_page - start_page < 2:
+            if start_page == 1:
+                end_page = min(3, paginator.num_pages)
+            else:
+                start_page = max(1, paginator.num_pages - 2)
+
+        # Create a list of page numbers to display
+        page_numbers = range(start_page, end_page + 1)
+        context['page_numbers'] = page_numbers
         context['profiles'] = profile_obj
+        # context['users'] = user_obj
+        context['search_query'] = search_query
+
         return render(request, 'adminside/users.html', context)
     else:
         return redirect('admin_login_page')
@@ -127,6 +226,66 @@ def admin_login(request):
     
     return render(request, "adminside/adminlogin.html") 
 
+
+def is_valid_description(description):
+    
+    description = description.strip()
+
+    if not description:
+        return False
+    
+    if not (5 <= len(description) <= 100):
+        return False
+    
+    return True
+
+
+def is_valid_product_title(title):
+    title = title.strip()
+
+    if not title:
+        return False
+
+    # Allow any characters, including symbols
+    if not re.match(r'^[^\n\r\t\v\f]*$', title):
+        return False
+
+    if not (3 <= len(title) <= 100):
+        return False
+    
+    return True
+
+
+def is_valid_price(price):
+
+    try:
+
+        price = float(price)
+
+        if price > 0:
+            return True
+        else:
+            return False
+    except ValueError:
+
+        return False
+    
+
+def is_valid_stock(stock):
+
+    try:
+
+        stock = int(stock)
+
+        if stock >= 0:
+            return True
+        else:
+            return False
+    except ValueError:
+
+        return False
+
+
 def add_product(request):
     context = {}
     
@@ -135,17 +294,39 @@ def add_product(request):
         price = request.POST.get('price')
         selling_price = request.POST.get('selling_price')
         category = request.POST.get('category')
-        # print(category)
-        try:
-            s_stock = int(request.POST.get('s_stock'))
-            m_stock = int(request.POST.get('m_stock'))
-            l_stock = int(request.POST.get('l_stock'))
-            xl_stock =int(request.POST.get('xl_stock'))
-        except Exception as e:
-            messages.error(request, e)
+
+        if not is_valid_product_title(product_name):
+            messages.error(request, f'{product_name} Not a valid product Name')
+            return redirect('add_product_page')
+        if not is_valid_price(price):
+            messages.error(request, 'Price should be a positive number')
+            return redirect('add_product_page')
+        if not is_valid_price(selling_price):
+            messages.error(request, 'Price should be a positive number')
+            return redirect('add_product_page')
+        
+        s_stock = request.POST.get('s_stock')
+        m_stock = request.POST.get('m_stock')
+        l_stock = request.POST.get('l_stock')
+        xl_stock = request.POST.get('xl_stock')
+        
+        if not is_valid_stock(s_stock):
+            messages.error(request, 'Stock should be a positive Integer')
+            return redirect('add_product_page')
+        if not is_valid_stock(m_stock):
+            messages.error(request, 'Stock should be a positive Integer')
+            return redirect('add_product_page')
+        if not is_valid_stock(l_stock):
+            messages.error(request, 'Stock should be a positive Integer')
+            return redirect('add_product_page')
+        if not is_valid_stock(xl_stock):
+            messages.error(request, 'Stock should be a positive Integer')
             return redirect('add_product_page')
 
         description = request.POST.get('description')
+        if not is_valid_description(description):
+            messages.error(request, 'Invalid Description')
+            return redirect('add_product_page')
 
         image_front = request.FILES.get('image_front')
         image_back = request.FILES.get('image_back')
@@ -250,10 +431,38 @@ def edit_product(request, uid):
         description = request.POST.get('description')
         price = request.POST.get('price')
         selling_price = request.POST.get('selling_price')
+        if not is_valid_product_title(product_name):
+            messages.error(request, f'{product_name} Not a valid product Name')
+            print('1111111111111111111111111111111111111111111')
+            return redirect(request.META.get("HTTP_REFERER"))
+        if not is_valid_price(price):
+            messages.error(request, 'Price should be a positive number')
+            print('2222222222222222222222222222222222222222222')
+            return redirect(request.META.get("HTTP_REFERER"))
+        if not is_valid_price(selling_price):
+            messages.error(request, 'Price should be a positive number')
+            return redirect(request.META.get("HTTP_REFERER"))
         s_stock = request.POST.get('s_stock')
         m_stock = request.POST.get('m_stock')
         l_stock = request.POST.get('l_stock')
         xl_stock = request.POST.get('xl_stock')
+
+        if not is_valid_stock(s_stock):
+            messages.error(request, 'Stock should be a positive Integer')
+            return redirect('add_product_page')
+        if not is_valid_stock(m_stock):
+            messages.error(request, 'Stock should be a positive Integer')
+            return redirect(request.META.get("HTTP_REFERER"))
+        if not is_valid_stock(l_stock):
+            messages.error(request, 'Stock should be a positive Integer')
+            return redirect(request.META.get("HTTP_REFERER"))
+        if not is_valid_stock(xl_stock):
+            messages.error(request, 'Stock should be a positive Integer')
+            return redirect(request.META.get("HTTP_REFERER"))
+        if not is_valid_description(description):
+            messages.error(request, 'Invalid Description')
+            return redirect(request.META.get("HTTP_REFERER"))
+        
         image_front = request.FILES.get('image_front') if 'image_front' in request.FILES else None
         category = request.POST.get('category')
         image_back = request.FILES.get('image_back') if 'image_back' in request.FILES else None
@@ -284,6 +493,9 @@ def edit_product(request, uid):
             
             if image_front is not None:
                 products.image_front = image_front
+                print('NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOt')
+            if image_front is None:
+                print('Noneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
             
             products.category = category_instance
             products.price = price
@@ -314,6 +526,7 @@ def edit_product(request, uid):
             
         except Exception as e:
             messages.error(request, str(e))
+            return redirect(request.META.get("HTTP_REFERER"))
             
    
     context['categories'] = categories
@@ -396,3 +609,46 @@ def delete_category(request, id):
         return redirect(reverse('categories'))
     except Exception as e:
         return HttpResponse(e)
+    
+
+@admin_required
+def orders(request):
+    context = {}
+    all_orders = Order.objects.all().order_by('-created_at')
+
+    # Pagination
+    items_per_page = 10
+    paginator = Paginator(all_orders, items_per_page)
+    page = request.GET.get('page')
+
+    try:
+        orders = paginator.page(page)
+    except PageNotAnInteger:
+        # If the page parameter is not an integer, deliver the first page.
+        orders = paginator.page(1)
+    except EmptyPage:
+        # If the page is out of range (e.g., 9999), deliver the last page of results.
+        orders = paginator.page(paginator.num_pages)
+
+    context['orders'] = orders
+    return render(request, 'adminside/orders.html', context)
+# def orders(request):
+#     context = {}
+#     orders = Order.objects.all().order_by('-created_at')
+#     context['orders'] = orders
+#     return render(request, 'adminside/orders.html', context)
+
+@admin_required
+def order_info(request, uid):
+    context = {}
+    order = Order.objects.get(uid = uid)
+    order_items = OrderItems.objects.filter(order = order)
+    if request.method == 'POST':
+        new_status = request.POST.get('status', None)
+        if new_status:
+            order.status = new_status
+            order.save()
+        return redirect(request.META.get('HTTP_REFERER'))
+    context['order'] = order
+    context['order_items'] = order_items
+    return render(request, 'adminside/orderinfo.html', context)

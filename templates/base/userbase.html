@@ -65,16 +65,18 @@
                                     
                                 </li>
                                 <li>
+                                    {% if request.user.is_authenticated %}
                                     <a class="text-black">
-                                        {% if user.is_authenticated %}
-                                            {{ user.first_name }} <i class="fi-rs-angle-down"></i>
-                                        {% else %}
-                                            Account <i class="fi-rs-angle-down"></i>
-                                        {% endif %}
+                                            {{ request.user.first_name }} <i class="fi-rs-angle-down"></i>
                                     </a>
+                                    {% else %}
+                                    <a class="text-black">
+                                        Account <i class="fi-rs-angle-down"></i>
+                                    </a>
+                                    {% endif %}
                                     <ul class="sub-menu">
-                                        {% if user.is_authenticated %}
-                                            <li><a href="{% url "user_profile" %}">My Account</a></li>
+                                        {% if request.user.is_authenticated %}
+                                            <li><a href="/userauth/userprofile/{{ request.user.userprofile.uid }}">My Account</a></li>
                                             <li><a href="{% url "log_out" %}">Logout</a></li>
                                         {% else %}
                                             <li><a href="{% url "login_page" %}">Login</a></li>
@@ -103,47 +105,18 @@
                                 </a>
                             </div>
                             <div class="header-action-icon-2">
-                                <a class="mini-cart-icon" href="shop-cart.html">
+                                {% if request.user.is_authenticated %}
+                                <a class="mini-cart-icon" href="/userauth/cart/{{ request.user.userprofile.uid }}">
                                     <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}">
-                                    <span class="pro-count blue">2</span>
+                                    {% comment %} <span class="pro-count blue">2</span> {% endcomment %}
                                 </a>
-                                {% comment %} <div class="cart-dropdown-wrap cart-dropdown-hm2"> {% endcomment %}
-                                    {% comment %} <ul>
-                                        <li>
-                                            <div class="shopping-cart-img">
-                                                <a href="shop-product-right.html"><img alt="Evara" src="{% static 'assets/imgs/shop/thumbnail-3.jpg' %}"></a>
-                                            </div>
-                                            <div class="shopping-cart-title">
-                                                <h4><a href="shop-product-right.html">Plain Striola Shirts</a></h4>
-                                                <h3><span>1 × </span>$800.00</h3>
-                                            </div>
-                                            <div class="shopping-cart-delete">
-                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="shopping-cart-img">
-                                                <a href="shop-product-right.html"><img alt="Evara" src="{% static 'assets/imgs/shop/thumbnail-1.jpg' %}"></a>
-                                            </div>
-                                            <div class="shopping-cart-title">
-                                                <h4><a href="shop-product-right.html">Macbook Pro 2022</a></h4>
-                                                <h3><span>1 × </span>$3200.00</h3>
-                                            </div>
-                                            <div class="shopping-cart-delete">
-                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
-                                            </div>
-                                        </li>
-                                    </ul> {% endcomment %}
-                                    {% comment %} <div class="shopping-cart-footer">
-                                        <div class="shopping-cart-total">
-                                            <h4>Total <span>$4000.00</span></h4>
-                                        </div>
-                                        <div class="shopping-cart-button">
-                                            <a href="shop-cart.html">View cart</a>
-                                            <a href="shop-checkout.html">Checkout</a>
-                                        </div>
-                                    </div> {% endcomment %}
-                                {% comment %} </div> {% endcomment %}
+                                {% else %}
+                                <a class="mini-cart-icon" href="{% url "login_page" %}">
+                                    <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}">
+                                    {% comment %} <span class="pro-count blue">2</span> {% endcomment %}
+                                </a>
+                                {% endif %}
+                                
                             </div>
                             <div class="header-action-icon d-block d-lg-none">
                                 <div class="burger-icon">

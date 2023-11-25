@@ -90,7 +90,7 @@ def shop_page(request):
     print('111')
     print(products)
     print()
-    categories = Category.objects.all()
+    categories = Category.objects.filter(is_listed = True)
     sizes = Size.objects.all()
 
     # Get the search query from the GET parameters
@@ -155,7 +155,6 @@ def shop_page(request):
 def product_details(request, uid):
     try:
         context = {}
-        # user = User.objects.get(user=request.user)
         product_obj = Product.objects.get(uid = uid)
         product_img_obj = Product_Image.objects.get(product = product_obj)
         category_obj = product_obj.category
@@ -168,11 +167,11 @@ def product_details(request, uid):
         if request.method == "POST":
             size = request.POST.get('size')
             size_obj  = Size.objects.get(id = size)
-            return redirect(f'/product/cart/{product_obj.uid}/{size_obj.id}')
+            return redirect(f'/products/add_to_cart/{product_obj.uid}/{size_obj.id}')
 
         if request.user.is_authenticated and request.user.is_staff is False:
             # context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
-            context['user'] = request.user
+            context['user'] = UserProfile.objects.get(user=request.user)
         # context['reviews'] = Review.objects.filter(product = product_obj).exclude(review = "")
         context['products'] = product_obj
         context['sizes'] = sizes
@@ -193,4 +192,7 @@ def contact_page(request):
     if request.user.is_authenticated and request.user.is_staff:
         logout(request)
     return render(request, 'pages/contact.html')
+
+def error(request):
+    return render(request, '404/index.html')
 

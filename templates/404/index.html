@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>404 HTML Template by Colorlib</title>
+
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+        }
+
+        #notfound {
+            text-align: center;
+        }
+
+        .notfound {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .notfound-404 h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 200px;
+            margin: 0;
+            color: #088178;
+        }
+
+        .notfound h2 {
+            font-family: 'Cabin', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            color: #088178;
+        }
+
+        .notfound-404 span {
+            display: inline-block;
+            margin-right: 6px;
+            color: #ff665e;
+        }
+
+        .notfound p {
+            color: #838383;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #088178;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #046963;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="notfound">
+        <div class="notfound">
+            <div class="notfound-404">
+                <h1><span>4</span><span>0</span><span>4</span></h1>
+            </div>
+            <h2>Oops! Page not found</h2>
+            {% include "base/messages.html" %}
+            <p>We're sorry, but the page you requested could not be found. Please go back to the <a href="{% url "home_page" %}" style="color: #088178;">home page</a>.</p>
+            <a href="{% url "home_page" %}" class="btn">Home Page</a>
+        </div>
+    </div>
+
+</body><!-- This template was made by Colorlib (https://colorlib.com) -->
+
+</html>

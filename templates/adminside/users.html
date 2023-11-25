@@ -15,7 +15,9 @@
             <header class="card-header">
                 <div class="row gx-3">
                     <div class="col-lg-4 col-md-6 me-auto">
-                        <input type="text" placeholder="Search..." class="form-control">
+                        <form method="GET" action="{% url 'users' %}">
+                            <input type="text" name="search" placeholder="Search..." class="form-control" value="{{ search_query }}">
+                        </form>
                     </div>
                     <div class="col-lg-2 col-md-3 col-6">
                         <select class="form-select">
@@ -54,7 +56,7 @@
                                 <td width="">
                                     <a href="#" class="itemside">
                                         <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar1.jpg' %} " class="img-sm img-avatar" alt="Userpic">
+                                            <img src="{{ profile.profile_image.url }}" class="img-sm img-avatar" alt="Profile Picture">
                                         </div>
                                         <div class="info pl-3">
                                             <h6 class="mb-0 title">{{profile.user.first_name}}</h6>
@@ -87,183 +89,13 @@
                             {% comment %} {% endif %} {% endcomment %}
                             {% endfor %}
                             
-                            {% comment %} <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar2.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Mary Monasa</h6>
-                                            <small class="text-muted">Seller ID: #129</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>monalisa@example.com</td>
-                                <td><span class="badge rounded-pill alert-success">Active</span></td>
-                                <td>11.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar3.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Jonatan Ive</h6>
-                                            <small class="text-muted">Seller ID: #400</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>mrjohn@example.com</td>
-                                <td><span class="badge rounded-pill alert-success">Active</span></td>
-                                <td>08.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar4.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Eleanor Pena</h6>
-                                            <small class="text-muted">Seller ID: #439</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>eleanor2022@example.com</td>
-                                <td><span class="badge rounded-pill alert-danger">Inactive</span></td>
-                                <td>08.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar1.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Albert Pushkin</h6>
-                                            <small class="text-muted">Seller ID: #439</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>someone@mymail.com</td>
-                                <td><span class="badge rounded-pill alert-success">Active</span></td>
-                                <td>20.11.2019</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar2.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Alexandra Pena</h6>
-                                            <small class="text-muted">Seller ID: #439</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>eleanor2022@example.com</td>
-                                <td><span class="badge rounded-pill alert-danger">Inactive</span></td>
-                                <td>08.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar3.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Eleanor Pena</h6>
-                                            <small class="text-muted">Seller ID: #439</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>eleanor2022@example.com</td>
-                                <td><span class="badge rounded-pill alert-danger">Inactive</span></td>
-                                <td>08.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar4.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Alex Pushkina</h6>
-                                            <small class="text-muted">Seller ID: #439</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>alex@gmail.org</td>
-                                <td><span class="badge rounded-pill alert-success">Active</span></td>
-                                <td>08.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar1.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Eleanor Pena</h6>
-                                            <small class="text-muted">Seller ID: #439</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>eleanor2022@example.com</td>
-                                <td><span class="badge rounded-pill alert-success">Active</span></td>
-                                <td>08.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="40%">
-                                    <a href="#" class="itemside">
-                                        <div class="left">
-                                            <img src="{% static 'assets/imgs/people/avatar2.jpg' %} " class="img-sm img-avatar" alt="Userpic">
-                                        </div>
-                                        <div class="info pl-3">
-                                            <h6 class="mb-0 title">Eleanor Pena</h6>
-                                            <small class="text-muted">Seller ID: #439</small>
-                                        </div>
-                                    </a>
-                                </td>
-                                <td>eleanor2022@example.com</td>
-                                <td><span class="badge rounded-pill alert-success">Active</span></td>
-                                <td>08.07.2022</td>
-                                <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
-                                </td>
-                            </tr> {% endcomment %}
+                            
                         </tbody>
                     </table> <!-- table-responsive.// -->
                 </div>
             </div> <!-- card-body end// -->
         </div> <!-- card end// -->
-        <div class="pagination-area mt-15 mb-50">
+        {% comment %} <div class="pagination-area mt-15 mb-50">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">
                     <li class="page-item active"><a class="page-link" href="#">01</a></li>
@@ -272,6 +104,21 @@
                     <li class="page-item"><a class="page-link dot" href="#">...</a></li>
                     <li class="page-item"><a class="page-link" href="#">16</a></li>
                     <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                </ul>
+            </nav>
+        </div> {% endcomment %}
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
+                    {% for num in profiles.paginator.page_range %}
+                        {% if users.number == num %}
+                            <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item"><a class="page-link" href="?page={{ profiles.paginator.num_pages }}">&raquo;</a></li>
                 </ul>
             </nav>
         </div>

@@ -24,17 +24,23 @@
                                 <form method="post">
                                     {% csrf_token %}
                                     <div class="form-group">
-                                        
-                                        <input type="text" name="otp" placeholder="Enter your otp here" required>
+                                        <input type="text" name="otp" placeholder="Enter your OTP here" required>
                                     </div>
-                                    <div class="login_footer form-group">
-                                        
+                                    
+                                    <div class="form-group">
+                                        <p id="countdowntext"><span id="countdown" class="countdown">30</span> seconds remaining</p>
                                     </div>
+                                    
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-fill-out btn-block hover-up" name="">Verify</button>
                                     </div>
 
                                 </form>
+                                <a href="{% url "resend_otp" %}">
+                                    <button type="submit" id="resendOTP" class="btn btn-danger h-auto d-none">
+                                        Resend OTP
+                                    </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -48,4 +54,34 @@
     </div>
 </section>
 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const resendOTPButton = document.getElementById("resendOTP");
+        const countdownDisplay = document.getElementById("countdown");
+        const countdownText = document.getElementById("countdowntext");
+        let countdown = {{ remaining_time }};  // Pass the remaining time from the view
+
+        function startCountdown() {
+            const interval = setInterval(function () {
+                countdown--;
+                countdownDisplay.textContent = Math.floor(countdown);  // Convert to integer
+
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    countdownDisplay.textContent = "0";
+                    resendOTPButton.classList.remove("d-none");
+                    countdownText.classList.add("d-none");
+                }
+            }, 1000);
+        }
+
+        startCountdown();
+
+        resendOTPButton.addEventListener("click", function () {
+            countdown = {{ remaining_time }};  // Reset the countdown to the remaining time
+            startCountdown();
+        });
+    });
+</script>
 {% endblock %}

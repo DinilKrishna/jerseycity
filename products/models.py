@@ -3,6 +3,7 @@ from base.models import BaseModel
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from PIL import Image
+from userauth.models import UserProfile
 
 
 # Create your models here.
@@ -79,3 +80,24 @@ def resize_images(sender, instance, **kwargs):
     image_back.save(instance.image_back.path)
     extra_image_one.save(instance.extra_image_one.path)
     extra_image_two.save(instance.extra_image_two.path)
+
+
+class Cart(BaseModel):
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    product = models.ManyToManyField(Product, through="CartItems")
+
+    def __str__(self) -> str:
+        return f'{self.user.user.username} : Cart'
+        
+class CartItems(BaseModel):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+                                            
+    
+    def __str__(self) -> str:
+        return f'{self.quantity} x {self.product.product_name} in Cart'
+
+    def calculate_sub_total(self):
+        return self.product.selling_price * self.quantity

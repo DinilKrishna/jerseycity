@@ -42,13 +42,16 @@
                                             </div>
                                             <a class="text-muted" href="#">Forgot password?</a>
                                         </div>
-                                        {% for x in messages %}
-                                        <div class="alert alert-danger px-3" id="error">{{x}}</div>
-                                        {% endfor %}
+                                        {% include "base/messages.html" %}
+                                        {% comment %} {% for x in messages %}
+                                        <div class="alert px-3" id="error">{{x}}</div>
+                                        {% endfor %} {% endcomment %}
                                         <div class="form-group">
                                             <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Log in</button>
                                         </div>
-                                        <p>Don't have an account yet?</p><a href="{% url "signup_page" %}" >Click here to sign up</a>
+                                        <a href="{% url "otp_login" %}">Login using OTP</a>
+                                        
+                                        <p><br>Don't have an account yet?</p><a href="{% url "signup_page" %}" >Click here to sign up</a>
                                     </form>
                                 </div>
                             </div>

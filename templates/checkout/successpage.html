@@ -1,0 +1,26 @@
+{% extends "base/userbase.html" %}
+{% load static %}
+{% block title %}User Profile{% endblock  %}
+{% block content %}
+<div class="checkout-area pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-4 text-center">
+                <img class="mx-auto d-block" src="{% static 'assets/imgs/misc/order_success.webp' %}" alt="">
+            </div>
+            <div class="col-md-3 ">
+                <div class="quickview-btn-cart mt-3">
+                    {% comment %} <a class="btn-hover-black border rounded" href="/shop">Continue Shopping</a><br>
+                    <a class="btn-hover-black border rounded" href="#">View Orders</a><br>
+                    <a class="btn-hover-black border rounded" href="#">Invoice</a><br> {% endcomment %}
+                    <a href="/shop" class="btn w-100 p-2">Continue Shopping</a><br><br>
+                    <a href="/userauth/userprofile/{{user_id}}" class="btn w-100 p-2">View Orders</a><br><br>
+                    <a href="#" class="btn w-100 p-2">Invoice</a>
+                    {% comment %} <a class="btn-hover-black border rounded" href="/account/order/{{user.profile.uid}}">View Orders</a>
+                    <a class="btn-dark rounded" href="/checkout/invoice/{{order.uid}}">Invoice</a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

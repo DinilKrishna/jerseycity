@@ -1,0 +1,175 @@
+{% extends "base/userbase.html" %}
+{% load static %}
+{% block title %}User Profile{% endblock  %}
+{% block content %}
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Your Cart
+            </div>
+        </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        {% include "base/messages.html" %}
+                        <table class="table shopping-summery text-center clean">
+                            <thead>
+                                <tr class="main-heading">
+                                    <th scope="col">Image</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Subtotal</th>                                    
+                                    <th scope="col">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td class="image product-thumbnail"><img src="{{ product.product.image_front.url }}" alt="#"></td>
+                                    <td class="product-des product-name">
+                                        <h5 class="product-name"><a href="shop-product-right.html">{{ product.product.product_name }}</a></h5>
+                                        {% if product.product.is_out_of_stock %}
+                                            <p class="text-danger">Out of Stock</p>
+                                        {% endif %}
+                                        <p class="font-xs">{{ product.product.description }}
+                                        </p>
+                                    </td>
+                                    <td class="price" data-title="Price"><span>${{ product.product.selling_price }} </span></td>
+                                    <td class="product-price-cart">
+                                        <span class="amount"
+                                            >{{product.size.size}}</span
+                                        >
+                                    </td>
+                                    <td class="text-center" data-title="Quantity">
+                                        <div class="">
+                                            <a href="#" onclick="updateQuantity('{{ product.uid }}', 'decrease')" class="btn btn-info p-2">-</a>
+                                            <span id="quantity-{{ product.uid }}" class="align-items-middle p-2">{{ product.quantity }}</span>
+                                            <a href="#" onclick="updateQuantity('{{ product.uid }}', 'add')" class="btn btn-primary p-2">+</a>
+                                        </div>
+                                        {% comment %} {% include "base/messages.html" %} {% endcomment %}
+                                    </td>
+                                    
+                                    <td class="product-subtotal" >
+                                        <span>$</span><span id="total-{{ product.uid }}" >{{ product.calculate_sub_total }}</span>
+                                    </td>
+                                    <td class="action" data-title="Remove"><a href="/products/cart_remove/{{product.uid}}" class="text-muted"><i class="fi-rs-trash"></i></a></td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="6" class="text-end">
+                                        <a href="#" onclick="clearCart()" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="cart-action text-end">
+                        <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
+                        <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                    </div>
+                    <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                    <div class="row mb-50">
+
+                        <div class="col-lg-6 col-md-12">
+                            <div class="border p-md-4 p-30 border-radius cart-totals">
+                                <div class="heading_s1 mb-3">
+                                    <h4>Cart Totals</h4>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="cart_total_label">Cart Total</td>
+                                                <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">$<span id = "cart-total">{{grand_total}}</span></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="cart_total_label">Shipping</td>
+                                                <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="cart_total_label">Grand Total</td>
+                                                <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">$<span id = "grand-total">{{grand_total}}</span></span></strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <a href="{% url "checkout" %}" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    function updateQuantity(uid, action) {
+        console.log('WOrking')
+        fetch(`/products/${action}_quantity/${uid}`)
+            .then(response => response.json())
+            
+            .then(data => {
+                if (data.success) {
+                    console.log(data.quantity)
+                    const quantityElement = document.getElementById(`quantity-${uid}`);
+                    quantityElement.innerText = data.quantity;
+
+                    // If you need to update the subtotal, you can do it here.
+                    console.log(data.subtotal)
+                    const subtotalElement = document.getElementById(`total-${uid}`);
+                    subtotalElement.innerText = data.subtotal;
+
+                    //Update the cart totalconsole.log(data.grand_total)
+                    const cartTotalElement = document.getElementById('cart-total');
+                    cartTotalElement.innerText = data.grand_total;
+
+                    // Update the grand total
+                    console.log(data.grand_total)
+                    const grandTotalElement = document.getElementById('grand-total');
+                    grandTotalElement.innerText = data.grand_total;
+
+                } else {
+                    // Handle the case where the action was not successful.
+                    console.error(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function removeFromCart(uid) {
+        fetch(`/products/cart_remove/${uid}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the row from the table
+                    const row = document.getElementById(`row-${uid}`);
+                    row.parentNode.removeChild(row);
+
+                    // Update the grand total
+                    const grandTotalElement = document.getElementById('grand-total');
+                    grandTotalElement.innerText = data.grand_total;
+
+                } else {
+                    // Handle the case where the action was not successful.
+                    console.error(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+
+
+{% endblock %}

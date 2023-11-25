@@ -2,5 +2,266 @@
 {% load static %}
 {% block title %}User Profile{% endblock  %}
 {% block content %}
-<h1>User Profile Page</h1>
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> My Account
+            </div>
+        </div>
+    </div>
+    <div class="container text-center pt-30">
+        <img src="{{ profile.profile_image.url }}" alt="Profile Image" width="150" class="rounded-circle">
+        <br>
+        <a href="/userauth/change_profile_image/{{request.user.userprofile.uid}}">Change Profile Picture</a>
+    </div>
+    
+    <section class="pt-100 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="dashboard-menu">
+                                <ul class="nav flex-column" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="add-address-tab" data-bs-toggle="tab" href="#add-address" role="tab" aria-controls="add-address" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Add Address</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Edit Profile</a>
+                                    </li>
+                                    {% comment %} <li class="nav-item">
+                                        <a class="nav-link" href="page-login-register.html"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                    </li> {% endcomment %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="tab-content dashboard-content">
+                                <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Hello {{user.first_name}}! </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a></p><br>
+                                            <p>Name: {{profile.user.first_name}} {{profile.user.last_name}}</p>
+                                            {% comment %} <p></p> {% endcomment %}
+                                            <p>Email: {{profile.user.email}}</p>
+                                            {% comment %} <p>{{profiile.last_name}}</p>
+                                            <p>{{profiile.last_name}}</p> {% endcomment %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="add-address" role="tabpanel" aria-labelledby="add-address-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Add Address</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            {% comment %} <p>Already have an account? <a href="page-login-register.html">Log in instead!</a></p> {% endcomment %}
+                                            <form method="post" action="{% url "add_address" %}">
+                                                {% csrf_token %}
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label>Phone Number <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="phone" type="text" >
+                                                    </div>
+                                                    {% comment %} <div class="form-group col-md-6">
+                                                        <label>Last Name <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="last_name" value="{{profile.user.last_name}}">
+                                                    </div> {% endcomment %}
+                                                    {% comment %} <div class="form-group col-md-12">
+                                                        <label>Display Name <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="dname" type="text">
+                                                    </div> {% endcomment %}
+                                                    <div class="form-group col-md-12">
+                                                        <label>Address <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="address" type="text" >
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>City <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="city" type="text">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>District <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="district" type="text">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>State <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="state" type="text">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>Pincode <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="pincode" type="text">
+                                                    </div>
+                                                    {% include "base/messages.html" %}
+                                                    <div class="col-md-12">
+                                                        <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Add</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Your Orders</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            {% comment %} <th>Order</th> {% endcomment %}
+                                                            <th>Date</th>
+                                                            <th>Status</th>
+                                                            <th>Total</th>
+                                                            <th>Actions</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for order in orders %}
+                                                        <tr>
+                                                            <td>{{order.created_at}}</td>
+                                                            <td>{{order.status}}</td>
+                                                            <td>{{order.amount_to_pay}}</td>
+                                                            <td><a href="/userauth/order_details/{{order.uid}}" class="btn-small d-block">View</a></td>
+                                                            {% if order.status == 'Confirmed' %}
+                                                            <td><a href="/userauth/cancel_order/{{order.uid}}" class="btn-danger p-2">Cancel</a></td>
+                                                            {% else %}
+                                                            <td>Already {{order.status}}</td>
+                                                            {% endif %}
+                                                            
+                                                        </tr>
+                                                        {% endfor %}
+                                                        {% comment %} <tr>
+                                                            <td>#2468</td>
+                                                            <td>June 29, 2020</td>
+                                                            <td>Completed</td>
+                                                            <td>$364.00 for 5 item</td>
+                                                            <td><a href="#" class="btn-small d-block">View</a></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#2366</td>
+                                                            <td>August 02, 2020</td>
+                                                            <td>Completed</td>
+                                                            <td>$280.00 for 3 item</td>
+                                                            <td><a href="#" class="btn-small d-block">View</a></td>
+                                                        </tr> {% endcomment %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Orders tracking</h5>
+                                        </div>
+                                        <div class="card-body contact-from-area">
+                                            <p>To track your order please enter your OrderID in the box below and press "Track" button. This was given to you on your receipt and in the confirmation email you should have received.</p>
+                                            <div class="row">
+                                                <div class="col-lg-8">
+                                                    <form class="contact-form-style mt-30 mb-50" action="#" method="post">
+                                                        <div class="input-style mb-20">
+                                                            <label>Order ID</label>
+                                                            <input name="order-id" placeholder="Found in your order confirmation email" type="text" class="square">
+                                                        </div>
+                                                        <div class="input-style mb-20">
+                                                            <label>Billing email</label>
+                                                            <input name="billing-email" placeholder="Email you used during checkout" type="email" class="square">
+                                                        </div>
+                                                        <button class="submit submit-auto-width" type="submit">Track</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                    <div class="row">
+                                        {% for address in addresses %}
+                                        <div class="col-lg-6">
+                                            <div class="card mb-3 mb-lg-0">
+                                                <div class="card-header">
+                                                    <h5 class="mb-0">Billing Address</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <address>{{address.address}},<br>{{address.city}},<br> {{address.district}},<br>{{address.state}},<br>{{address.pincode}},<br>{{address.phone_number}}</address><br>
+                                                    <a href="/userauth/edit_address/{{address.uid}}" class="btn-small">Edit</a><br>
+                                                    <a href="/userauth/delete_address/{{address.uid}}" class="btn-small">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% comment %} <div class="col-lg-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5 class="mb-0">Shipping Address</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <address>4299 Express Lane<br>
+                                                        Sarasota, <br>FL 34249 USA <br>Phone: 1.941.227.4444</address>
+                                                    <p>Sarasota</p>
+                                                    <a href="#" class="btn-small">Edit</a>
+                                                </div>
+                                            </div>
+                                        </div> {% endcomment %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Edit Profile</h5>
+                                        </div>
+                                        <div class="card-body">
+                                           {% comment %} <p>Already have an account? <a href="page-login-register.html">Log in instead!</a></p> {% endcomment %}
+                                            <form method="post" action="/userauth/edit_profile/{{request.user.userprofile.uid}}/">
+                                                {% csrf_token %}
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label>First Name <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="first_name" type="text" value="{{profile.user.first_name}}">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label>Last Name <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="last_name" value="{{profile.user.last_name}}">
+                                                    </div>
+                                                    {% include "base/messages.html" %}
+                                                    <div class="col-md-12">
+                                                        <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <br>
+                                            <a href="/userauth/change_password/{{request.user.userprofile.uid}}" class="btn">Change Password</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 {% endblock  %}

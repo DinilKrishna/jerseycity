@@ -159,13 +159,11 @@
                     <div class="widget-category mb-30">
                         <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
                         <ul class="categories">
-                            <li><a href="shop-grid-right.html">Shoes & Bags</a></li>
-                            <li><a href="shop-grid-right.html">Blouses & Shirts</a></li>
-                            <li><a href="shop-grid-right.html">Dresses</a></li>
-                            <li><a href="shop-grid-right.html">Swimwear</a></li>
-                            <li><a href="shop-grid-right.html">Beauty</a></li>
-                            <li><a href="shop-grid-right.html">Jewelry & Watch</a></li>
-                            <li><a href="shop-grid-right.html">Accessories</a></li>
+                            {% for category in categories %}
+                            <li><a href="shop-grid-right.html">{{category.category_name}}</a></li>
+                            {% endfor %}
+                            
+
                         </ul>
                     </div>
                     <!-- Filter By Price -->
