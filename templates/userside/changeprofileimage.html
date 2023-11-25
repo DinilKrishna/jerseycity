@@ -3,6 +3,15 @@
 {% block title %}Contact{% endblock  %}
 {% block content %}
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.css">
+
+<style>
+.not-visible {
+    display: none;
+}
+</style>
+
 <section class="pt-150 pb-150">
     <div class="container">
         <div class="row">
@@ -23,19 +32,18 @@
                                     <div class="card mb-4">
                                         <div class="card-body">
                                             <div>
-                                                <img src="{{ profile.profile_image.url }}" alt="Profile Image" width="150"><br><br>
+                                                <img src="{{ profile.profile_image.url }}" alt="Profile Image" width="150" id="preview-image"><br><br>
                                                 <label class="form-label">Upload New Picture</label>
-                                                <input class="form-control" type="file" name="profile_image" required>
-                                                
+                                                <input class="form-control" type="file" name="profile_image" id="id_file" required>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <button type="submit" class="btn btn-fill-out btn-block hover-up" name="">Save</button>
+                                        <button type="button" class="btn btn-primary mt-3" id="confirm-btn">Confirm</button>
                                     </div>
-                                    
 
+                                    <!-- Add the Confirm button here -->
                                 </form>
                                
                                 
@@ -51,5 +59,63 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM Loaded');  // Add this line
+        const input = document.getElementById('id_file');
+        const previewImage = document.getElementById('preview-image');
+        const confirmBtn = document.getElementById('confirm-btn');
+    
+        input.addEventListener('change', () => {
+            console.log('File selected');  // Add this line
+            const imgData = input.files[0];
+            console.log(imgData);
+            const imgUrl = URL.createObjectURL(imgData);
+            console.log(imgUrl);
+    
+            previewImage.src = imgUrl;
+            console.log(previewImage.src);
+    
+            const $image = $('#preview-image');
+            $image.cropper({
+                aspectRatio: 1,
+                viewMode: 1,
+                movable: true,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                autoCropArea: 0.8,
+            });
+
+            // Attach the confirm button's click event listener
+            confirmBtn.addEventListener('click', () => {
+                console.log('Confirm button clicked');  // Add this line
+                const cropper = $image.data('cropper');
+                cropper.getCroppedCanvas().toBlob((blob) => {
+                    const formData = new FormData();
+                    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                    formData.append('profile_image', blob, 'cropped-image.jpg');
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "change_profile_image" uid=profile.uid %}',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (response) => {
+                            console.log(response.status);
+                            window.location.href = `/userauth/userprofile/${response.uid}/`
+                        },
+                        error: (error) => {
+                            console.error(error);
+                        },
+                    });
+                });
+            });
+        });
+    });
+</script>
+    
+    
 
 {% endblock %}

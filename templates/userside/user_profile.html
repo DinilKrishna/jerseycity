@@ -13,7 +13,8 @@
         </div>
     </div>
     <div class="container text-center pt-30">
-        <img src="{{ profile.profile_image.url }}" alt="Profile Image" width="150" class="rounded-circle">
+        {% comment %} <img src="{{ profile.profile_image.url }}" alt="Profile Image" width="150" class="rounded-circle"> {% endcomment %}
+        <img src="{{ profile.profile_image.url }}?{{ profile.profile_image.date_added.timestamp }}" alt="Profile Image" width="150" class="rounded-circle">
         <br>
         <a href="/userauth/change_profile_image/{{request.user.userprofile.uid}}">Change Profile Picture</a>
     </div>

@@ -31,7 +31,6 @@ class Payment_Method(BaseModel):
 
 class Order(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # order_id = models.PositiveIntegerField(blank=True, null=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=10, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)

@@ -316,13 +316,22 @@ def user_profile(request, uid):
 def change_profile_image(request, uid):
     id = uid
     context = {}  
-    profile = UserProfile.objects.get(uid = uid)
+    profile = UserProfile.objects.get(uid=uid)
+    
     try:
         if request.method == 'POST':
             profile_image = request.FILES.get('profile_image') if 'profile_image' in request.FILES else None
-            profile.profile_image = profile_image
-            profile.save()
-            return redirect(reverse('user_profile', kwargs={'uid': id}))
+
+            # Ensure the image is not None before attempting to save
+            if profile_image:
+                # Add a timestamp to the image filename to make it unique
+                filename = f'profile_image_{timezone.now().timestamp()}.jpg'
+                profile.profile_image.save(filename, profile_image, save=True)
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'uid': uid,
+                })
     except Exception as e:
         return HttpResponse(e)
 
