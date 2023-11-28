@@ -41,42 +41,24 @@ def signup_page(request):
         logout(request)
     return render(request, 'pages/signup.html')
 
-# def otp(request, uid):
-    
-
-
-    
-    # if request.method == "POST":
-    #     random_num = random.randint(1000, 9999)
-    #     request.session['OTP_Key'] = random_num
-    #     send_otp_email(request.session['email'], random_num)
-    #     return redirect('verify_otp')
-    # return render(request, 'pages/otpverification.html')
-
-
-    # random_num=random.randint(1000,9999)
-    # request.session['OTP_Key']=random_num
-    # send_mail(
-    # "OTP AUTHENTICATING jersey_city",
-    # f"{random_num} -OTP",
-    # "dinilkrishna594@gmail.com",
-    # [request.session['email']],
-    # fail_silently=False,
-    # )
-    # print(random_num)
-    # # return redirect('verify_otp')
-    # return render(request,'pages/otpverification.html')
-
 
 def home_page(request):
     context = {}
+    uid = request.user.userprofile.uid
+    
+    # profile = UserProfile.objects.filter(uid = uid)
+    user_cart = Cart.objects.get(user_id = uid)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
     products = Product.objects.all().order_by('-updated_at')[:6]
     categories = Category.objects.all()
     sizes = Size.objects.all()
     context['categories'] = categories
     context['products'] = products
     context['sizes'] = sizes
-    # print(products)
+    context['number_in_cart'] = number_in_cart
     if request.user.is_authenticated and not request.user.is_staff:
         return render(request, 'pages/home.html', context)
     elif request.user.is_authenticated:
@@ -87,9 +69,13 @@ def home_page(request):
 def shop_page(request):
     context = {}
     products = Product.objects.filter(is_selling=True).order_by('created_at')
-    print('111')
-    print(products)
-    print()
+    user_id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = user_id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     categories = Category.objects.filter(is_listed = True)
     sizes = Size.objects.all()
 
@@ -155,6 +141,13 @@ def shop_page(request):
 def product_details(request, uid):
     try:
         context = {}
+        user_id = request.user.userprofile.uid
+        user_cart = Cart.objects.get(user_id = user_id)
+        cart_items = CartItems.objects.filter(cart = user_cart)
+        number_in_cart = 0
+        for item in cart_items:
+            number_in_cart += 1
+        context['number_in_cart'] = number_in_cart
         product_obj = Product.objects.get(uid = uid)
         product_img_obj = Product_Image.objects.get(product = product_obj)
         category_obj = product_obj.category
@@ -186,12 +179,28 @@ def product_details(request, uid):
 def about_page(request):
     if request.user.is_authenticated and request.user.is_staff:
         logout(request)
-    return render(request, 'pages/about.html')
+    context = {}
+    user_id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = user_id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
+    return render(request, 'pages/about.html', context)
 
 def contact_page(request):
     if request.user.is_authenticated and request.user.is_staff:
         logout(request)
-    return render(request, 'pages/contact.html')
+    context = {}
+    user_id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = user_id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
+    return render(request, 'pages/contact.html', context)
 
 def error(request):
     return render(request, '404/index.html')

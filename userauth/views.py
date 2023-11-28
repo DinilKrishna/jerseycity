@@ -185,7 +185,7 @@ def verify_otp(request, uid):
         else:
             messages.error(request, "Invalid otp")
             redirect(f'/otp/{user.uid}')
-    return render(request,'pages/otpverification.html')
+    return render(request,'pages/otpverification.html', {'remaining_time': remaining_time})
 
 
 def otp_login(request):
@@ -303,6 +303,12 @@ def user_profile(request, uid):
     if request.user.is_authenticated: 
         context = {}  
         profile = UserProfile.objects.get(uid = uid)
+        user_cart = Cart.objects.get(user_id = uid)
+        cart_items = CartItems.objects.filter(cart = user_cart)
+        number_in_cart = 0
+        for item in cart_items:
+            number_in_cart += 1
+        context['number_in_cart'] = number_in_cart
         addresses = Address.objects.filter(user = profile.user)
         orders = Order.objects.filter(user = profile.user)
         context['profile'] = profile 
@@ -314,9 +320,13 @@ def user_profile(request, uid):
 
 @login_required
 def change_profile_image(request, uid):
-    id = uid
     context = {}  
     profile = UserProfile.objects.get(uid=uid)
+    user_cart = Cart.objects.get(user_id = uid)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
     
     try:
         if request.method == 'POST':
@@ -336,6 +346,7 @@ def change_profile_image(request, uid):
         return HttpResponse(e)
 
     context['profile'] = profile 
+    context['number_in_cart']
     return render(request, 'userside/changeprofileimage.html', context)
 
 
@@ -362,7 +373,14 @@ def edit_profile(request, uid):
 @login_required
 def change_password(request, uid):
     id = uid
+    context = {}
     user_profile = get_object_or_404(UserProfile, uid=uid)
+    user_cart = Cart.objects.get(user_id = uid)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     if request.method == 'POST':
         current_password = request.POST['current_password']
         pass1 = request.POST['password']
@@ -385,7 +403,7 @@ def change_password(request, uid):
         user_profile.user.save()
         return redirect(reverse('user_profile', kwargs={'uid': id}))
 
-    return render(request, 'userside/changepassword.html')        
+    return render(request, 'userside/changepassword.html', context)        
 
 
 def is_valid_phone_number(phone_number):
@@ -498,6 +516,12 @@ def edit_address(request, uid):
     context = {}
     address = Address.objects.get(uid = uid)
     id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     if request.method == 'POST':
         address.phone_number = request.POST.get('phone')
         if not is_valid_phone_number(address.phone_number):
@@ -526,6 +550,7 @@ def edit_address(request, uid):
         address.save()
         return redirect(reverse('user_profile', kwargs={'uid': id}))
     context['address'] = address
+    context['number_in_cart'] = number_in_cart
     return render(request, 'userside/editaddress.html', context)
 
 
@@ -545,6 +570,7 @@ def delete_address(request, uid):
 @login_required
 def cart(request, uid):
     context = {}
+    
     try:
         profile = get_object_or_404(UserProfile, uid=uid)
         cart, created = Cart.objects.get_or_create(user=profile)
@@ -565,6 +591,10 @@ def cart(request, uid):
     except Exception as e:
         messages.error(request, e)
         return redirect('/404error')
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     
     return render(request, 'userside/cart.html', context)
 
@@ -572,6 +602,12 @@ def cart(request, uid):
 def order_details(request, uid):
     context = {}
     user_id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = user_id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     user = UserProfile.objects.get(uid = user_id)
     order = Order.objects.get(uid = uid)
     order_items = OrderItems.objects.filter(order = order)

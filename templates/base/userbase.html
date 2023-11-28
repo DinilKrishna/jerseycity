@@ -108,7 +108,7 @@
                                 {% if request.user.is_authenticated %}
                                 <a class="mini-cart-icon" href="/userauth/cart/{{ request.user.userprofile.uid }}">
                                     <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}">
-                                    {% comment %} <span class="pro-count blue">2</span> {% endcomment %}
+                                    <span class="pro-count blue">{{number_in_cart}}</span>
                                 </a>
                                 {% else %}
                                 <a class="mini-cart-icon" href="{% url "login_page" %}">
@@ -234,12 +234,12 @@
     <script src="{% static "assets/js/plugins/isotope.js" %}"></script>
     <script src="{% static "assets/js/plugins/scrollup.js" %}"></script>
     <script src="{% static "assets/js/plugins/jquery.vticker-min.js" %}"></script>
-    <script src="{% static "assets/js/plugins/jquery.theia.sticky.j" %}s"></script>
+    <script src="{% static "assets/js/plugins/jquery.theia.sticky.js" %}"></script>
     
     <script src="{% static "assets/js/main.js" %}"></script>
     <script src="{% static "assets/js/plugins/jquery.elevatezoom.js" %}"></script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js"></script>
     
     <script src="{% static "/assets/js/shop.js" %}"></script>

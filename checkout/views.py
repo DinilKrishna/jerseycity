@@ -16,6 +16,10 @@ def checkout(request):
     profile = UserProfile.objects.get(uid=uid)
     cart = Cart.objects.get(user=profile)
     cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     addresses = Address.objects.filter(unlisted=False, user=request.user)
     if not cart_items:
         messages.warning(request, "Cart is empty!")
@@ -115,6 +119,14 @@ def checkout(request):
 
 
 def add_new_address(request):
+    context = {}
+    user_id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = user_id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     if request.method == "POST":
         user = request.user
         phone_number = request.POST.get('phone')
@@ -146,11 +158,17 @@ def add_new_address(request):
         address.save()
 
         return redirect('checkout')
-    return render(request, 'checkout/addnewaddress.html')
+    return render(request, 'checkout/addnewaddress.html',context)
 
 
 def success_page(request, uid):
     context = {}
     user_id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = user_id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
     context['user_id'] = user_id 
     return render (request, 'checkout/successpage.html', context)

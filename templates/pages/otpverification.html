@@ -1,6 +1,6 @@
 {% extends "base/userbase.html" %}
 {% load static %}
-{% block title %}Contact{% endblock  %}
+{% block title %}OTP Verify{% endblock  %}
 {% block content %}
 
 <section class="pt-150 pb-150">
@@ -27,9 +27,9 @@
                                         <input type="text" name="otp" placeholder="Enter your OTP here" required>
                                     </div>
                                     
-                                    <div class="form-group">
+                                    {% comment %} <div class="form-group">
                                         <p id="countdowntext"><span id="countdown" class="countdown">30</span> seconds remaining</p>
-                                    </div>
+                                    </div> {% endcomment %}
                                     
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-fill-out btn-block hover-up" name="">Verify</button>
@@ -41,6 +41,7 @@
                                         Resend OTP
                                     </button>
                                 </a>
+                                <p id="countdowntext"><span id="countdown" class="countdown"></span> seconds remaining</p>
                             </div>
                         </div>
                     </div>
