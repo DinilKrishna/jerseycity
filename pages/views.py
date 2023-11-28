@@ -44,23 +44,25 @@ def signup_page(request):
 
 def home_page(request):
     context = {}
-    uid = request.user.userprofile.uid
     
-    # profile = UserProfile.objects.filter(uid = uid)
-    user_cart = Cart.objects.get(user_id = uid)
-    cart_items = CartItems.objects.filter(cart = user_cart)
-    number_in_cart = 0
-    for item in cart_items:
-        number_in_cart += 1
     products = Product.objects.all().order_by('-updated_at')[:6]
     categories = Category.objects.all()
     sizes = Size.objects.all()
     context['categories'] = categories
     context['products'] = products
     context['sizes'] = sizes
-    context['number_in_cart'] = number_in_cart
+    
     if request.user.is_authenticated and not request.user.is_staff:
-        return render(request, 'pages/home.html', context)
+        uid = request.user.userprofile.uid
+    
+        # profile = UserProfile.objects.filter(uid = uid)
+        user_cart = Cart.objects.get(user_id = uid)
+        cart_items = CartItems.objects.filter(cart = user_cart)
+        number_in_cart = 0
+        for item in cart_items:
+            number_in_cart += 1
+            context['number_in_cart'] = number_in_cart
+            return render(request, 'pages/home.html', context)
     elif request.user.is_authenticated:
         logout(request)
     return redirect('landing_page')
@@ -69,13 +71,14 @@ def home_page(request):
 def shop_page(request):
     context = {}
     products = Product.objects.filter(is_selling=True).order_by('created_at')
-    user_id = request.user.userprofile.uid
-    user_cart = Cart.objects.get(user_id = user_id)
-    cart_items = CartItems.objects.filter(cart = user_cart)
-    number_in_cart = 0
-    for item in cart_items:
-        number_in_cart += 1
-    context['number_in_cart'] = number_in_cart
+    if request.user.is_authenticated and not request.user.is_staff:
+        user_id = request.user.userprofile.uid
+        user_cart = Cart.objects.get(user_id = user_id)
+        cart_items = CartItems.objects.filter(cart = user_cart)
+        number_in_cart = 0
+        for item in cart_items:
+            number_in_cart += 1
+        context['number_in_cart'] = number_in_cart
     categories = Category.objects.filter(is_listed = True)
     sizes = Size.objects.all()
 
@@ -141,22 +144,19 @@ def shop_page(request):
 def product_details(request, uid):
     try:
         context = {}
-        user_id = request.user.userprofile.uid
-        user_cart = Cart.objects.get(user_id = user_id)
-        cart_items = CartItems.objects.filter(cart = user_cart)
-        number_in_cart = 0
-        for item in cart_items:
-            number_in_cart += 1
-        context['number_in_cart'] = number_in_cart
+        if request.user.is_authenticated and not request.user.is_staff:
+            user_id = request.user.userprofile.uid
+            user_cart = Cart.objects.get(user_id = user_id)
+            cart_items = CartItems.objects.filter(cart = user_cart)
+            number_in_cart = 0
+            for item in cart_items:
+                number_in_cart += 1
+            context['number_in_cart'] = number_in_cart
         product_obj = Product.objects.get(uid = uid)
         product_img_obj = Product_Image.objects.get(product = product_obj)
         category_obj = product_obj.category
         sizes = Size.objects.all()
         products_with_category = Product.objects.filter(category = category_obj)
-        # try:
-        #     category_offer(Product.objects.filter(uid = uid))
-        # except:
-        #     pass
         if request.method == "POST":
             size = request.POST.get('size')
             size_obj  = Size.objects.get(id = size)
@@ -166,6 +166,7 @@ def product_details(request, uid):
             # context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
             context['user'] = UserProfile.objects.get(user=request.user)
         # context['reviews'] = Review.objects.filter(product = product_obj).exclude(review = "")
+        print(product_obj.uid)
         context['products'] = product_obj
         context['sizes'] = sizes
         context['images'] = product_img_obj

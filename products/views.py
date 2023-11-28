@@ -7,32 +7,37 @@ from django.contrib import messages
 # Create your views here.
 
 @login_required
-def add_to_cart(request, product_uid, size_id):
+def add_to_cart(request):
     try:
-        product_obj = Product.objects.get(uid = product_uid)
-        size = Size.objects.get(id = size_id)
-        product_variant = Product_Variant.objects.get(product = product_obj, size = size)
-        cart, created = Cart.objects.get_or_create(user = request.user.userprofile)
-        if product_variant.stock <= 1:
-            messages.warning(request, "Out of Stock")
-            return redirect(request.META.get("HTTP_REFERER"))
-        
-        cart_item, item_created = CartItems.objects.get_or_create(
-            cart= cart, 
-            product = product_obj,
-            size = size
-            )
-        
-        if not item_created:
-            if cart_item.quantity < product_variant.stock:
-                cart_item.quantity += 1
-                cart_item.save()
-                messages.success(request, "Added to cart")
-            else:
-                messages.warning(request, "Out of stock")
-        return redirect(request.META.get("HTTP_REFERER"))
+        if request.method == 'POST':
+            product = request.POST.get('product_uid')
+            print(product)
+            size_id = request.POST.get('size_id')
+            print(size_id)
+            product_obj = Product.objects.get(uid = product)
+            size = Size.objects.get(id = size_id)
+            product_variant = Product_Variant.objects.get(product = product_obj, size = size_id)
+            cart, created = Cart.objects.get_or_create(user = request.user.userprofile)
+            if product_variant.stock <= 1:
+                return JsonResponse({'stock' : True})
+            
+            cart_item, item_created = CartItems.objects.get_or_create(
+                cart= cart, 
+                product = product_obj,
+                size = size
+                )
+            # messages.success(request, "Added to cart")
+            
+            if not item_created:
+                if cart_item.quantity < product_variant.stock:
+                    cart_item.quantity += 1
+                    cart_item.save()
+                else:
+                    return JsonResponse({'stock' : True})
+            return JsonResponse({'success': True})
     except Exception as e:
-        return HttpResponse(e)
+        print('excepteddddddddddddddddddddddddddddddddddddddddddddd')
+        return JsonResponse({'success': False, 'error_message': str(e)})
     
 
 def add_quantity(request, uid):

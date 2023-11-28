@@ -89,34 +89,31 @@
                                         </ul>
                                     </div>
                                     <div class="attr-detail attr-size">
-                                        
-                                        <form method="post">
-
-
-                                        
+                                        <form method="post" id="addToCartForm">
                                             {% csrf_token %}
                                             <label>Size : </label>
                                             <div class="border border-primary p-2">
-                                                <select class="" name="size" id="">
+                                                <select class="" name="size" id="select_size">
                                                     {% for size in sizes %}
-                                                    <option value="{{size.id}}">{{size.size}}</option>
+                                                        <option value="{{size.id}}">{{size.size}}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
-                                                
-                                    </div>
-                                    <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                                    <div class="detail-extralink">
-                                        <div class="product-extra-link2">
-                                            {% if request.user.is_authenticated and request.user.is_staff is False %} 
-                                                <button type="submit" class="btn-dark py-2 px-2">Add to Cart</button>
-                                            </form>
-                                            {% else %}
-                                                <a class="btn-hover-black" href="{% url "login_page" %}">Add to cart</a>
-                                            {% endif %}
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                            <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
-                                        </div>
+                                            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                                            <div class="detail-extralink">
+                                                <div class="product-extra-link2">
+                                                    {% if request.user.is_authenticated and request.user.is_staff is False %} 
+                                                    <button type="button" class="button button-add-to-cart" id="addToCartBtn" data-product-uid="{{ products.uid }}" data-size-id="{{ size.id }}">Add to Cart</button>
+                                                    {% else %}
+                                                        <button type="button" class="button button-add-to-cart" onclick="window.location.href='{% url "login_page" %}'">Add to cart</button>
+                                                    {% endif %}
+                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                                    <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                                </div>
+                                                <br><br>
+                                                {% include "base/messages.html" %}
+                                            </div>
+                                        </form>
                                     </div>
                                     <ul class="product-meta font-xs color-grey mt-50">
                                         <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
@@ -430,4 +427,49 @@
         </div>
     </section>
 </main>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#addToCartBtn').on('click', function () {
+            var productUid = $(this).data('product-uid');
+            var sizeId = $('#select_size').val();
+            console.log('Button clicked')
+            console.log(productUid)
+            console.log(sizeId)
+            // Send AJAX request
+            $.ajax({
+                url: '/products/add_to_cart/',  // Replace with the actual URL for your AJAX endpoint
+                method: 'POST',
+                data: {
+                    'product_uid': productUid,
+                    'size_id': sizeId,
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(), // Include CSRF token
+                },
+                success: function (data) {
+                    // Handle success response
+                    console.log('Product added to cart successfully');
+                    if (data.stock) {
+                        console.log('Out of stock');
+                        alert('Out of stock');
+                    } else {
+                        alert('Product added to cart successfully');
+                    }
+                },
+                
+                error: function (error) {
+                    // Handle error response
+                    console.error('Error adding product to cart');
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
 {% endblock %}
