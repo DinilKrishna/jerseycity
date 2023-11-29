@@ -144,7 +144,7 @@
                 <ul class="pagination justify-content-start">
                     {% if orders.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a>
+                            <a class="page-link" href="?page={{ orders.previous_page_number }}">&larr;</a>
                         </li>
                     {% endif %}
                     
@@ -156,7 +156,7 @@
         
                     {% if orders.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ orders.next_page_number }}">Next</a>
+                            <a class="page-link" href="?page={{ orders.next_page_number }}">&rarr;</a>
                         </li>
                     {% endif %}
                 </ul>

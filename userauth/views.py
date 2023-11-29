@@ -310,7 +310,7 @@ def user_profile(request, uid):
             number_in_cart += 1
         context['number_in_cart'] = number_in_cart
         addresses = Address.objects.filter(user = profile.user)
-        orders = Order.objects.filter(user = profile.user)
+        orders = Order.objects.filter(user = profile.user).order_by('-created_at')
         context['profile'] = profile 
         context['addresses'] = addresses
         context['orders'] = orders

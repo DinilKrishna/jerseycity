@@ -54,7 +54,7 @@ def checkout(request):
         else:
             messages.warning(request, "Please select an address.")
 
-        if payment_option == 'direct_bank_transfer':
+        if payment_option == 'wallet':
             # Handle Direct Bank Transfer logic
             messages.warning(request, 'You chose ', payment_option)
             print("Selected Payment Option: Direct Bank Transfer")
@@ -139,8 +139,8 @@ def create_order(request):
     print(selected_address_id)
     selected_address = Address.objects.get(uid=selected_address_id)
     payment_method_instance = Payment_Method.objects.get(method='razorpay')
-    print(payment_method_instance)
     profile = UserProfile.objects.get(uid=uid)
+    print(payment_method_instance)
     cart = Cart.objects.get(user=profile)
     cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
     order = Order.objects.create(
@@ -151,7 +151,8 @@ def create_order(request):
             district=selected_address.district,
             state=selected_address.state,
             pincode=selected_address.pincode,
-            payment_method=payment_method_instance
+            payment_method=payment_method_instance,
+            payed=True
         )
     print('Order created:', order.city)
     for item in cart_items:

@@ -44,6 +44,7 @@ class Order(BaseModel):
     amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
     status = models.CharField(max_length=50, null = True, blank = True)
+    payed = models.BooleanField(default=False)
     
 
 #     wallet_applied = models.BooleanField(default=False)

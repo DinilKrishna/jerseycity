@@ -137,7 +137,7 @@
                                                     <dd>
                                                         {% if order.payment_method.method == 'cash_on_delivery' and order.status == 'Delivered' %}
                                                         <span class="badge rounded-pill alert-success text-success">Payment done</span>
-                                                        {% elif order.payment_method.method == 'razorpay' and order.status == 'Confirmed' or order.status == 'Shipped' or order.status == 'Delivered' %}
+                                                        {% elif order.payed == True %}
                                                         <span class="badge rounded-pill alert-success text-success">Payment done</span>
                                                         {% else %}
                                                         <span class="badge rounded-pill alert-success text-warning">Payment not done</span>
