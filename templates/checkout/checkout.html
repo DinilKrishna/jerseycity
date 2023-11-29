@@ -15,13 +15,35 @@
     </div>
     <section class=" mb-50">
         <div class="container">
+            <div class="row">
+                
+                <div class="col-lg-12">
+                    <div class="toggle_info">
+                        <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
+                    </div>
+                    <div class="panel-collapse collapse coupon_form " id="coupon">
+                        <div class="panel-body">
+                            <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                            <form action="{% url "validate_coupon" %}" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input type="text" name="coupon_code" placeholder="Enter Coupon Code..." required>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-md">Apply Coupon</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            <form method="post">
             <div class="row">
                 <div class="col-12">
                     <div class="divider mt-50 mb-50"></div>
                 </div>
             </div>
+            <form method="post">
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-25">
@@ -62,27 +84,7 @@
                         </div>                   
                         
                         
-                        <div class="row">
-                
-                            <div class="col-lg-12">
-                                <div class="toggle_info">
-                                    <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
-                                </div>
-                                <div class="panel-collapse collapse coupon_form " id="coupon">
-                                    <div class="panel-body">
-                                        <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                                        <form action="#" method="post">
-                                            <div class="form-group">
-                                                <input type="text" placeholder="Enter Coupon Code...">
-                                            </div>
-                                            <div class="form-group">
-                                                <button class="btn  btn-md" name="login">Apply Coupon</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        
                     
                 </div>
                 
@@ -148,27 +150,5 @@
     </section>
 </main>
 
-<script>
-    function validateForm() {
-        var checkboxes = document.getElementsByName("selected_address");
-        var checkedCount = 0;
-
-        for (var i = 0; i < checkboxes.length; i++) {
-            if (checkboxes[i].checked) {
-                checkedCount++;
-            }
-        }
-
-        if (checkedCount === 0) {
-            alert("Please select at least one address.");
-            return false;
-        } else if (checkedCount > 1) {
-            alert("Please select only one address.");
-            return false;
-        }
-
-        return true;
-    }
-</script>
 
 {% endblock %}

@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from base.models import BaseModel
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save
+from userauth.models import UserProfile
 from products.models import Product, Size
 
 # Create your models here.
@@ -66,4 +67,15 @@ class OrderItems(BaseModel):
     discounted_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=40, default="Pending")
     is_paid = models.BooleanField(default=False)
+
+
+
+class Coupon(BaseModel):
+    code = models.CharField(max_length=10)
+    expiry_date = models.DateTimeField()
+    discount_percentage = models.IntegerField()
+    # maximum_use = models.IntegerField(default=1)
+    minimum_amount = models.IntegerField(default = 60)
+    unlisted = models.BooleanField(default=False)
+
 

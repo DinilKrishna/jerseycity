@@ -1,0 +1,33 @@
+{% extends "base/userbase.html" %}
+{% load static %}
+{% block title %}Razorpay{% endblock  %}
+
+{% block content %}
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        key: 'rzp_test_KSJKvKAn2yU3LA',
+        amount: {{ grand_total }},  // Use the actual amount from your Django context
+        currency: 'INR',
+        prefill: {
+            name: '{{ user.first_name }}',
+            email: '{{ user.email }}',
+            notes: {
+                success_url: "{% url 'create_order' %}"
+            }
+        },
+        handler: function(response) {
+            if (response.razorpay_payment_id) {
+                window.location.href = "{% url 'create_order' %}";
+            } else {
+                console.log('Payment failed or canceled');
+            }
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+</script>
+{% endblock %}

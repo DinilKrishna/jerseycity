@@ -6,3 +6,4 @@ from . models import *
 admin.site.register(Address)
 admin.site.register(Payment_Method)
 admin.site.register(Order)
+admin.site.register(Coupon)

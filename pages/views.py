@@ -45,7 +45,7 @@ def signup_page(request):
 def home_page(request):
     context = {}
     
-    products = Product.objects.all().order_by('-updated_at')[:6]
+    products = Product.objects.filter(is_selling=True).order_by('-updated_at')[:6]
     categories = Category.objects.all()
     sizes = Size.objects.all()
     context['categories'] = categories
@@ -54,8 +54,6 @@ def home_page(request):
     
     if request.user.is_authenticated and not request.user.is_staff:
         uid = request.user.userprofile.uid
-    
-        # profile = UserProfile.objects.filter(uid = uid)
         user_cart = Cart.objects.get(user_id = uid)
         cart_items = CartItems.objects.filter(cart = user_cart)
         number_in_cart = 0
