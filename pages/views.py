@@ -165,7 +165,9 @@ def product_details(request, uid):
             context['user'] = UserProfile.objects.get(user=request.user)
         # context['reviews'] = Review.objects.filter(product = product_obj).exclude(review = "")
         print(product_obj.uid)
+        offer_percentage = (1 - (product_obj.selling_price/product_obj.price)) * 100
         context['products'] = product_obj
+        context['offer_percentage'] = round(offer_percentage)
         context['sizes'] = sizes
         context['images'] = product_img_obj
         context['category_products'] = products_with_category

@@ -305,6 +305,7 @@ def user_profile(request, uid):
     if request.user.is_authenticated: 
         context = {}  
         profile = UserProfile.objects.get(uid = uid)
+        wallet = Wallet.objects.get(user = profile)
         try:
             user_cart = Cart.objects.get(user_id = uid)
             cart_items = CartItems.objects.filter(cart = user_cart)
@@ -317,6 +318,7 @@ def user_profile(request, uid):
         addresses = Address.objects.filter(user = profile.user)
         orders = Order.objects.filter(user = profile.user).order_by('-created_at')
         context['profile'] = profile 
+        context['wallet'] = wallet
         context['addresses'] = addresses
         context['orders'] = orders
         return render(request, 'userside/user_profile.html', context)
@@ -629,6 +631,21 @@ def order_details(request, uid):
 def cancel_order(request, uid):
     order = Order.objects.get(uid = uid)
     order.status = 'Cancelled'
+    print(order.payment_method)
+    if order.payment_method.method == 'razorpay' or order.payment_method.method == 'wallet':
+        profile = UserProfile.objects.get(uid = request.user.userprofile.uid)
+        wallet = Wallet.objects.get(user = profile)
+        wallet.amount += order.amount_to_pay
+        print(order.amount_to_pay)
+        print(wallet.amount)
+        wallet.save()
+        order_items = OrderItems.objects.filter(order = order)
+    order_items = OrderItems.objects.filter(order = order)
+    for item in order_items:
+        product = Product_Variant.objects.get(product = item.product, size = item.size)
+        product.stock += item.quantity
+        product.sold -= item.quantity
+        product.save()
     order.save()
     return redirect(request.META.get("HTTP_REFERER"))
 
