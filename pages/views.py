@@ -59,8 +59,8 @@ def home_page(request):
         number_in_cart = 0
         for item in cart_items:
             number_in_cart += 1
-            context['number_in_cart'] = number_in_cart
-            return render(request, 'pages/home.html', context)
+        context['number_in_cart'] = number_in_cart
+        return render(request, 'pages/home.html', context)
     elif request.user.is_authenticated:
         logout(request)
     return redirect('landing_page')

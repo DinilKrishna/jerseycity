@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 import random
 from django.core.mail import send_mail
 from products.models import *
-from checkout.models import Address, Order, OrderItems
+from checkout.models import Address, Order, OrderItems, Wallet
 from userauth.decorator import login_required
 from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
@@ -153,7 +153,9 @@ def sign_up(request):
                 request.session['otp_expiration'] = time.time() + expiration_time
             except Exception as e:
                 print(f"Error sending email: {e}")
-            UserProfile.objects.create(user=user)
+            userprofile = UserProfile.objects.create(user=user)
+            Wallet.objects.create(user = userprofile)
+            Cart.objects.create(user = userprofile)
             return redirect(f'/userauth/verify_otp/{user.userprofile.uid}')
 
     return render(request, 'pages/signup.html')
@@ -303,12 +305,15 @@ def user_profile(request, uid):
     if request.user.is_authenticated: 
         context = {}  
         profile = UserProfile.objects.get(uid = uid)
-        user_cart = Cart.objects.get(user_id = uid)
-        cart_items = CartItems.objects.filter(cart = user_cart)
-        number_in_cart = 0
-        for item in cart_items:
-            number_in_cart += 1
-        context['number_in_cart'] = number_in_cart
+        try:
+            user_cart = Cart.objects.get(user_id = uid)
+            cart_items = CartItems.objects.filter(cart = user_cart)
+            number_in_cart = 0
+            for item in cart_items:
+                number_in_cart += 1
+            context['number_in_cart'] = number_in_cart
+        except:
+            pass
         addresses = Address.objects.filter(user = profile.user)
         orders = Order.objects.filter(user = profile.user).order_by('-created_at')
         context['profile'] = profile 
@@ -568,11 +573,13 @@ def delete_address(request, uid):
 
 
 @login_required
-def cart(request, uid):
+def cart(request):
+    uid = request.user.userprofile.uid
+    print(uid)
     context = {}
     
     try:
-        profile = get_object_or_404(UserProfile, uid=uid)
+        profile = UserProfile.objects.get(uid = uid)
         cart, created = Cart.objects.get_or_create(user=profile)
         cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
         out_of_stock = any(

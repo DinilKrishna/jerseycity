@@ -39,8 +39,8 @@
                         Cash On Delivery
                         {% elif order.payment_method.method == 'razorpay' %}
                         RazorPay
-                        {% elif order.payment_method.method == 'direct_bank_transfer' %}
-                        Bank Transfer
+                        {% elif order.payment_method.method == 'wallet' %}
+                        Wallet
                         {% else %}
                         None
                         {% endif %}</p>

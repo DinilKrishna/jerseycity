@@ -106,7 +106,7 @@
                             </div>
                             <div class="header-action-icon-2">
                                 {% if request.user.is_authenticated %}
-                                <a class="mini-cart-icon" href="/userauth/cart/{{ request.user.userprofile.uid }}">
+                                <a class="mini-cart-icon" href="/userauth/cart/">
                                     <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}">
                                     <span class="pro-count blue">{{number_in_cart}}</span>
                                 </a>

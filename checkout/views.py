@@ -56,8 +56,10 @@ def checkout(request):
 
         if payment_option == 'wallet':
             # Handle Direct Bank Transfer logic
+            
             messages.warning(request, 'You chose ', payment_option)
             print("Selected Payment Option: Direct Bank Transfer")
+            return redirect('wallet_payment')
         elif payment_option == 'razorpay':
             
             print("Selected Payment Option: RazorPay")
@@ -77,8 +79,7 @@ def checkout(request):
             # Handle Cash on Delivery logic
             print("Selected Payment Option: Cash on Delivery")
 
-            payment_method_instance = Payment_Method.objects.get(method='cash_on_delivery')
-            
+            payment_method_instance = Payment_Method.objects.get(method='cash_on_delivery')            
             print('instance: ', payment_method_instance)
 
             order = Order.objects.create(
@@ -131,6 +132,93 @@ def checkout(request):
         return redirect(request.META.get("HTTP_REFERER"))
     
     return render(request, 'checkout/checkout.html', context)
+
+
+def wallet_payment(request):
+    context = {}
+    uid = request.user.userprofile.uid
+    user = UserProfile.objects.get(uid = uid)
+    cart_items = CartItems.objects.filter(cart__user=user,product__is_selling = True,product__category__is_listed = True)
+    wallet = Wallet.objects.get(user=user)
+    out_of_stock = False
+    grand_total = 0
+    for cart_item in cart_items:
+        sub_total = cart_item.calculate_sub_total()
+        grand_total += sub_total
+        variant = Product_Variant.objects.get(product = cart_item.product, size = cart_item.size)
+        if cart_item.quantity > variant.stock:
+            out_of_stock = True
+    remaining_balance = wallet.amount - grand_total
+    if request.method == 'POST':
+        if wallet.amount < grand_total:
+            messages.error(request, 'Not enough balance in wallet')
+            return redirect(request.META.get("HTTP_REFERER"))
+        print('wallet.amount')
+        wallet.amount = remaining_balance
+        print('                   ',wallet.amount)
+        wallet.save()
+        print('                                       ',wallet.amount)
+        uid = request.user.userprofile.uid
+        selected_address_id = request.session.get('selected_address_id')
+        print(selected_address_id)
+        selected_address = Address.objects.get(uid=selected_address_id)
+        payment_method_instance = Payment_Method.objects.get(method='wallet')
+        profile = UserProfile.objects.get(uid=uid)
+        print(payment_method_instance)
+        cart = Cart.objects.get(user=profile)
+        cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
+        order = Order.objects.create(
+                user=request.user,
+                address=selected_address,
+                phone_number=selected_address.phone_number,
+                city=selected_address.city,
+                district=selected_address.district,
+                state=selected_address.state,
+                pincode=selected_address.pincode,
+                payment_method=payment_method_instance,
+                payed=True
+            )
+        print('Order created:', order.city)
+        for item in cart_items:
+            sub_total = item.quantity * item.product.selling_price
+
+            order_item = OrderItems.objects.create(
+                order=order,  
+                product=item.product,
+                quantity=item.quantity,
+                product_price=item.product.selling_price,
+                size=item.size,
+                sub_total=sub_total,
+                discounted_subtotal=sub_total,
+            )
+
+            product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
+            product_stock.stock -= item.quantity
+            product_stock.sold += item.quantity
+            product_stock.save()
+            print('Product stock updated')
+
+        order.calculate_bill_amount()
+        order.amount_to_pay = order.bill_amount
+        order.status = 'Confirmed'
+        order.save()
+        print('Order saved again')
+
+        # Clear the user's cart
+        cart_items.delete()
+        print('Cart cleared')
+
+        return redirect(f'/checkout/success_page/')
+        
+    context['user'] = user
+    context['out_of_stock'] = out_of_stock
+    context['products'] = cart_items
+    context['grand_total'] = grand_total
+    context['wallet'] = wallet
+    
+    
+    context['remaining_balance'] = remaining_balance
+    return render(request, 'checkout/wallet.html', context)
 
 
 def create_order(request):
