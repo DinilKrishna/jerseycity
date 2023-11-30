@@ -54,12 +54,20 @@ def home_page(request):
     
     if request.user.is_authenticated and not request.user.is_staff:
         uid = request.user.userprofile.uid
+        profile = UserProfile.objects.get(uid = uid)
         user_cart = Cart.objects.get(user_id = uid)
         cart_items = CartItems.objects.filter(cart = user_cart)
         number_in_cart = 0
         for item in cart_items:
             number_in_cart += 1
         context['number_in_cart'] = number_in_cart
+        wishlist = Wishlist.objects.get(user = profile)
+        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+        wishlist_items
+        number_in_wishlist = 0
+        for item in wishlist_items:
+            number_in_wishlist += 1
+        context['number_in_wishlist'] = number_in_wishlist
         return render(request, 'pages/home.html', context)
     elif request.user.is_authenticated:
         logout(request)
@@ -71,12 +79,20 @@ def shop_page(request):
     products = Product.objects.filter(is_selling=True).order_by('created_at')
     if request.user.is_authenticated and not request.user.is_staff:
         user_id = request.user.userprofile.uid
+        profile = UserProfile.objects.get(uid = user_id)
         user_cart = Cart.objects.get(user_id = user_id)
         cart_items = CartItems.objects.filter(cart = user_cart)
         number_in_cart = 0
         for item in cart_items:
             number_in_cart += 1
         context['number_in_cart'] = number_in_cart
+        wishlist = Wishlist.objects.get(user = profile)
+        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+        wishlist_items
+        number_in_wishlist = 0
+        for item in wishlist_items:
+            number_in_wishlist += 1
+        context['number_in_wishlist'] = number_in_wishlist
     categories = Category.objects.filter(is_listed = True)
     sizes = Size.objects.all()
 
@@ -175,12 +191,20 @@ def product_details(request, uid):
         context = {}
         if request.user.is_authenticated and not request.user.is_staff:
             user_id = request.user.userprofile.uid
+            profile = UserProfile.objects.get(uid = uid)
             user_cart = Cart.objects.get(user_id = user_id)
             cart_items = CartItems.objects.filter(cart = user_cart)
             number_in_cart = 0
             for item in cart_items:
                 number_in_cart += 1
             context['number_in_cart'] = number_in_cart
+            wishlist = Wishlist.objects.get(user = profile)
+            wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+            wishlist_items
+            number_in_wishlist = 0
+            for item in wishlist_items:
+                number_in_wishlist += 1
+            context['number_in_wishlist'] = number_in_wishlist
         product_obj = Product.objects.get(uid = uid)
         product_img_obj = Product_Image.objects.get(product = product_obj)
         category_obj = product_obj.category
@@ -213,12 +237,20 @@ def about_page(request):
         logout(request)
     context = {}
     user_id = request.user.userprofile.uid
+    profile = UserProfile.objects.get(uid = user_id)
     user_cart = Cart.objects.get(user_id = user_id)
     cart_items = CartItems.objects.filter(cart = user_cart)
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
     context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    wishlist_items
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     return render(request, 'pages/about.html', context)
 
 def contact_page(request):
@@ -226,12 +258,20 @@ def contact_page(request):
         logout(request)
     context = {}
     user_id = request.user.userprofile.uid
+    profile = UserProfile.objects.get(uid = user_id)
     user_cart = Cart.objects.get(user_id = user_id)
     cart_items = CartItems.objects.filter(cart = user_cart)
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
     context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    wishlist_items
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     return render(request, 'pages/contact.html', context)
 
 def error(request):

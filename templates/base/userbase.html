@@ -99,10 +99,17 @@
                                 <button type="submit">Search</button>
                             </div>
                             <div class="header-action-icon-2">
-                                <a href="shop-wishlist.html">
+                                {% if request.user.is_authenticated %}
+                                <a href="{% url "wishlist" %}">
                                     <img class="svgInject" alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}">
-                                    <span class="pro-count blue" id=cartCount>4</span>
+                                    <span class="pro-count blue" id="cartCount">{{number_in_wishlist}}</span>
                                 </a>
+                                {% else %}
+                                <a href="{% url "wishlist" %}">
+                                    <img class="svgInject" alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}">
+                                    {% comment %} <span class="pro-count blue" id="cartCount">4</span> {% endcomment %}
+                                </a>
+                                {% endif %}
                             </div>
                             <div class="header-action-icon-2">
                                 {% if request.user.is_authenticated %}

@@ -24,4 +24,5 @@ urlpatterns = [
     path('change_profile_image/<uid>/',views.change_profile_image, name = 'change_profile_image'),
     path('order_details/<uid>/',views.order_details, name = 'order_details'),    
     path('cancel_order/<uid>/',views.cancel_order, name = 'cancel_order'),
+    path('wishlist/',views.wishlist, name = 'wishlist'),
 ]

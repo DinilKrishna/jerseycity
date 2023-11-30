@@ -156,6 +156,7 @@ def sign_up(request):
             userprofile = UserProfile.objects.create(user=user)
             Wallet.objects.create(user = userprofile)
             Cart.objects.create(user = userprofile)
+            Wishlist.objects.create(user = userprofile)
             return redirect(f'/userauth/verify_otp/{user.userprofile.uid}')
 
     return render(request, 'pages/signup.html')
@@ -306,15 +307,21 @@ def user_profile(request, uid):
         context = {}  
         profile = UserProfile.objects.get(uid = uid)
         wallet = Wallet.objects.get(user = profile)
-        try:
-            user_cart = Cart.objects.get(user_id = uid)
-            cart_items = CartItems.objects.filter(cart = user_cart)
-            number_in_cart = 0
-            for item in cart_items:
-                number_in_cart += 1
-            context['number_in_cart'] = number_in_cart
-        except:
-            pass
+        
+        user_cart = Cart.objects.get(user_id = uid)
+        cart_items = CartItems.objects.filter(cart = user_cart)
+        number_in_cart = 0
+        for item in cart_items:
+            number_in_cart += 1
+        context['number_in_cart'] = number_in_cart
+        
+        wishlist = Wishlist.objects.get(user = profile)
+        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+        wishlist_items
+        number_in_wishlist = 0
+        for item in wishlist_items:
+            number_in_wishlist += 1
+        context['number_in_wishlist'] = number_in_wishlist
         addresses = Address.objects.filter(user = profile.user)
         orders = Order.objects.filter(user = profile.user).order_by('-created_at')
         context['profile'] = profile 
@@ -334,6 +341,13 @@ def change_profile_image(request, uid):
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    wishlist_items
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     
     try:
         if request.method == 'POST':
@@ -388,6 +402,13 @@ def change_password(request, uid):
     for item in cart_items:
         number_in_cart += 1
     context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = user_profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    wishlist_items
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     if request.method == 'POST':
         current_password = request.POST['current_password']
         pass1 = request.POST['password']
@@ -523,12 +544,20 @@ def edit_address(request, uid):
     context = {}
     address = Address.objects.get(uid = uid)
     id = request.user.userprofile.uid
+    profile = UserProfile.objects.get(uid = id)
     user_cart = Cart.objects.get(user_id = id)
     cart_items = CartItems.objects.filter(cart = user_cart)
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
     context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    wishlist_items
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     if request.method == 'POST':
         address.phone_number = request.POST.get('phone')
         if not is_valid_phone_number(address.phone_number):
@@ -575,9 +604,36 @@ def delete_address(request, uid):
 
 
 @login_required
+def wishlist(request):
+    uid = request.user.userprofile.uid
+    context = {}
+    try:
+        profile = UserProfile.objects.get(uid = uid)
+        wishlist, created = Wishlist.objects.get_or_create(user = profile)
+        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)         
+    
+        context['user'] = profile
+        context['products'] = wishlist_items
+    except Exception as e:
+        messages.error(request, e)
+        return redirect('/404error')
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
+    cart = Cart.objects.get(user=profile)
+    cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
+
+    
+    return render(request, 'userside/wishlist.html', context)
+
+@login_required
 def cart(request):
     uid = request.user.userprofile.uid
-    print(uid)
     context = {}
     
     try:
@@ -604,6 +660,13 @@ def cart(request):
     for item in cart_items:
         number_in_cart += 1
     context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    wishlist_items
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     
     return render(request, 'userside/cart.html', context)
 
@@ -611,12 +674,20 @@ def cart(request):
 def order_details(request, uid):
     context = {}
     user_id = request.user.userprofile.uid
+    profile = UserProfile.objects.get(uid = user_id)
     user_cart = Cart.objects.get(user_id = user_id)
     cart_items = CartItems.objects.filter(cart = user_cart)
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
     context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    wishlist_items
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     user = UserProfile.objects.get(uid = user_id)
     order = Order.objects.get(uid = uid)
     order_items = OrderItems.objects.filter(order = order)

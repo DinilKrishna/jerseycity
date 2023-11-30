@@ -101,3 +101,19 @@ class CartItems(BaseModel):
 
     def calculate_sub_total(self):
         return self.product.selling_price * self.quantity
+    
+
+class Wishlist(BaseModel):
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    product = models.ManyToManyField(Product, through="WishlistItems")
+
+    def __str__(self) -> str:
+        return f'{self.user.user.username} : Wishlist'
+    
+class WishlistItems(BaseModel):
+    wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+                                            
+    
+    def __str__(self) -> str:
+        return f'{self.quantity} x {self.product.product_name} in Cart'
