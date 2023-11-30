@@ -92,7 +92,7 @@
     <section class="product-tabs pt-25 pb-20 wow fadeIn animated">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3">
+                {% comment %} <div class="col-lg-3">
                     <div class="widget-category mb-30">
                         <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
                         <ul class="categories">
@@ -120,16 +120,16 @@
                             <li><a href="shop-grid-right.html">800$+</a></li>
                         </ul>
                     </div>
-                    {% comment %} <div class="banner-img wow fadeIn mb-45mb-lg-0 animated d-lg-block d-none">
+                    <div class="banner-img wow fadeIn mb-45mb-lg-0 animated d-lg-block d-none">
                         <img src="{% static "assets/imgs/banner/banner-11.jpg" %}" alt="">
                         <div class="banner-text">
                             <span>Women Zone</span>
                             <h4>Save 17% on <br>Office Dress</h4>
                             <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
                         </div>
-                    </div> {% endcomment %}
-                </div>
-                <div class="col-lg-9">
+                    </div>
+                </div> {% endcomment %}
+                <div class="col-lg-12">
                     <div class="tab-header">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -156,7 +156,7 @@
                                             <div class="product-img product-img-zoom">
                                                 <a href="/product_details/{{product.uid}}">
                                                     <img class="default-img" src="{{ product.image_front.url }}" alt="">
-                                                    <img class="hover-img" src="{% static 'assets/imgs/shop/product-1-2.webp' %}" alt="">
+                                                    <img class="hover-img" src="{{ product.image_front.url }}" alt="">
                                                 </a>                                                    
                                             </div>
                                             <div class="product-action-1">
@@ -196,7 +196,7 @@
                             <!--End product-grid-4-->
                         </div>
                         <!--En tab two (Popular)-->
-                        <div class="tab-pane fade" id="tab-three" role="tabpanel" aria-labelledby="tab-three">
+                        {% comment %} <div class="tab-pane fade" id="tab-three" role="tabpanel" aria-labelledby="tab-three">
                             <div class="row product-grid-4">
                                 <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                                     <div class="product-cart-wrap mb-30">
@@ -239,7 +239,7 @@
                                 
                             </div>
                             <!--End product-grid-4-->
-                        </div>
+                        </div> {% endcomment %}
                         <!--En tab three (New added)-->
                     </div>
                     <!--End tab-content-->

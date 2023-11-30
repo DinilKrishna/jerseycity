@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -91,6 +91,36 @@ def shop_page(request):
         Q(description__icontains=search_query))
     ).order_by('created_at')
 
+    # Initialize selected_category as None
+    selected_category = None
+    # Get the selected category from the GET parameters
+    selected_category_id = request.GET.get('category_id')
+    if selected_category_id:
+        selected_category = get_object_or_404(Category, pk=selected_category_id)
+        products = products.filter(category=selected_category)
+
+    price_range = request.GET.get('price_range')
+
+    if price_range:
+        price_ranges = [
+            ('0-40', Q(selling_price__lte=40)),
+            ('40-60', Q(selling_price__gt=40, selling_price__lte=60)),
+            ('60+', Q(selling_price__gt=60)),
+        ]
+
+        selected_price_filter = None
+
+        for range_key, q_object in price_ranges:
+            if range_key == '60+' and price_range.startswith('60'):
+                selected_price_filter = q_object
+                break
+            elif range_key == price_range:
+                selected_price_filter = q_object
+                break
+
+        if selected_price_filter:
+            products = products.filter(selected_price_filter)
+
     items_per_page = 3
     paginator = Paginator(products, items_per_page)
     
@@ -131,6 +161,7 @@ def shop_page(request):
     page_numbers = range(start_page, end_page + 1)
 
     context['categories'] = categories
+    context['selected_category'] = selected_category
     context['products'] = products
     context['sizes'] = sizes
     context['page_numbers'] = page_numbers

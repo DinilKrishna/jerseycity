@@ -620,8 +620,6 @@ def order_details(request, uid):
     user = UserProfile.objects.get(uid = user_id)
     order = Order.objects.get(uid = uid)
     order_items = OrderItems.objects.filter(order = order)
-    # print(order_items)
-    print('bllllllllllllllll',order.payment_method)
     context['user'] = user
     context['order'] = order
     context['order_items'] = order_items
@@ -636,8 +634,6 @@ def cancel_order(request, uid):
         profile = UserProfile.objects.get(uid = request.user.userprofile.uid)
         wallet = Wallet.objects.get(user = profile)
         wallet.amount += order.amount_to_pay
-        print(order.amount_to_pay)
-        print(wallet.amount)
         wallet.save()
         order_items = OrderItems.objects.filter(order = order)
     order_items = OrderItems.objects.filter(order = order)
