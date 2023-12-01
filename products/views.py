@@ -101,3 +101,16 @@ def remove_from_cart(request, uid):
         return HttpResponse("Cart not found")
     except Exception as e:
         return redirect("/404error")
+    
+
+def add_to_wishlist(request, uid):
+    try:
+        product = Product.objects.get(uid=uid)
+        user_id = request.user.userprofile.uid
+        user = UserProfile.objects.get(uid=user_id)
+        wishlist = Wishlist.objects.get(user=user)
+        wishlist_item = WishlistItems.objects.create(wishlist=wishlist, product=product)
+        wishlist_item.save()
+        return JsonResponse({'success': True, 'message': 'Product added to wishlist successfully'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})

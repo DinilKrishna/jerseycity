@@ -103,12 +103,18 @@
                                             <div class="detail-extralink">
                                                 <div class="product-extra-link2">
                                                     {% if request.user.is_authenticated and request.user.is_staff is False %} 
-                                                    <button type="button" class="button button-add-to-cart" id="addToCartBtn" data-product-uid="{{ products.uid }}" data-size-id="{{ size.id }}">Add to Cart</button>
+                                                        <button type="button" class="button hover-up button-add-to-cart" id="addToCartBtn" data-product-uid="{{ products.uid }}" data-size-id="{{ size.id }}">Add to Cart</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                     {% else %}
-                                                        <button type="button" class="button button-add-to-cart" onclick="window.location.href='{% url "login_page" %}'">Add to cart</button>
+                                                        <button type="button" class="button hover-up button-add-to-cart" onclick="window.location.href='{% url "login_page" %}'">Add to cart</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                     {% endif %}
-                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                                    <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                                    {% if request.user.is_authenticated and request.user.is_staff is False %}
+                                                        <button type="button" class="button hover-up button-add-to-wishlist p-2 px-3" id="addToWishlistBtn" data-product-uid="{{ products.uid }}">
+                                                            <i class="fi-rs-heart"></i>
+                                                        </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    {% else %}
+                                                        <a aria-label="Add To Wishlist" class="action-btn hover-up" href="{% url "login_page" %}"><i class="fi-rs-heart"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    {% endif %}
+                                                    <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                 </div>
                                                 <br><br>
                                                 {% include "base/messages.html" %}
@@ -468,8 +474,39 @@
 </script>
 
 
-
-
+<script>
+    $(document).ready(function () {
+        $('#addToWishlistBtn').on('click', function () {
+            var productUid = $(this).data('product-uid');
+            console.log('Button clicked');
+            console.log(productUid);
+            
+            // Send AJAX request
+            $.ajax({
+                url: `/products/add_to_wishlist/${productUid}/`,
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                },
+                success: function (data) {
+                    // Handle success response
+                    if (data.success) {
+                        console.log('Product added to wishlist successfully');
+                        alert('Product added to wishlist successfully');
+                    } else {
+                        console.error('Error adding product to wishlist:', data.message);
+                        alert('Error adding product to wishlist: ' + data.message);
+                    }
+                },
+                error: function (error) {
+                    // Handle error response
+                    console.error('Error adding product to wishlist:', error.responseText);
+                    alert('Error adding product to wishlist: ' + error.responseText);
+                }
+            });
+        });
+    });
+</script>
 
 
 {% endblock %}

@@ -367,7 +367,7 @@ def change_profile_image(request, uid):
         return HttpResponse(e)
 
     context['profile'] = profile 
-    context['number_in_cart']
+    context['number_in_cart'] = number_in_cart
     return render(request, 'userside/changeprofileimage.html', context)
 
 

@@ -55,15 +55,14 @@ def home_page(request):
     if request.user.is_authenticated and not request.user.is_staff:
         uid = request.user.userprofile.uid
         profile = UserProfile.objects.get(uid = uid)
-        user_cart = Cart.objects.get(user_id = uid)
-        cart_items = CartItems.objects.filter(cart = user_cart)
+        user_cart = Cart.objects.get(user = profile)
+        cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
         number_in_cart = 0
         for item in cart_items:
             number_in_cart += 1
         context['number_in_cart'] = number_in_cart
         wishlist = Wishlist.objects.get(user = profile)
         wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
-        wishlist_items
         number_in_wishlist = 0
         for item in wishlist_items:
             number_in_wishlist += 1
@@ -191,7 +190,7 @@ def product_details(request, uid):
         context = {}
         if request.user.is_authenticated and not request.user.is_staff:
             user_id = request.user.userprofile.uid
-            profile = UserProfile.objects.get(uid = uid)
+            profile = UserProfile.objects.get(uid = user_id)
             user_cart = Cart.objects.get(user_id = user_id)
             cart_items = CartItems.objects.filter(cart = user_cart)
             number_in_cart = 0
@@ -217,7 +216,7 @@ def product_details(request, uid):
 
         if request.user.is_authenticated and request.user.is_staff is False:
             # context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
-            context['user'] = UserProfile.objects.get(user=request.user)
+            context['user'] = profile
         # context['reviews'] = Review.objects.filter(product = product_obj).exclude(review = "")
         print(product_obj.uid)
         offer_percentage = (1 - (product_obj.selling_price/product_obj.price)) * 100
