@@ -44,7 +44,7 @@
                                         {% comment %} <button class="btn btn-sm"><i class="fi-rs-shopping-bag mr-5"></i>View Product</button> {% endcomment %}
                                         <a href="/product_details/{{product.product.uid}}" class="btn btn-sm"><i class="fi-rs-shopping-bag mr-5"></i>View Product</a>
                                     </td>
-                                    <td class="action" data-title="Remove"><a href="#"><i class="fi-rs-trash"></i></a></td>
+                                    <td class="action" data-title="Remove"><a href="/products/remove_from_wishlist/{{product.product.uid}}"><i class="fi-rs-trash"></i></a></td>
                                 </tr>
                                 {% endfor %}
                                 

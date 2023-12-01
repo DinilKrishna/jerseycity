@@ -109,8 +109,31 @@ def add_to_wishlist(request, uid):
         user_id = request.user.userprofile.uid
         user = UserProfile.objects.get(uid=user_id)
         wishlist = Wishlist.objects.get(user=user)
+
+        # Check if the product is already in the wishlist
+        if WishlistItems.objects.filter(wishlist=wishlist, product=product).exists():
+            return JsonResponse({'success': False, 'message': 'Product is already in the wishlist'})
+
+        # If not, add the product to the wishlist
         wishlist_item = WishlistItems.objects.create(wishlist=wishlist, product=product)
         wishlist_item.save()
+
         return JsonResponse({'success': True, 'message': 'Product added to wishlist successfully'})
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)})
+    
+
+def remove_from_wishlist(request, uid):
+    try:
+        print(uid)
+        user = UserProfile.objects.get(uid = request.user.userprofile.uid)
+        print(user)
+        wishlist = Wishlist.objects.get(user = user)
+        print(wishlist)
+        wishlist_items = WishlistItems.objects.get(wishlist = wishlist, product__uid = uid )
+        wishlist_items.delete()
+        return redirect(request.META.get("HTTP_REFERER"))
+    except Wishlist.DoesNotExist:
+        return HttpResponse("Wishlist not found")
+    except Exception as e:
+        return HttpResponse(e)
