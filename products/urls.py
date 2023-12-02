@@ -9,4 +9,5 @@ urlpatterns = [
     path('cart_remove/<uid>/' ,views.remove_from_cart, name = 'remove_from_cart'),
     path('add_to_wishlist/<uuid:uid>/' , views.add_to_wishlist, name = "add_to_wishlist"),
     path('remove_from_wishlist/<uid>/', views.remove_from_wishlist, name = 'remove_from_wishlist'),
+    path('return_order/<uid>/', views.return_order, name = 'return_order'),
 ]

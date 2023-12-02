@@ -93,7 +93,11 @@
                     </tr>
                     
                 </tbody>
-            </table>
+            </table><br>
+            {% if order.status == 'Delivered' %}
+            <a href="/products/return_order/{{order.uid}}" class="btn">Return Order</a>
+            {% endif %}
+            
         </div>
     </div>
     

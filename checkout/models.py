@@ -45,6 +45,7 @@ class Order(BaseModel):
     razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
     status = models.CharField(max_length=50, null = True, blank = True)
     payed = models.BooleanField(default=False)
+    # return_product = models.BooleanField(default=False)
     
 
 #     wallet_applied = models.BooleanField(default=False)

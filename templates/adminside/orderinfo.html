@@ -31,6 +31,7 @@
                                 <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
                                 <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
                                 <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                <option value="Returned" {% if order.status == 'Returned' %}selected{% endif %}>Returned</option>
                             </select>
                     
                             <button type="submit" class="btn btn-primary">Save</button>
@@ -135,7 +136,9 @@
                                                 <dl class="dlist">
                                                     <dt class="text-muted">Payment status:</dt>
                                                     <dd>
-                                                        {% if order.payment_method.method == 'cash_on_delivery' and order.status == 'Delivered' %}
+                                                        {% if order.status == 'Returned' %}
+                                                        <span class="badge rounded-pill alert-success text-danger">Refunded</span>
+                                                        {% elif order.payment_method.method == 'cash_on_delivery' and order.status == 'Delivered' %}
                                                         <span class="badge rounded-pill alert-success text-success">Payment done</span>
                                                         {% elif order.payed == True %}
                                                         <span class="badge rounded-pill alert-success text-success">Payment done</span>

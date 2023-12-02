@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from checkout.models import *
 from userauth.decorator import login_required
 from .models import *
 from django.contrib import messages
@@ -137,3 +138,21 @@ def remove_from_wishlist(request, uid):
         return HttpResponse("Wishlist not found")
     except Exception as e:
         return HttpResponse(e)
+    
+
+def return_order(request, uid):
+    order = Order.objects.get(uid=uid)
+    order.status = 'Returned'
+    order.save()
+    amount = order.amount_to_pay
+    user = UserProfile.objects.get(uid = request.user.userprofile.uid)
+    wallet = Wallet.objects.get(user = user)
+    order_items = OrderItems.objects.filter(order = order)
+    wallet.amount += amount
+    wallet.save()
+    for item in order_items:
+        product_variant = Product_Variant.objects.get(product=item.product, size=item.size)
+        product_variant.stock += item.quantity  # Increase stock by the quantity returned
+        product_variant.save()
+
+    return redirect(request.META.get('HTTP_REFERER'))
