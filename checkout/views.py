@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from products.models import *
 from userauth.models import UserProfile
@@ -333,23 +334,22 @@ def success_page(request):
 
 
 def validate_coupon(request):
-    # if request.method == 'POST':
-    #     code = request.POST.get('coupon_code')
-    #     context = {}
-    #     response_data = {}
-    #     user_id = request.user.userprofile.uid
-    #     user_cart = Cart.objects.get(user_id = user_id)
-    #     cart_items = CartItems.objects.filter(cart = user_cart, product__is_selling = True, product__category__is_listed = True)
-    #     grand_total = 0
-    #     for item in cart_items:
-    #         grand_total += (item.quantity * item.product.selling_price)
-    #     print(grand_total)
-    #     coupon = Coupon.objects.get(code=code)
-    #     current_datetime = timezone.now()
-    #     no = CouponHistory.objects.filter(user = request.user.profile, coupon = coupon).count()
-    #     if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no+1) <= coupon.maximum_use and coupon.unlisted is False:
-    #         response_data['success'] = True
-    #         response_data['discount_percent'] = coupon.discount_percentage
-    #         grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
-    #         response_data['total'] = grand_total + 50
+    if request.method == 'POST':
+        response_data = {}
+        coupon_code = request.POST.get('coupon_code')
+        user_id = request.user.userprofile.uid
+        user_cart = Cart.objects.get(user_id = user_id)
+        cart_items = CartItems.objects.filter(cart = user_cart, product__is_selling = True, product__category__is_listed = True)
+        grand_total = 0
+        for item in cart_items:
+            grand_total += (item.quantity * item.product.selling_price)
+        coupon = Coupon.objects.get(code=coupon_code)
+        current_datetime = timezone.now()
+        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and coupon.unlisted is False:
+            new_total = grand_total - (grand_total * coupon.discount_percentage)/100
+            new_total = round(new_total, 2)
+            response_data['new_total'] = new_total
+            
+            return JsonResponse({'success' : True, 'new_total': new_total})
+        return JsonResponse({'success' : False})
     return redirect('checkout')

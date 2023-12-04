@@ -28,7 +28,16 @@ class Payment_Method(BaseModel):
     
     def __str__(self) -> str:
         return self.method
-    
+
+
+class Coupon(BaseModel):
+    code = models.CharField(max_length=10)
+    expiry_date = models.DateTimeField()
+    discount_percentage = models.IntegerField()
+    # maximum_use = models.IntegerField(default=1)
+    minimum_amount = models.IntegerField(default = 60)
+    unlisted = models.BooleanField(default=False)
+
 
 class Order(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -45,11 +54,12 @@ class Order(BaseModel):
     razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
     status = models.CharField(max_length=50, null = True, blank = True)
     payed = models.BooleanField(default=False)
+    coupon = models.ForeignKey(Coupon,on_delete= models.CASCADE, null=True, blank=True)
     # return_product = models.BooleanField(default=False)
     
 
 #     wallet_applied = models.BooleanField(default=False)
-#     coupon = models.ForeignKey(Coupon,on_delete= models.CASCADE, null=True, blank=True)
+    
 
     def calculate_bill_amount(self):
         # Calculate the bill_amount as the sum of sub_total for all OrderItems
@@ -72,13 +82,7 @@ class OrderItems(BaseModel):
 
 
 
-class Coupon(BaseModel):
-    code = models.CharField(max_length=10)
-    expiry_date = models.DateTimeField()
-    discount_percentage = models.IntegerField()
-    # maximum_use = models.IntegerField(default=1)
-    minimum_amount = models.IntegerField(default = 60)
-    unlisted = models.BooleanField(default=False)
+
 
 
 

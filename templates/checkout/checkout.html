@@ -24,13 +24,13 @@
                     <div class="panel-collapse collapse coupon_form " id="coupon">
                         <div class="panel-body">
                             <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                            <form action="{% url "validate_coupon" %}" method="post">
+                            <form id="couponForm" action="{% url "validate_coupon" %}" method="post">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <input type="text" name="coupon_code" placeholder="Enter Coupon Code..." required>
+                                    <input type="text" id="couponCode" name="coupon_code" placeholder="Enter Coupon Code..." required>
                                 </div>
                                 <div class="form-group">
-                                    <button class="btn btn-md">Apply Coupon</button>
+                                    <button type="button" class="btn btn-md" onclick="applyCoupon()">Apply Coupon</button>
                                 </div>
                             </form>
                         </div>
@@ -119,7 +119,7 @@
                                 <tbody>
                                     <tr>
                                         <td class="cart_total_label font-lg fw-900 text-brand">Total Payable</td>
-                                        <td class="cart_total_amount"><span class="font-md fw-700">$<span id = "cart-total">{{grand_total}}</span></span></td>
+                                        <td class="cart_total_amount"><span class="font-md fw-700">$<span id="cart-total">{{ grand_total }}</span></span></td>
                                     </tr>
                                     
                                 </tbody>
@@ -149,6 +149,41 @@
         </div>
     </section>
 </main>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function applyCoupon() {
+        console.log('Apply Coupon')
+        // Get the coupon code from the input field
+        var couponCode = $("#couponCode").val();
+
+        // Make an AJAX request
+        $.ajax({
+            url: "{% url 'validate_coupon' %}",
+            method: "POST",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                coupon_code: couponCode
+            },
+            success: function(response) {
+                // Handle the success response
+                console.log(response);
+                console.log(response.new_total)
+
+                // Update the grand total with the new total
+                alert('Coupon Applied Succesfully')
+                $("#cart-total").text(response.new_total);
+            },
+            error: function(error) {
+                // Handle the error response
+                console.error(error);
+                alert('Invalid coupon')
+            }
+        });
+    }
+</script>
 
 
 {% endblock %}
