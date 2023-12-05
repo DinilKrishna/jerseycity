@@ -18,20 +18,29 @@
             <div class="row">
                 
                 <div class="col-lg-12">
-                    <div class="toggle_info">
+                    {% comment %} <div class="toggle_info">
                         <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
-                    </div>
-                    <div class="panel-collapse collapse coupon_form " id="coupon">
+                    </div> {% endcomment %}
+                    <div class="coupon_form" id="coupon">
                         <div class="panel-body">
                             <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
                             <form id="couponForm" action="{% url "validate_coupon" %}" method="post">
                                 {% csrf_token %}
+                                {% if cart.coupon %}
+                                Currently applied coupon (Click to cancel):
+                                <a href="/checkout/remove_coupon/{{cart.uid}}" class="btn bg-success rounded p-1 text-dark">{{cart.coupon.code}}</i> </a><br><br>
+                                {% endif %}
                                 <div class="form-group">
                                     <input type="text" id="couponCode" name="coupon_code" placeholder="Enter Coupon Code..." required>
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-md" onclick="applyCoupon()">Apply Coupon</button>
+                                    <button type="submit" class="btn btn-md" >Apply Coupon</button>
                                 </div>
+                                <div class="d-inline-block">
+                                    {% include "base/messages.html" %}
+                                </div>
+                                
+                                
                             </form>
                         </div>
                     </div>
@@ -73,7 +82,7 @@
                                 {% endfor %}
                             </tbody>
                         </table> <br>
-                        <div class="col-md-5 text-center">{% include "base/messages.html" %}</div>  
+                        {% comment %} <div class="col-md-5 text-center">{% include "base/messages.html" %}</div>   {% endcomment %}
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-12">
@@ -118,8 +127,12 @@
                             <table class="table">
                                 <tbody>
                                     <tr>
-                                        <td class="cart_total_label font-lg fw-900 text-brand">Total Payable</td>
+                                        <td class="cart_total_label font-lg fw-900 text-brand">Bill Amount</td>
                                         <td class="cart_total_amount"><span class="font-md fw-700">$<span id="cart-total">{{ grand_total }}</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cart_total_label font-lg fw-900 text-brand">Total Payable</td>
+                                        <td class="cart_total_amount"><span class="font-md fw-700">$<span id="cart-total">{{ discounted_total }}</span></span></td>
                                     </tr>
                                     
                                 </tbody>

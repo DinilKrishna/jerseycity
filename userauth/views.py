@@ -324,6 +324,7 @@ def user_profile(request, uid):
         context['number_in_wishlist'] = number_in_wishlist
         addresses = Address.objects.filter(user = profile.user)
         orders = Order.objects.filter(user = profile.user).order_by('-created_at')
+
         context['profile'] = profile 
         context['wallet'] = wallet
         context['addresses'] = addresses
@@ -691,6 +692,8 @@ def order_details(request, uid):
     user = UserProfile.objects.get(uid = user_id)
     order = Order.objects.get(uid = uid)
     order_items = OrderItems.objects.filter(order = order)
+    discount = order.bill_amount - order.amount_to_pay
+    context['discount'] = discount
     context['user'] = user
     context['order'] = order
     context['order_items'] = order_items

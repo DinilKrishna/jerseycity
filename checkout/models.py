@@ -37,6 +37,7 @@ class Coupon(BaseModel):
     # maximum_use = models.IntegerField(default=1)
     minimum_amount = models.IntegerField(default = 60)
     unlisted = models.BooleanField(default=False)
+    users = models.ManyToManyField(UserProfile, blank=True)
 
 
 class Order(BaseModel):

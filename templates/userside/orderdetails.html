@@ -84,6 +84,15 @@
                         <td>${{item.sub_total}}</td>
                     </tr>
                     {% endfor %}
+                    {% if discount != 0 %}
+                    <tr>
+                        <td ></td>
+                        <td></span></td>
+                        <td></td>
+                        <td><span class="fw-600 ">Coupon Discount</span></td>
+                        <td><span class="fw-600 ">${{discount}}</span></td>
+                    </tr>
+                    {% endif %}
                     <tr>
                         <td ></td>
                         <td></span></td>
@@ -91,6 +100,7 @@
                         <td><span class="fw-600 ">Grand Total:</span></td>
                         <td><span class="fw-600 ">${{order.amount_to_pay}}</span></td>
                     </tr>
+
                     
                 </tbody>
             </table><br>

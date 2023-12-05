@@ -12,6 +12,20 @@ import razorpay
 
 # Create your views here.
 
+
+def serialize_cart_items(cart_items):
+    serialized_items = []
+    for cart_item in cart_items:
+        serialized_item = {
+            'product_id': cart_item.product.name,
+            'quantity': cart_item.quantity,
+            'size': cart_item.size.size,
+        }
+        serialized_items.append(serialized_item)
+    return serialized_items
+
+
+
 @login_required
 def checkout(request):
     uid = request.user.userprofile.uid
@@ -23,6 +37,12 @@ def checkout(request):
     for item in cart_items:
         number_in_cart += 1
     context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
     addresses = Address.objects.filter(unlisted=False, user=request.user)
     if not cart_items:
         messages.warning(request, "Cart is empty!")
@@ -35,6 +55,13 @@ def checkout(request):
         variant = Product_Variant.objects.get(product = cart_item.product, size = cart_item.size)
         if cart_item.quantity > variant.stock:
             out_of_stock = True
+    discounted_total = grand_total
+    if cart.coupon:
+        discounted_total = grand_total - (grand_total * cart.coupon.discount_percentage)/100
+        discounted_total = round(discounted_total, 2)
+        print(discounted_total)
+    context['discounted_total'] = discounted_total
+    context['cart'] = cart
     context['out_of_stock'] = out_of_stock
     context['products'] = cart_items
     context['grand_total'] = grand_total
@@ -60,22 +87,28 @@ def checkout(request):
             
             messages.warning(request, 'You chose ', payment_option)
             print("Selected Payment Option: Direct Bank Transfer")
+            # discounted_total = float(discounted_total)
+            # request.session['discounted_total'] = discounted_total
             return redirect('wallet_payment')
         elif payment_option == 'razorpay':
             
             print("Selected Payment Option: RazorPay")
-            grand_total = grand_total*100
+            discounted_total = float(discounted_total)
+            request.session['discounted_total'] = discounted_total
+            discounted_total = int(discounted_total * 100)
+            
+            
             client = razorpay.Client(auth=("rzp_test_KSJKvKAn2yU3LA", "1aqi5ebdJfkUFfAiXFOFuALn"))
 
             DATA = {
-                "amount": int(grand_total),
+                "amount": int(discounted_total),
                 "currency": "INR",
                 "payment_capture":'1'
                 
             }
             client.order.create(data=DATA)
 
-            return render(request,"checkout/razorpay.html", {"grand_total":grand_total})
+            return render(request,"checkout/razorpay.html", {"grand_total":discounted_total})
         elif payment_option == 'cash_on_delivery':
             # Handle Cash on Delivery logic
             print("Selected Payment Option: Cash on Delivery")
@@ -116,13 +149,15 @@ def checkout(request):
                 print('Product stock updated')
 
             order.calculate_bill_amount()
-            order.amount_to_pay = order.bill_amount
+            order.amount_to_pay = discounted_total
             order.status = 'Confirmed'
             order.save()
             print('Order saved again')
 
             # Clear the user's cart
             cart_items.delete()
+            cart.coupon = None
+            cart.save()
             print('Cart cleared')
 
             return redirect(f'/checkout/success_page/')
@@ -161,12 +196,16 @@ def wallet_payment(request):
         print('                                       ',wallet.amount)
         uid = request.user.userprofile.uid
         selected_address_id = request.session.get('selected_address_id')
+        request.session.pop('selected_address_id', None)
         print(selected_address_id)
         selected_address = Address.objects.get(uid=selected_address_id)
         payment_method_instance = Payment_Method.objects.get(method='wallet')
         profile = UserProfile.objects.get(uid=uid)
         print(payment_method_instance)
         cart = Cart.objects.get(user=profile)
+        if cart.coupon:
+            discounted_total = grand_total - (grand_total * cart.coupon.discount_percentage)/100
+            discounted_total = round(discounted_total, 2)
         cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
         order = Order.objects.create(
                 user=request.user,
@@ -200,13 +239,15 @@ def wallet_payment(request):
             print('Product stock updated')
 
         order.calculate_bill_amount()
-        order.amount_to_pay = order.bill_amount
+        order.amount_to_pay = discounted_total
         order.status = 'Confirmed'
         order.save()
         print('Order saved again')
 
         # Clear the user's cart
         cart_items.delete()
+        cart.coupon = None
+        cart.save()
         print('Cart cleared')
 
         return redirect(f'/checkout/success_page/')
@@ -225,6 +266,7 @@ def wallet_payment(request):
 def create_order(request):
     uid = request.user.userprofile.uid
     selected_address_id = request.session.get('selected_address_id')
+    request.session.pop('selected_address_id', None)
     print(selected_address_id)
     selected_address = Address.objects.get(uid=selected_address_id)
     payment_method_instance = Payment_Method.objects.get(method='razorpay')
@@ -264,13 +306,16 @@ def create_order(request):
         print('Product stock updated')
 
     order.calculate_bill_amount()
-    order.amount_to_pay = order.bill_amount
+    order.amount_to_pay = request.session.get('discounted_total')
+    request.session.pop('discounted_total', None)
     order.status = 'Confirmed'
     order.save()
     print('Order saved again')
 
     # Clear the user's cart
     cart_items.delete()
+    cart.coupon = None
+    cart.save()
     print('Cart cleared')
 
     return redirect(f'/checkout/success_page/')
@@ -338,6 +383,7 @@ def validate_coupon(request):
         response_data = {}
         coupon_code = request.POST.get('coupon_code')
         user_id = request.user.userprofile.uid
+        user = UserProfile.objects.get(uid = user_id)
         user_cart = Cart.objects.get(user_id = user_id)
         cart_items = CartItems.objects.filter(cart = user_cart, product__is_selling = True, product__category__is_listed = True)
         grand_total = 0
@@ -345,11 +391,41 @@ def validate_coupon(request):
             grand_total += (item.quantity * item.product.selling_price)
         coupon = Coupon.objects.get(code=coupon_code)
         current_datetime = timezone.now()
+        
+        if user not in coupon.users.all():
+            if user_cart.coupon:
+                user_cart.coupon.users.remove(user)  # Mark the coupon as used by the current user      
+                coupon.save()
+            coupon.users.add(user)  # Mark the coupon as used by the current user      
+            coupon.save()
+        else:
+            messages.error(request, 'Coupon already applied')
+            return redirect(request.META.get('HTTP_REFERER'))
         if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and coupon.unlisted is False:
             new_total = grand_total - (grand_total * coupon.discount_percentage)/100
             new_total = round(new_total, 2)
             response_data['new_total'] = new_total
-            
-            return JsonResponse({'success' : True, 'new_total': new_total})
-        return JsonResponse({'success' : False})
+            user_cart.coupon = coupon
+            user_cart.save()
+            messages.success(request, 'Coupon applied succesfully')
+            return redirect(request.META.get('HTTP_REFERER'))
+            # return JsonResponse({'success' : True, 'new_total': new_total})
+        messages.error(request, 'Invalid coupon')
+        return redirect(request.META.get('HTTP_REFERER'))
+        # return JsonResponse({'success' : False})
     return redirect('checkout')
+
+
+def remove_coupon(request, uid):
+    cart = Cart.objects.get(uid = uid)
+    coupon_code = cart.coupon.code
+    user_id = request.user.userprofile.uid
+    user = UserProfile.objects.get(uid = user_id)
+    coupon = Coupon.objects.get(code=coupon_code)
+    print(coupon.users)   
+    coupon.users.remove(user)  # Mark the coupon as used by the current user   
+    print(coupon.users)   
+    coupon.save()
+    cart.coupon = None
+    cart.save()
+    return redirect(request.META.get('HTTP_REFERER'))

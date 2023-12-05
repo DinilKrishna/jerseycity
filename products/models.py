@@ -3,7 +3,7 @@ from base.models import BaseModel
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from PIL import Image
-from checkout.models import Coupon
+
 from userauth.models import UserProfile
 
 
@@ -86,7 +86,7 @@ def resize_images(sender, instance, **kwargs):
 class Cart(BaseModel):
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     product = models.ManyToManyField(Product, through="CartItems")
-    # coupon = models.ForeignKey(Coupon,on_delete= models.CASCADE, null=True, blank=True)
+    coupon = models.ForeignKey("checkout.Coupon",on_delete= models.CASCADE, null=True, blank=True)
 
     def __str__(self) -> str:
         return f'{self.user.user.username} : Cart'
