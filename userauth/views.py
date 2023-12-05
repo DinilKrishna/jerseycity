@@ -309,7 +309,7 @@ def user_profile(request, uid):
         wallet = Wallet.objects.get(user = profile)
         
         user_cart = Cart.objects.get(user_id = uid)
-        cart_items = CartItems.objects.filter(cart = user_cart)
+        cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
         number_in_cart = 0
         for item in cart_items:
             number_in_cart += 1
@@ -338,7 +338,7 @@ def change_profile_image(request, uid):
     context = {}  
     profile = UserProfile.objects.get(uid=uid)
     user_cart = Cart.objects.get(user_id = uid)
-    cart_items = CartItems.objects.filter(cart = user_cart)
+    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
@@ -398,7 +398,7 @@ def change_password(request, uid):
     context = {}
     user_profile = get_object_or_404(UserProfile, uid=uid)
     user_cart = Cart.objects.get(user_id = uid)
-    cart_items = CartItems.objects.filter(cart = user_cart)
+    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
@@ -547,7 +547,7 @@ def edit_address(request, uid):
     id = request.user.userprofile.uid
     profile = UserProfile.objects.get(uid = id)
     user_cart = Cart.objects.get(user_id = id)
-    cart_items = CartItems.objects.filter(cart = user_cart)
+    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
@@ -677,7 +677,7 @@ def order_details(request, uid):
     user_id = request.user.userprofile.uid
     profile = UserProfile.objects.get(uid = user_id)
     user_cart = Cart.objects.get(user_id = user_id)
-    cart_items = CartItems.objects.filter(cart = user_cart)
+    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1

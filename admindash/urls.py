@@ -25,5 +25,10 @@ urlpatterns = [
 
     path('orders/',views.orders, name='orders'),
     path('order_info/<uid>',views.order_info, name='order_info'),
+
+    path('coupons/',views.coupons, name='coupons'),
+    path('unlist_coupon/<uid>',views.unlist_coupon, name='unlist_coupon'),
+    path('list_coupon/<uid>',views.list_coupon, name='list_coupon'),
+    path('add_coupon/',views.add_coupon, name='add_coupon'),
     
 ]

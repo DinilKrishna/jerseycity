@@ -652,3 +652,45 @@ def order_info(request, uid):
     context['order'] = order
     context['order_items'] = order_items
     return render(request, 'adminside/orderinfo.html', context)
+
+
+@admin_required
+def coupons(request):
+    context = {}
+    coupons = Coupon.objects.all().order_by('expiry_date')
+    context['coupons'] = coupons
+    return render(request, 'adminside/coupons.html', context)
+
+def unlist_coupon(request, uid):
+    coupon = Coupon.objects.get(uid = uid)
+    coupon.unlisted = True
+    coupon.save()
+    return redirect(request.META.get('HTTP_REFERER'))
+
+def list_coupon(request, uid):
+    coupon = Coupon.objects.get(uid = uid)
+    coupon.unlisted = False
+    coupon.save()
+    return redirect(request.META.get('HTTP_REFERER'))
+
+def add_coupon(request):
+    if request.method == 'POST':
+        code = request.POST['coupon_code']
+        date = request.POST['expiry_date']
+        minimum_amount = request.POST['minimum_amount']
+        discount_percentage = request.POST['discount_percentage']
+        try:
+            existing_coupon = Coupon.objects.get(code = code)
+            messages.error(request, 'Coupon already exists')
+            return redirect(request.META.get('HTTP_REFERER'))
+        except:
+            pass
+        
+        coupon = Coupon.objects.create(
+            code = code,
+            expiry_date = date,
+            minimum_amount = minimum_amount,
+            discount_percentage = discount_percentage
+        )
+        return redirect('coupons')
+    return render (request, 'adminside/addcoupon.html')

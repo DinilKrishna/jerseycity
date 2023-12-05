@@ -59,7 +59,6 @@ def checkout(request):
     if cart.coupon:
         discounted_total = grand_total - (grand_total * cart.coupon.discount_percentage)/100
         discounted_total = round(discounted_total, 2)
-        print(discounted_total)
     context['discounted_total'] = discounted_total
     context['cart'] = cart
     context['out_of_stock'] = out_of_stock
@@ -87,9 +86,8 @@ def checkout(request):
             
             messages.warning(request, 'You chose ', payment_option)
             print("Selected Payment Option: Direct Bank Transfer")
-            # discounted_total = float(discounted_total)
-            # request.session['discounted_total'] = discounted_total
             return redirect('wallet_payment')
+        
         elif payment_option == 'razorpay':
             
             print("Selected Payment Option: RazorPay")
@@ -149,7 +147,13 @@ def checkout(request):
                 print('Product stock updated')
 
             order.calculate_bill_amount()
-            order.amount_to_pay = discounted_total
+            if cart.coupon:
+                if cart.coupon.unlisted is False:
+                    order.amount_to_pay = discounted_total
+                    print(discounted_total, 'discounttttt')
+                else:
+                    order.amount_to_pay = order.bill_amount
+                    print(order.bill_amount, 'billlllllllllllllllll')
             order.status = 'Confirmed'
             order.save()
             print('Order saved again')
@@ -239,7 +243,13 @@ def wallet_payment(request):
             print('Product stock updated')
 
         order.calculate_bill_amount()
-        order.amount_to_pay = discounted_total
+        if cart.coupon:
+            if cart.coupon.unlisted is False:
+                order.amount_to_pay = discounted_total
+                print(discounted_total, 'discounttttt')
+            else:
+                order.amount_to_pay = order.bill_amount
+                print(order.bill_amount, 'billlllllllllllllllll')
         order.status = 'Confirmed'
         order.save()
         print('Order saved again')
@@ -306,7 +316,14 @@ def create_order(request):
         print('Product stock updated')
 
     order.calculate_bill_amount()
-    order.amount_to_pay = request.session.get('discounted_total')
+    discounted_total = request.session.get('discounted_total')
+    if cart.coupon:
+        if cart.coupon.unlisted is False:
+            order.amount_to_pay = discounted_total
+            print(discounted_total, 'discounttttt')
+        else:
+            order.amount_to_pay = order.bill_amount
+            print(order.bill_amount, 'billlllllllllllllllll')
     request.session.pop('discounted_total', None)
     order.status = 'Confirmed'
     order.save()

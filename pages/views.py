@@ -80,10 +80,11 @@ def shop_page(request):
         user_id = request.user.userprofile.uid
         profile = UserProfile.objects.get(uid = user_id)
         user_cart = Cart.objects.get(user_id = user_id)
-        cart_items = CartItems.objects.filter(cart = user_cart)
+        cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
         number_in_cart = 0
         for item in cart_items:
             number_in_cart += 1
+            print('111111111111111')
         context['number_in_cart'] = number_in_cart
         wishlist = Wishlist.objects.get(user = profile)
         wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
@@ -192,7 +193,7 @@ def product_details(request, uid):
             user_id = request.user.userprofile.uid
             profile = UserProfile.objects.get(uid = user_id)
             user_cart = Cart.objects.get(user_id = user_id)
-            cart_items = CartItems.objects.filter(cart = user_cart)
+            cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
             number_in_cart = 0
             for item in cart_items:
                 number_in_cart += 1
@@ -238,7 +239,7 @@ def about_page(request):
     user_id = request.user.userprofile.uid
     profile = UserProfile.objects.get(uid = user_id)
     user_cart = Cart.objects.get(user_id = user_id)
-    cart_items = CartItems.objects.filter(cart = user_cart)
+    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
@@ -259,7 +260,7 @@ def contact_page(request):
     user_id = request.user.userprofile.uid
     profile = UserProfile.objects.get(uid = user_id)
     user_cart = Cart.objects.get(user_id = user_id)
-    cart_items = CartItems.objects.filter(cart = user_cart)
+    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
     number_in_cart = 0
     for item in cart_items:
         number_in_cart += 1
