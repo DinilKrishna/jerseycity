@@ -445,9 +445,7 @@ def remove_coupon(request, uid):
     user_id = request.user.userprofile.uid
     user = UserProfile.objects.get(uid = user_id)
     coupon = Coupon.objects.get(code=coupon_code)
-    print(coupon.users)   
-    coupon.users.remove(user)  # Mark the coupon as used by the current user   
-    print(coupon.users)   
+    coupon.users.remove(user) 
     coupon.save()
     cart.coupon = None
     cart.save()

@@ -108,6 +108,9 @@ def sign_up(request):
         email = request.POST.get('email')
         pass1 = request.POST.get('password')
         pass2 = request.POST.get('confirm_password')
+        referal = request.POST.get('referal')
+        if referal is None:
+            referal = "None"
 
         if not is_valid_name(fname):
             messages.error(request, f"{fname} is not a valid name format. Name is case sensitive")
@@ -136,6 +139,9 @@ def sign_up(request):
         else:
            
             user = User.objects.create_user(username=email, password=pass1, email=email, first_name=fname, last_name=lname)
+            userprofile = UserProfile.objects.create(user=user)
+            user.userprofile.refered = referal
+            user.userprofile.save()
             request.session['email'] = email
             request.session['password'] = pass1
             otp = random.randint(1000, 9999)
@@ -153,7 +159,7 @@ def sign_up(request):
                 request.session['otp_expiration'] = time.time() + expiration_time
             except Exception as e:
                 print(f"Error sending email: {e}")
-            userprofile = UserProfile.objects.create(user=user)
+            
             Wallet.objects.create(user = userprofile)
             Cart.objects.create(user = userprofile)
             Wishlist.objects.create(user = userprofile)
@@ -183,6 +189,16 @@ def verify_otp(request, uid):
         if otp_token == otp:
             user.is_verified = True
             user.save()
+            refered_user = UserProfile.objects.filter(referance_code = user.refered)
+            if refered_user.exists():
+                r_user = UserProfile.objects.get(referance_code = user.refered)
+                user_wallet = Wallet.objects.get(user = user)
+                user_wallet.amount += 50
+                user_wallet.save()
+                refered_wallet= Wallet.objects.get(user = r_user)
+                
+                refered_wallet.amount += 100
+                refered_wallet.save()
             messages.success(request, "signup successful!")
             return redirect('login_page')
         else:
