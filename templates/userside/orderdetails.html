@@ -61,7 +61,9 @@
                 </div>
             </div>
         </div>
-
+        {% if order.status == 'Returned' %}
+            <h5>Reason for return: {{returned.description}}</h5>
+        {% endif %}
         <!-- Table -->
         <div class="table-container mt-50">
             <table>

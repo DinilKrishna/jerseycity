@@ -21,9 +21,13 @@
                         </span> <br>
                         <small class="text-muted">Order ID: {{order.uid}}</small>
                     </div>
+                    {% if order.status == 'Returned' %}
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <h5>Order Returned</h5>
+                    {% else%}
                     <form method="post">
                         {% csrf_token %}
-                    
+                        
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                             <select name="status" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
                                 <option value="None" {% if order.status == 'None' %}selected{% endif %}>None</option>
@@ -39,6 +43,7 @@
                             <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
                         </div>
                     </form>
+                    {% endif %}
                 </div>
             </header> <!-- card-header end// -->
             <div class="card-body">

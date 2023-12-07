@@ -140,19 +140,41 @@ def remove_from_wishlist(request, uid):
         return HttpResponse(e)
     
 
+@login_required
 def return_order(request, uid):
-    order = Order.objects.get(uid=uid)
-    order.status = 'Returned'
-    order.save()
-    amount = order.amount_to_pay
-    user = UserProfile.objects.get(uid = request.user.userprofile.uid)
-    wallet = Wallet.objects.get(user = user)
-    order_items = OrderItems.objects.filter(order = order)
-    wallet.amount += amount
-    wallet.save()
-    for item in order_items:
-        product_variant = Product_Variant.objects.get(product=item.product, size=item.size)
-        product_variant.stock += item.quantity  # Increase stock by the quantity returned
-        product_variant.save()
+    context = {}
+    print('funvtion')
+    if request.method == 'POST':
+        print('entereed')
+        description = request.POST.get('return_description')
+        print(description)
+        order = Order.objects.get(uid=uid)
+        print(order)
+        order.status = 'Returned'
+        print('order status changed to returned')
+        order.save()
+        print('savedd')
+        returned = Return.objects.create(order = order, description = description)
+        print('return created --- ', returned)
+        amount = order.amount_to_pay
+        print('amount --', amount)
+        user = UserProfile.objects.get(uid = request.user.userprofile.uid)
+        print(user)
+        wallet = Wallet.objects.get(user = user)
+        print(wallet.amount)
+        order_items = OrderItems.objects.filter(order = order)
+        wallet.amount += amount
+        wallet.save()
+        print(wallet.amount)
+        for item in order_items:
+            product_variant = Product_Variant.objects.get(product=item.product, size=item.size)
+            product_variant.stock += item.quantity  # Increase stock by the quantity returned
+            product_variant.save()
+            print('quantity updated')
+        user_id = request.user.userprofile.uid
+        return redirect(f'/userauth/userprofile/{user_id}')
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    context['product_uid'] = uid
+    return render(request, 'userside/returnorder.html', context)
+
+    

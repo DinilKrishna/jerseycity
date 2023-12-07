@@ -119,3 +119,8 @@ class WishlistItems(BaseModel):
     
     def __str__(self) -> str:
         return f'{self.quantity} x {self.product.product_name} in Cart'
+    
+
+class Return(BaseModel):
+    order = models.ForeignKey("checkout.Order", on_delete=models.CASCADE)
+    description = models.TextField()
