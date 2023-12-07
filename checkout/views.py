@@ -154,6 +154,8 @@ def checkout(request):
                 else:
                     order.amount_to_pay = order.bill_amount
                     print(order.bill_amount, 'billlllllllllllllllll')
+            else:
+                order.amount_to_pay = order.bill_amount
             order.status = 'Confirmed'
             order.save()
             print('Order saved again')
@@ -250,6 +252,8 @@ def wallet_payment(request):
             else:
                 order.amount_to_pay = order.bill_amount
                 print(order.bill_amount, 'billlllllllllllllllll')
+        else:
+            order.amount_to_pay = order.bill_amount
         order.status = 'Confirmed'
         order.save()
         print('Order saved again')
@@ -324,6 +328,8 @@ def create_order(request):
         else:
             order.amount_to_pay = order.bill_amount
             print(order.bill_amount, 'billlllllllllllllllll')
+    else:
+        order.amount_to_pay = order.bill_amount
     request.session.pop('discounted_total', None)
     order.status = 'Confirmed'
     order.save()
