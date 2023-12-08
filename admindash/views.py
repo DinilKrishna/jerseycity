@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -570,13 +571,18 @@ def block_user(request, uid):
 @admin_required
 def edit_category(request, id):
     context = {}
-    categories = Category.objects.get(id = id)
-    context['categories'] = categories
+    category = Category.objects.get(id = id)
+    context['categories'] = category
 
     if request.method == "POST":
         category_name = request.POST.get('category_name')
         category_slug = request.POST.get('category_slug')
-        category_description = request.POST.get('category_description')
+        # category_description = request.POST.get('category_description')
+        offer = request.POST.get('offer')
+        expiry_date = request.POST.get('offer_expiry_date')
+        print(expiry_date)
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+        print(expiry_date)
 
         if Category.objects.filter(category_name__iexact=category_name).exclude(id=id).exists():
             messages.error(request, 'Category with this name already exists.')
@@ -587,12 +593,27 @@ def edit_category(request, id):
             messages.error(request, 'Category with this slug already exists.')
             return render(request, 'adminside/editcategory.html', context)
 
+        try:
+            category.category_name = category_name
+            category.category_slug = category_slug
+            category.save()
+            category_offer, created = CategoryOffer.objects.get_or_create(category=category)
+            category_offer.percentage = offer
 
-        categories.category_name = category_name
-        categories.category_slug = category_slug
-        categories.category_description = category_description
-        categories.save()
-        return redirect(reverse('categories'))
+            if expiry_date is not None:
+                category_offer.expiry_date = expiry_date
+
+            category_offer.save()
+
+            print('Category and CategoryOffer saved successfully.')
+            print('ajkslfhljksdhfsafjksadhfjklshfjklsdhfahljksdhfljkhfjklhsdjkfhasjklf')
+            products = Product.objects.filter(category = category)
+            for product in products:
+                product.selling_price = (float(product.price) - (float(product.price)*float(category_offer.percentage)/100))
+                product.save()
+            return redirect(reverse('categories'))
+        except Exception as e:
+            return HttpResponse(e)
 
     return render(request, 'adminside/editcategory.html', context)
 

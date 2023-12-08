@@ -28,10 +28,10 @@
                                 <label for="product_slug" class="form-label">Slug</label>
                                 <input type="text" placeholder="Type here" class="form-control" name="category_slug" required/>
                             </div>
-                            <div class="mb-4">
+                            {% comment %} <div class="mb-4">
                                 <label class="form-label">Description</label>
                                 <textarea placeholder="Type here" class="form-control" name="category_description" required></textarea>
-                            </div>
+                            </div> {% endcomment %}
                             {% for x in messages %}
                             <div class="alert alert-danger px-3" id="error">{{x}}</div>
                             {% endfor %}
@@ -47,7 +47,7 @@
                                     <tr>
                                         <th class="text-center">ID</th>
                                         <th class="text-center">Name</th>
-                                        <th class="text-center">Description</th>
+                                        {% comment %} <th class="text-center">Description</th> {% endcomment %}
                                         <th class="text-center">Slug</th>
                                         <th class="text-center">Action</th>
                                     </tr>
@@ -57,7 +57,7 @@
                                     <tr>
                                         <td class="text-center">{{cat.id}}</td>
                                         <td class="text-center"><b>{{cat.category_name}}</b></td>
-                                        <td class="text-center">{{cat.category_description}}</td>
+                                        {% comment %} <td class="text-center">{{cat.category_description}}</td> {% endcomment %}
                                         <td class="text-center">{{cat.category_slug}}</td>
                                         <td class="text-center">
                                             <a href="/adminpanel/edit_category/{{cat.id}}" class="btn btn-sm font-sm rounded btn-brand">

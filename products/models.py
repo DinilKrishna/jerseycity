@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from base.models import BaseModel
 from django.dispatch import receiver
@@ -12,8 +13,9 @@ from userauth.models import UserProfile
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50, unique=True)
+    offer = models.IntegerField(default = 0)
     category_slug = models.SlugField(unique=True, null=True, blank=True)
-    category_description = models.TextField(default=category_name)
+    # category_description = models.TextField(default=category_name)
     is_listed = models.BooleanField(default=True)
 
     def __str__(self) -> str:
@@ -124,3 +126,15 @@ class WishlistItems(BaseModel):
 class Return(BaseModel):
     order = models.ForeignKey("checkout.Order", on_delete=models.CASCADE)
     description = models.TextField()
+
+
+class CategoryOffer(BaseModel):
+    category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name="category_offer")
+    percentage = models.IntegerField(default=0)
+    expiry_date = models.DateField(default= timezone.now)
+
+    def is_valid(self):
+        return self.expiry_date >= timezone.now().date()
+
+    def __str__(self):
+        return f"{self.category.category_name} Offer"

@@ -28,9 +28,17 @@
                                 <label for="product_slug" class="form-label">Slug</label>
                                 <input type="text" placeholder="Type here" class="form-control" name="category_slug" value="{{categories.category_slug}}" required/>
                             </div>
-                            <div class="mb-4">
+                            {% comment %} <div class="mb-4">
                                 <label class="form-label">Description</label>
                                 <textarea placeholder="Type here" class="form-control" name="category_description" value="" required>{{categories.category_description}}</textarea>
+                            </div> {% endcomment %}
+                            <div class = "mb-4">
+                                <label class="form-label">Offer Percentage</label>
+                                <textarea type="number" placeholder="Discount" class="form-control" name="offer" value="" required>{{categories.category_offer.percentage}}</textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Expiry Date</label>
+                                <input class="form-control" type="date" id="offer_expiry_date" name="offer_expiry_date" value="{{ category.category_offer.expiry_date|date:'Y-m-d' }}" required>
                             </div>
                             {% for x in messages %}
                             <div class="alert alert-danger px-3" id="error">{{x}}</div>
