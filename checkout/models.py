@@ -86,3 +86,30 @@ class Wallet(BaseModel):
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name="wallet")
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    def save(self, *args, **kwargs):
+        # Check if the instance has already been saved (update operation)
+        if self.pk is not None:
+            # Retrieve the previous state of the instance
+            old_wallet = Wallet.objects.get(pk=self.pk)
+            
+            # Determine the action based on the change in amount
+            if self.amount > old_wallet.amount:
+                action = "Credited"
+            elif self.amount < old_wallet.amount:
+                action = "Debited"
+            else:
+                action = None
+
+            # Create a new entry in WalletHistory
+            if action:
+                WalletHistory.objects.create(wallet=self, amount=abs(self.amount - old_wallet.amount), action=action)
+
+        super(Wallet, self).save(*args, **kwargs)
+
+
+class WalletHistory(BaseModel):
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name="wallet_history")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    action = models.CharField(max_length=10)
+
+

@@ -150,21 +150,24 @@
                                         <div class="card-body contact-from-area">
                                             <p>Wallet Balance:</p>
                                             <p>$ {{wallet.amount}}</p>
-                                            {% comment %} <div class="row">
-                                                <div class="col-lg-8">
-                                                    <form class="contact-form-style mt-30 mb-50" action="#" method="post">
-                                                        <div class="input-style mb-20">
-                                                            <label>Order ID</label>
-                                                            <input name="order-id" placeholder="Found in your order confirmation email" type="text" class="square">
-                                                        </div>
-                                                        <div class="input-style mb-20">
-                                                            <label>Billing email</label>
-                                                            <input name="billing-email" placeholder="Email you used during checkout" type="email" class="square">
-                                                        </div>
-                                                        <button class="submit submit-auto-width" type="submit">Track</button>
-                                                    </form>
-                                                </div>
-                                            </div> {% endcomment %}
+                                            <br>
+                                            <p>Wallet History:</p><br>
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Amount</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for history in wallet_history %}
+                                                    <tr>
+                                                        <td>$ {{history.amount}}</td>
+                                                        <td>{{history.action}}</td>                                                        
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>

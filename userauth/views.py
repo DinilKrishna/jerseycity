@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 import random
 from django.core.mail import send_mail
 from products.models import *
-from checkout.models import Address, Order, OrderItems, Wallet
+from checkout.models import Address, Order, OrderItems, Wallet, WalletHistory
 from userauth.decorator import login_required
 from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
@@ -323,6 +323,7 @@ def user_profile(request, uid):
         context = {}  
         profile = UserProfile.objects.get(uid = uid)
         wallet = Wallet.objects.get(user = profile)
+        wallet_history = WalletHistory.objects.filter(wallet = wallet)
         
         user_cart = Cart.objects.get(user_id = uid)
         cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
@@ -343,6 +344,7 @@ def user_profile(request, uid):
 
         context['profile'] = profile 
         context['wallet'] = wallet
+        context['wallet_history'] = wallet_history
         context['addresses'] = addresses
         context['orders'] = orders
         return render(request, 'userside/user_profile.html', context)
