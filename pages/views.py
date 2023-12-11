@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -219,9 +219,9 @@ def product_details(request, uid):
             # context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
             context['user'] = profile
         # context['reviews'] = Review.objects.filter(product = product_obj).exclude(review = "")
-        print(product_obj.uid)
         offer_percentage = (1 - (product_obj.selling_price/product_obj.price)) * 100
         context['products'] = product_obj
+        context['product_id'] = product_obj.uid
         context['offer_percentage'] = round(offer_percentage)
         context['sizes'] = sizes
         context['images'] = product_img_obj
@@ -230,6 +230,21 @@ def product_details(request, uid):
         return render(request, 'pages/productdetails.html', context)
     except Exception as e:
         return HttpResponse(e)
+    
+
+def get_stock(request, product_id, size_id):
+    try:
+        product = Product.objects.get(uid = product_id)
+        size = Size.objects.get(id = size_id)
+        product_variant = Product_Variant.objects.get(product=product, size=size)
+        response_data = {'stock': product_variant.stock}
+        return JsonResponse(response_data)
+    except Product_Variant.DoesNotExist:
+        response_data = {'error': 'Product variant not found'}
+        return JsonResponse(response_data, status=404)
+    except Exception as e:
+        response_data = {'error': str(e)}
+        return JsonResponse(response_data, status=500)
 
 
 def about_page(request):

@@ -70,11 +70,11 @@
                                             {% if products.price > products.selling_price %}
                                             <ins><span class="text-brand">${{products.selling_price}}</span></ins>
                                             <ins><span class="old-price font-md ml-15">${{products.price}}</span></ins>
+                                            <span class="save-price  font-md color3 ml-15">{{offer_percentage}}% Off</span>
                                             {% else %}
                                             <ins><span class="text-brand">${{products.selling_price}}</span></ins>
                                             {% endif %}
                                             
-                                            <span class="save-price  font-md color3 ml-15">{{offer_percentage}}% Off</span>
                                         </div>
                                     </div>
                                     <div class="bt-1 border-color-1 mt-15 mb-15"></div>
@@ -89,7 +89,7 @@
                                         </ul>
                                     </div>
                                     <div class="attr-detail attr-size">
-                                        <form method="post" id="addToCartForm">
+                                        <form method="post" id="addToCartForm" data-product-id="{{ products.uid }}">
                                             {% csrf_token %}
                                             <label>Size : </label>
                                             <div class="border border-primary p-2">
@@ -99,6 +99,8 @@
                                                     {% endfor %}
                                                 </select>
                                             </div>
+                                            <input type="hidden" id="product_id" data-product-id="{{ products.uid }}"><br>
+                                            <p id="stock_left">Stock left: {{"update the stock here"}} </p>
                                             <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                             <div class="detail-extralink">
                                                 <div class="product-extra-link2">
@@ -506,6 +508,46 @@
             });
         });
     });
+</script>
+
+<script>
+    // Function to update stock left based on selected size
+    function updateStockLeft() {
+        // Get the selected size value from the dropdown
+        var selectedSizeId = document.getElementById('select_size').value;
+
+        // Fetch product ID from the HTML data attribute
+        var productId = "{{ products.uid }}";
+
+        // Fetch stock left for the selected size using AJAX
+        fetch(`/get_stock/${productId}/${selectedSizeId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.response);
+
+                // Get the stock left element
+                var stockLeftElement = document.getElementById('stock_left');
+
+                // Check if stock is zero
+                if (data.stock === 0) {
+                    stockLeftElement.innerText = 'Out of stock';
+                    // Apply red color to the text
+                    stockLeftElement.style.color = 'red';
+                } else {
+                    // Update the stock left field with the fetched stock value
+                    stockLeftElement.innerText = `Stock left: ${data.stock}`;
+                    // Reset the text color to its default
+                    stockLeftElement.style.color = '';
+                }
+            })
+            .catch(error => console.error('Error fetching stock:', error));
+    }
+
+    // Attach the updateStockLeft function to the change event of the size dropdown
+    document.getElementById('select_size').addEventListener('change', updateStockLeft);
+
+    // Trigger the function on page load to initialize the stock left value
+    window.onload = updateStockLeft;
 </script>
 
 

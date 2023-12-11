@@ -478,20 +478,21 @@ def edit_product(request, uid):
             offer_name = request.POST.get('offer')
             if offer_name == 'none':
                 offer = None
+                selling_price = float(price) - (float(price) * cat_offer.percentage)/100
                 selling_price = float(selling_price)
             else:
                 offer = ProductOffer.objects.get(offer_name = offer_name)
                 selling_price = float(selling_price) - (float(selling_price) * offer.percentage)/100
-                print(cat_off_percentage)
-                print(offer.percentage)
                 if(cat_off_percentage > offer.percentage):
                     selling_price = float(price) - (float(price) * cat_offer.percentage)/100
                 print(selling_price)
         except ProductOffer.DoesNotExist:
             offer = None
+            selling_price = float(price) - (float(price) * cat_off_percentage)/100
             selling_price = float(selling_price)  # Convert to float if not already
         except Exception as e:
             offer = None
+            selling_price = float(price) - (float(price) * cat_off_percentage)/100
             selling_price = float(selling_price)  # Convert to float if not already
         image_back = request.FILES.get('image_back') if 'image_back' in request.FILES else None
         extra_image_one = request.FILES.get('extra_image_one') if 'extra_image_one' in request.FILES else None

@@ -89,8 +89,10 @@
                                 </div>
                                 <h2><a href="shop-product-right.html">{{product.product_name}}</a></h2>
                                 <div class="product-price">
-                                    <span>${{product.selling_price}} </span>
-                                    <span class="old-price">${{product.price}}</span>
+                                    <span >${{ product.selling_price }}</span>
+                                    {% if product.price > product.selling_price %}
+                                    <span class="old-price">${{ product.price }}</span>
+                                    {% endif %}
                                 </div>
                                 <p class="mt-15">{{product.description}}</p>
                                 <div class="product-action-1 show">
