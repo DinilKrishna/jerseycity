@@ -1,13 +1,13 @@
 {% extends "base/adminbase.html" %}
 {% load static %}
-{% block title %}Edit Category{% endblock  %}
+{% block title %}Edit Offer{% endblock  %}
 {% block content %}
 <main class="main-wrap">
     <section class="content-main">
         <div class="content-header">
             <div>
-                <h2 class="content-title card-title">Categories </h2>
-                <p>Edit category</p>
+                <h2 class="content-title card-title">Offer</h2>
+                <p>Edit offer</p>
             </div>
         </div>
         <div class="card">
@@ -17,21 +17,17 @@
                         <form action="" method="post">
                             {% csrf_token %}
                             <div class="mb-4">
-                                <label for="product_name" class="form-label">Name</label>
-                                <input type="text" placeholder="Type here" class="form-control" name="category_name" value="{{categories.category_name}}" required/>
-                            </div>
-                            <div class="mb-4">
-                                <label for="product_slug" class="form-label">Slug</label>
-                                <input type="text" placeholder="Type here" class="form-control" name="category_slug" value="{{categories.category_slug}}" required/>
+                                <label for="product_name" class="form-label">Offer Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" name="offer_name" value="{{offer.offer_name}}" required/>
                             </div>
                             <div class = "mb-4">
-                                <label class="form-label">Offer Percentage</label>
-                                <textarea type="number" placeholder="Discount" class="form-control" name="offer" value="" required>{{categories.category_offer.percentage}}</textarea>
+                                <label class="form-label">Discount Percentage</label>
+                                <textarea type="number" placeholder="Discount" class="form-control" name="discount" value="" required>{{offer.percentage}}</textarea>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Expiry Date</label>
                                 <input class="form-control" type="date" id="offer_expiry_date" name="offer_expiry_date"
-                                    value="{{ category.category_offer.expiry_date|date:'Y-m-d' }}" required>
+                                    value="{{ offer.expiry_date|date:'Y-m-d' }}" required>
                             </div>
                             {% for x in messages %}
                             <div class="alert alert-danger px-3" id="error">{{x}}</div>

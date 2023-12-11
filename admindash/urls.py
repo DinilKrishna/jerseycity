@@ -33,4 +33,6 @@ urlpatterns = [
 
     path('product_offers/',views.product_offers, name='product_offers'),
     
+    path('edit_offer/<uid>',views.edit_offer, name='edit_offer'),
+    path('delete_offer/<uid>',views.delete_offer, name='delete_offer'),
 ]

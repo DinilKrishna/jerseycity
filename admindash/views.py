@@ -784,3 +784,37 @@ def product_offers(request):
         return redirect(request.META.get('HTTP_REFERER'))
     context['product_offers'] = product_offers
     return render(request, 'adminside/productoffers.html', context)
+
+
+def edit_offer(request, uid):
+    context = {}
+    offer = ProductOffer.objects.get(uid = uid)
+    if request.method == 'POST':
+        offer_name = request.POST['offer_name']
+        discount = request.POST['discount']
+        try:
+            discount = int(discount)
+            if not (0 <= discount <= 100):
+                raise ValueError('Discount must be between 0 and 100.')
+        except ValueError as ve:
+            messages.error(request, str(ve))
+            return redirect(request.META.get('HTTP_REFERER'))
+        expiry_date = request.POST['offer_expiry_date']
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+        offer.offer_name = offer_name
+        offer.percentage = discount
+        offer.expiry_date = expiry_date
+        offer.save()
+        return redirect('product_offers')
+    context['offer'] = offer
+    return render(request, 'adminside/editoffer.html', context)
+
+
+def delete_offer(request, uid):
+    offer = ProductOffer.objects.get(uid = uid)
+    if offer.is_listed:
+        offer.is_listed = False
+    else:
+        offer.is_listed = True
+    offer.save()
+    return redirect(request.META.get('HTTP_REFERER'))
