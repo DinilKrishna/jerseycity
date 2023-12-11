@@ -3,15 +3,11 @@
 {% block title %}Offers{% endblock  %}
 {% block content %}
 <main class="main-wrap">
-    {% include "base/adminheader.html" %}
     <section class="content-main">
         <div class="content-header">
             <div>
-                <h2 class="content-title card-title">Offers </h2>
+                <h2 class="content-title card-title">Offers </h2><br>
                 <p>Add Offer</p>
-            </div>
-            <div>
-                <input type="text" placeholder="Search Offers" class="form-control bg-white">
             </div>
         </div>
         <div class="card">
@@ -61,10 +57,6 @@
                                             <a href="/adminpanel/edit_offer/{{offer.uid}}" class="btn btn-sm font-sm rounded btn-brand">
                                                 <i class="material-icons md-edit"></i> Edit
                                             </a>
-                                            
-                                            {% comment %} <a href="/adminpanel/delete_category/{{ cat.uid }}" class="btn btn-sm font-sm btn-light rounded">
-                                                <i class="material-icons md-refresh"></i> Unlist
-                                            </a> <!-- dropdown //end --> {% endcomment %}
                                             {% if offer.is_listed %}
                                             <a href="/adminpanel/delete_offer/{{ offer.uid }}" class="btn btn-sm font-sm btn-light rounded">
                                                 <i class="material-icons md-delete"></i> Unlist

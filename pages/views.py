@@ -13,7 +13,7 @@ from django.core.mail import send_mail
 
 def landing_page(request):
     context = {}
-    products = Product.objects.all()
+    products = Product.objects.filter(is_selling=True).order_by('-updated_at')[:6]
     categories = Category.objects.all()
     sizes = Size.objects.all()
     context['categories'] = categories

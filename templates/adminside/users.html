@@ -3,13 +3,12 @@
 {% block title %}User List{% endblock  %}
 {% block content %}
 <main class="main-wrap">
-    {% include "base/adminheader.html" %}
     <section class="content-main">
         <div class="content-header">
             <h2 class="content-title">Users</h2>
-            <div>
+            {% comment %} <div>
                 <a href="#" class="btn btn-primary"><i class="material-icons md-plus"></i> Create new</a>
-            </div>
+            </div> {% endcomment %}
         </div>
         <div class="card mb-4">
             <header class="card-header">
@@ -18,21 +17,6 @@
                         <form method="GET" action="{% url 'users' %}">
                             <input type="text" name="search" placeholder="Search..." class="form-control" value="{{ search_query }}">
                         </form>
-                    </div>
-                    <div class="col-lg-2 col-md-3 col-6">
-                        <select class="form-select">
-                            <option>Status</option>
-                            <option>Active</option>
-                            <option>Disabled</option>
-                            <option>Show all</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-3 col-6">
-                        <select class="form-select">
-                            <option>Show 20</option>
-                            <option>Show 30</option>
-                            <option>Show 40</option>
-                        </select>
                     </div>
                 </div>
             </header> <!-- card-header end// -->
@@ -43,15 +27,12 @@
                             <tr>
                                 <th>User</th>
                                 <th>Email</th>
-                                {% comment %} <th>Authority</th> {% endcomment %}
                                 <th>Status</th>
-                                {% comment %} <th>Registered</th> {% endcomment %}
                                 <th class="text-center"> Action </th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for profile in profiles %}
-                            {% comment %} {% if profile.is_staff is False %} {% endcomment %}
                             <tr>
                                 <td width="">
                                     <a href="#" class="itemside">
@@ -65,11 +46,6 @@
                                     </a>
                                 </td>
                                 <td>{{profile.user.email}}</td>
-                                {% comment %} {% if profile.is_staff %}
-                                <td><span class="badge rounded-pill alert-secondary ">Staff</span></td>
-                                {% else %}
-                                <td><span class="badge rounded-pill alert-primary ">User</span></td>                                
-                                {% endif %} {% endcomment %}
                                 {% if profile.is_blocked %}
                                 <td><span class="badge rounded-pill alert-warning ">Blocked</span></td>
                                 {% else %}
@@ -86,7 +62,6 @@
                                     
                                 </td>
                             </tr>
-                            {% comment %} {% endif %} {% endcomment %}
                             {% endfor %}
                             
                             
@@ -95,18 +70,6 @@
                 </div>
             </div> <!-- card-body end// -->
         </div> <!-- card end// -->
-        {% comment %} <div class="pagination-area mt-15 mb-50">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-start">
-                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                    <li class="page-item"><a class="page-link" href="#">03</a></li>
-                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                    <li class="page-item"><a class="page-link" href="#">16</a></li>
-                    <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-                </ul>
-            </nav>
-        </div> {% endcomment %}
         <div class="pagination-area mt-15 mb-50">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">

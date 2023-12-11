@@ -7,17 +7,10 @@
     <br>
     <div class="container mt-5">
         <h2 class="text-center mb-4">Wallet Payment</h2>
-
-        <!-- 1. User Details -->
         <div class="mb-4">
             <p class="fw-700">User: {{user.user.first_name}} {{user.user.last_name}}</p>
-            <!-- Add more user details if needed -->
         </div>
-
-        <!-- 2. Order Summary -->
         <div class="mb-4">
-            
-            <!-- Display order details dynamically -->
             <div class="table-responsive order_table text-center">
                 <table class="table">
                     <thead>
@@ -27,10 +20,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
                         {% for product in products %}
                         <tr>
-                            
                             <td class="image product-thumbnail"><img src="{{ product.product.image_front.url }}" alt="#"></td>
                             <td>
                                 <h5><a href="shop-product-full.html">{{product.product.product_name}}</a></h5><span>Size:{{product.size.size}}</span> <br> <span class="product-qty">x{{ product.quantity }}</span>
@@ -46,33 +37,25 @@
                             <td class="cart_total_label font-lg fw-900 text-brand">Total Payable</td>
                             <td class="cart_total_amount"><span class="font-md fw-700">$<span id = "cart-total">{{grand_total}}</span></span></td>
                         </tr>
-                        
                     </tbody>
                 </table>
-                
             </div>
         </div>
         <br>
-        <!-- 3. Payment Method Information -->
         <div class="row ">
-            
             <div class="col-md-2"></div>
             <div class="col-md-6">
                 {% include "base/messages.html" %}
                 <div class="mb-4">
                     <h4>Payment Method</h3><br>
                     <p>Wallet: MyWallet</p>
-                    <!-- Add more payment method details if needed -->
                 </div>
                 <br>
-                <!-- 4. Wallet Balance -->
                 <div class="mb-4">
                     <h4>Wallet</h3><br>
                     <p>Current Balance: ${{wallet.amount}}</p>
-                    {% comment %} <p>Remaining Balance After Payment: ${{remaining_balance}}</p> {% endcomment %}
                 </div>
                 <br>
-                <!-- 5. Payment Authorization -->
                 <div class="mb-4 justify-content-between">
                     <form action="" method="post">
                         {% csrf_token %}
@@ -83,36 +66,6 @@
                 </div>
             </div>
         </div>
-        
-        
-
-        {% comment %} <!-- 6. Security and Trust Indicators -->
-        <div class="mb-4">
-            <!-- Add security indicators if needed -->
-        </div>
-
-        <!-- 7. Transaction Status -->
-        <div class="mb-4">
-            <h3>Transaction Status</h3>
-            <!-- Display loading indicators or messages dynamically -->
-        </div>
-
-        <!-- 8. Success/Failure Page Link -->
-        <div class="mb-4">
-            <!-- Add link to success/failure page -->
-        </div>
-
-        <!-- 9. Customer Support Information -->
-        <div class="mb-4">
-            <h3>Customer Support</h3>
-            <p>Contact us at support@example.com</p>
-        </div>
-
-        <!-- 10. Optional: Promotions or Offers -->
-        <div class="mb-4">
-            <h3>Special Offers</h3>
-            <p>Get 10% cashback on wallet payments!</p>
-        </div> {% endcomment %}
     </div>
 
 {% endblock %}

@@ -32,10 +32,6 @@
                                     <label for="price" class="form-label">Price</label>
                                     <input type="text" placeholder="Type here" class="form-control" name="price" id="price" value="{{product.price}}" required>
                                 </div>
-                                {% comment %} <div class="col-md-4  mb-3">
-                                    <label for="selling_price" class="form-label">Selling Price</label>
-                                    <input type="text" placeholder="Type here" class="form-control" name="selling_price" id="selling_price" value="{{product.selling_price}}" required>
-                                </div> {% endcomment %}
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Category</label>
                                     <select class="form-select" name="category">
@@ -122,10 +118,6 @@
                                 {% else %}
                                     <input class="form-control" type="file" name="image_back">
                                 {% endif %}
-                                {% comment %} <input class="form-control" type="file" name="image_back" required>
-                                {% if image.image_back %}
-                                <img src="{{ image.image_back.url }}" alt="Main Image" width="150">
-                                {% endif %} {% endcomment %}
                             </div>
                         </div>
                     </div>
@@ -139,11 +131,6 @@
                                 {% else %}
                                     <input class="form-control" type="file" name="extra_image_one">
                                 {% endif %}
-                                {% comment %} <label class="form-label">Image 2</label>
-                                <input class="form-control" type="file" name="extra_image_one" required>
-                                {% if image.extra_image_one %}
-                                <img src="{{ image.extra_image_one.url }}" alt="Main Image" width="150">
-                                {% endif %} {% endcomment %}
                             </div>
                         </div>
                     </div>

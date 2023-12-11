@@ -709,7 +709,10 @@ def order_details(request, uid):
     context['number_in_wishlist'] = number_in_wishlist
     user = UserProfile.objects.get(uid = user_id)
     order = Order.objects.get(uid = uid)
-    returned = Return.objects.get(order = order)
+    try:
+        returned = Return.objects.get(order = order)
+    except:
+        returned = None
     order_items = OrderItems.objects.filter(order = order)
     discount = order.bill_amount - order.amount_to_pay
     context['discount'] = discount

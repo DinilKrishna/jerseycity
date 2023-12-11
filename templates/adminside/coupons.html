@@ -8,23 +8,15 @@
     <section class="content-main">
         <div class="content-header">
             <div>
-                <h2 class="content-title card-title">Order List </h2>
-                <p>Lorem ipsum dolor sit amet.</p>
+                <h2 class="content-title card-title">Coupons List </h2>
+                <p>Coupons are shown here</p>
             </div>
         </div>
         <div class="card mb-4">
             <header class="card-header">
                 <div class="row gx-3">
                     <div class="col-lg-4 col-md-6 me-auto">
-                        <input type="text" placeholder="Search..." class="form-control">
-                    </div>
-                    <div class="col-lg-2 col-6 col-md-3">
-                        <select class="form-select">
-                            <option>Status</option>
-                            <option>Active</option>
-                            <option>Disabled</option>
-                            <option>Show all</option>
-                        </select>
+                        {% comment %} <input type="text" placeholder="Search..." class="form-control"> {% endcomment %}
                     </div>
                     <div class="col-lg-2 col-6 col-md-3">
                         <a href="{% url "add_coupon" %}" class="btn btn-brand">Add Coupon</a>
@@ -41,7 +33,6 @@
                                 <th scope="col" class="text-center">Expiry</th>
                                 <th scope="col" class="text-center">Discount</th>
                                 <th scope="col" class="text-center">Minimum Amount</th>
-                                {% comment %} <th scope="col">Active</th> {% endcomment %}
                                 <th scope="col" class="text-center"> Action </th>
                             </tr>
                         </thead>
@@ -51,7 +42,6 @@
                                 <td class="text-center"><b>{{coupon.code}}</b></td>
                                 <td class="text-center">{{coupon.expiry_date}}</td>
                                 <td class="text-center">{{coupon.discount_percentage}} %</td>
-                                {% comment %} <td><span class="badge rounded-pill alert-warning">Pending</span></td> {% endcomment %}
                                 <td class="text-center">$ {{coupon.minimum_amount}}</td>
                                 <td class="text-center">
                                     {% if coupon.unlisted %}
@@ -73,7 +63,7 @@
                 </div> <!-- table-responsive //end -->
             </div> <!-- card-body end// -->
         </div> <!-- card end// -->
-        <div class="pagination-area mt-15 mb-50">
+        {% comment %} <div class="pagination-area mt-15 mb-50">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">
                     <li class="page-item active"><a class="page-link" href="#">01</a></li>
@@ -84,7 +74,7 @@
                     <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
                 </ul>
             </nav>
-        </div>
+        </div> {% endcomment %}
     </section> <!-- content-main end// -->
     <footer class="main-footer font-xs">
         <div class="row pb-30 pt-15">
