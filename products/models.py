@@ -29,6 +29,16 @@ class Size(models.Model):
         return self.size
     
 
+class ProductOffer(BaseModel):
+    offer_name = models.TextField(max_length= 15)
+    percentage = models.IntegerField(default=0)
+    expiry_date = models.DateField(default=timezone.now)
+    is_listed = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return self.offer_name
+    
+
 class Product(BaseModel):
     product_name = models.CharField(max_length=100)
     description = models.TextField()
@@ -37,6 +47,7 @@ class Product(BaseModel):
     selling_price = models.DecimalField(max_digits=7, decimal_places=2, default=0.0)
     category = models.ForeignKey(Category, related_name='category_of_product', on_delete=models.CASCADE)
     is_selling = models.BooleanField(default=True)
+    offer = models.ForeignKey(ProductOffer, on_delete=models.CASCADE, null=True, blank=True)
     slug = models.SlugField(unique=True, null=True, blank=True)
 
 
@@ -138,3 +149,8 @@ class CategoryOffer(BaseModel):
 
     def __str__(self):
         return f"{self.category.category_name} Offer"
+
+
+
+
+

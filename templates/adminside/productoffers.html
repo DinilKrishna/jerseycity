@@ -1,0 +1,112 @@
+{% extends "base/adminbase.html" %}
+{% load static %}
+{% block title %}Offers{% endblock  %}
+{% block content %}
+<main class="main-wrap">
+    {% include "base/adminheader.html" %}
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Offers </h2>
+                <p>Add Offer</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Offers" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="offer_name" class="form-label">Offer Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" name="offer_name" required/>
+                            </div>
+                            <div class="mb-4">
+                                <label for="discount" class="form-label">Discount Percentage</label>
+                                <textarea type="number" placeholder="Discount Percentage" class="form-control" name="discount"  required></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="date" placeholder="" class="form-control" id="expiry_date" name="expiry_date" required/>
+                            </div>
+                            {% for x in messages %}
+                            <div class="alert alert-danger px-3" id="error">{{x}}</div>
+                            {% endfor %}
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-brand btn-block hover-up" name="create_category">Create Offer</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Name</th>
+                                        <th class="text-center">Discount Percentage</th>
+                                        <th class="text-center">Expiry Date</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for offer in product_offers %}
+                                    <tr>
+                                        <td class="text-center"><b>{{offer.offer_name}}</b></td>
+                                        <td class="text-center">{{offer.percentage}} %</td>
+                                        <td class="text-center">{{offer.expiry_date}}</td>
+                                        <td class="text-center">
+                                            <a href="/adminpanel/edit_offer/{{offer.uid}}" class="btn btn-sm font-sm rounded btn-brand">
+                                                <i class="material-icons md-edit"></i> Edit
+                                            </a>
+                                            
+                                            {% comment %} <a href="/adminpanel/delete_category/{{ cat.uid }}" class="btn btn-sm font-sm btn-light rounded">
+                                                <i class="material-icons md-refresh"></i> Unlist
+                                            </a> <!-- dropdown //end --> {% endcomment %}
+                                            {% if offer.is_listed %}
+                                            <a href="/adminpanel/delete_offer/{{ offer.uid }}" class="btn btn-sm font-sm btn-light rounded">
+                                                <i class="material-icons md-delete"></i> Unlist
+                                            </a>
+                                            {% else %}
+                                            <a href="/adminpanel/delete_offer/{{ offer.uid }}" class="btn btn-sm font-sm btn-light rounded">
+                                                <i class="material-icons md-refresh"></i> List
+                                            </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                document.write(new Date().getFullYear())
+                </script> ©, Evara - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+
+<script>
+    // Set the minimum date to tomorrow
+    var tomorrow = new Date();
+    tomorrow.setDate(new Date().getDate() + 1);
+    document.getElementById('expiry_date').min = tomorrow.toISOString().split('T')[0];
+</script>
+
+{% endblock  %}

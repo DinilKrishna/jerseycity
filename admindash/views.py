@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 import re
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -293,7 +293,7 @@ def add_product(request):
     if request.method == "POST":
         product_name = request.POST.get('product_name')
         price = request.POST.get('price')
-        selling_price = request.POST.get('selling_price')
+        selling_price = price
         category = request.POST.get('category')
 
         if not is_valid_product_title(product_name):
@@ -420,7 +420,15 @@ def edit_product(request, uid):
     context = {}
     products = Product.objects.get(uid = uid)
     image = Product_Image.objects.get(product = products)
+    categ = products.category
+    try:
+        cat_offer = CategoryOffer.objects.get(category = categ)
+        cat_off_percentage = cat_offer.percentage
+    except:
+        cat_off_percentage = 0
     categories = Category.objects.all()
+    current_datetime = datetime.now()
+    product_offers = ProductOffer.objects.filter(expiry_date__gt=current_datetime)
     sizes = Size.objects.all()
     size_obj_s = Size.objects.get(size='S')
     size_obj_m = Size.objects.get(size='M')
@@ -431,7 +439,7 @@ def edit_product(request, uid):
         product_name = request.POST.get('product_name')
         description = request.POST.get('description')
         price = request.POST.get('price')
-        selling_price = request.POST.get('selling_price')
+        selling_price = price
         if not is_valid_product_title(product_name):
             messages.error(request, f'{product_name} Not a valid product Name')
             print('1111111111111111111111111111111111111111111')
@@ -466,6 +474,25 @@ def edit_product(request, uid):
         
         image_front = request.FILES.get('image_front') if 'image_front' in request.FILES else None
         category = request.POST.get('category')
+        try:
+            offer_name = request.POST.get('offer')
+            if offer_name == 'none':
+                offer = None
+                selling_price = float(selling_price)
+            else:
+                offer = ProductOffer.objects.get(offer_name = offer_name)
+                selling_price = float(selling_price) - (float(selling_price) * offer.percentage)/100
+                print(cat_off_percentage)
+                print(offer.percentage)
+                if(cat_off_percentage > offer.percentage):
+                    selling_price = float(price) - (float(price) * cat_offer.percentage)/100
+                print(selling_price)
+        except ProductOffer.DoesNotExist:
+            offer = None
+            selling_price = float(selling_price)  # Convert to float if not already
+        except Exception as e:
+            offer = None
+            selling_price = float(selling_price)  # Convert to float if not already
         image_back = request.FILES.get('image_back') if 'image_back' in request.FILES else None
         extra_image_one = request.FILES.get('extra_image_one') if 'extra_image_one' in request.FILES else None
         extra_image_two = request.FILES.get('extra_image_two') if 'extra_image_two' in request.FILES else None
@@ -486,11 +513,10 @@ def edit_product(request, uid):
             quantity_of_l.save()
             quantity_of_xl.save()  
             category_instance = Category.objects.get(category_name=category)
-            
+            products.offer = offer
             products.product_name = product_name
             products.description = description
 
-            
             
             if image_front is not None:
                 products.image_front = image_front
@@ -522,7 +548,7 @@ def edit_product(request, uid):
             if extra_image_two is not None:
                 image.extra_image_two.save(extra_image_two.name, extra_image_two)
             
-            # messages.success(request, 'Edited Successfully!')
+            
             return redirect(reverse('admin_products'))
             
         except Exception as e:
@@ -531,6 +557,7 @@ def edit_product(request, uid):
             
    
     context['categories'] = categories
+    context['product_offers'] = product_offers
     context['sizes'] = sizes
     context['stock_s'] = Product_Variant.objects.get(product = products, size = size_obj_s).stock
     context['stock_m'] = Product_Variant.objects.get(product = products, size = size_obj_m).stock
@@ -573,6 +600,7 @@ def edit_category(request, id):
     context = {}
     category = Category.objects.get(id = id)
     context['categories'] = category
+    context['today_date']: date.today().strftime('%Y-%m-%d')
 
     if request.method == "POST":
         category_name = request.POST.get('category_name')
@@ -580,9 +608,15 @@ def edit_category(request, id):
         # category_description = request.POST.get('category_description')
         offer = request.POST.get('offer')
         expiry_date = request.POST.get('offer_expiry_date')
-        print(expiry_date)
         expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
-        print(expiry_date)
+
+        try:
+            offer = float(offer)
+            if not (0 <= offer <= 100):
+                raise ValueError('Offer must be between 0 and 100.')
+        except ValueError as ve:
+            messages.error(request, str(ve))
+            return render(request, 'adminside/editcategory.html', context)
 
         if Category.objects.filter(category_name__iexact=category_name).exclude(id=id).exists():
             messages.error(request, 'Category with this name already exists.')
@@ -606,11 +640,26 @@ def edit_category(request, id):
             category_offer.save()
 
             print('Category and CategoryOffer saved successfully.')
-            print('ajkslfhljksdhfsafjksadhfjklshfjklsdhfahljksdhfljkhfjklhsdjkfhasjklf')
             products = Product.objects.filter(category = category)
             for product in products:
-                product.selling_price = (float(product.price) - (float(product.price)*float(category_offer.percentage)/100))
+                print(product)
+                if product.offer:
+                    # print('xxxxxxxxxxxxxxxxxxxxxxxxxxx')
+                    product_offer = product.offer.percentage
+                else:
+                    # print('oooooooooooooooooooooooooooooooooooo')
+                    product_offer = 0
+                # print('1111111111111111111111111')
+                print(product_offer)
+                print('now price ==', product.selling_price)
+                if product_offer < category_offer.percentage:
+                    product.selling_price = (float(product.price) - (float(product.price)*float(category_offer.percentage)/100))
+                else:
+                    product.selling_price = (float(product.price) - (float(product.price)*float(product_offer)/100))
+                product.selling_price = round(product.selling_price, 2)
+                print('new price == ', product.selling_price)
                 product.save()
+            # print('looooooooooop overrrrrrrrrrrrrr')
             return redirect(reverse('categories'))
         except Exception as e:
             return HttpResponse(e)
@@ -715,3 +764,22 @@ def add_coupon(request):
         )
         return redirect('coupons')
     return render (request, 'adminside/addcoupon.html')
+
+
+def product_offers(request):
+    context = {}
+    product_offers = ProductOffer.objects.all()
+    if request.method == 'POST':
+        offer_name = request.POST['offer_name']
+        discount = request.POST['discount']
+        expiry_date = request.POST['expiry_date']
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+        try:
+            offer = ProductOffer.objects.get(offer_name = offer_name)
+            messages.error(request, 'Offer already exists')
+        except:
+            pass
+        ProductOffer.objects.create(offer_name=offer_name, percentage = discount, expiry_date = expiry_date)
+        return redirect(request.META.get('HTTP_REFERER'))
+    context['product_offers'] = product_offers
+    return render(request, 'adminside/productoffers.html', context)

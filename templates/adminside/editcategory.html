@@ -38,7 +38,8 @@
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Expiry Date</label>
-                                <input class="form-control" type="date" id="offer_expiry_date" name="offer_expiry_date" value="{{ category.category_offer.expiry_date|date:'Y-m-d' }}" required>
+                                <input class="form-control" type="date" id="offer_expiry_date" name="offer_expiry_date"
+                                    value="{{ category.category_offer.expiry_date|date:'Y-m-d' }}" required>
                             </div>
                             {% for x in messages %}
                             <div class="alert alert-danger px-3" id="error">{{x}}</div>
@@ -68,4 +69,11 @@
         </div>
     </footer>
 </main>
+
+<script>
+    // Set the minimum date to tomorrow
+    var tomorrow = new Date();
+    tomorrow.setDate(new Date().getDate() + 1);
+    document.getElementById('offer_expiry_date').min = tomorrow.toISOString().split('T')[0];
+</script>
 {% endblock  %}
