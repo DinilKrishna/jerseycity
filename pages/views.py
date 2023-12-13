@@ -53,6 +53,7 @@ def home_page(request):
     context['sizes'] = sizes
     
     if request.user.is_authenticated and not request.user.is_staff:
+        print('u',request.user)
         uid = request.user.userprofile.uid
         profile = UserProfile.objects.get(uid = uid)
         user_cart = Cart.objects.get(user = profile)

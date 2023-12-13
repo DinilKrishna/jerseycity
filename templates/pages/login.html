@@ -1,5 +1,6 @@
 {% extends "base/userbase.html" %}
 {% load static %}
+{% load socialaccount %}
 {% block title %}Login Page{% endblock  %}
 
 {% block content %}
@@ -19,7 +20,7 @@
                 <div class="col-lg-10 m-auto">
                     <div class="row">
 
-                        <div class="col-lg-5">
+                        <div class="col-lg-6">
                             <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
                                 <div class="padding_eight_all bg-white">
                                     <div class="heading_s1">
@@ -46,13 +47,19 @@
                                         {% comment %} {% for x in messages %}
                                         <div class="alert px-3" id="error">{{x}}</div>
                                         {% endfor %} {% endcomment %}
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Log in</button>
+                                        <div class="form-group row">
+                                            <div class="col-md-5">
+                                                <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Login</button>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <a href="{% provider_login_url 'google' %}?next=http://127.0.0.1:8000/home/" class="btn btn-google hover-up">Login With Google</a>
+                                            </div>
                                         </div>
                                         <a href="{% url "otp_login" %}">Login using OTP</a>
                                         
                                         <p><br>Don't have an account yet?</p><a href="{% url "signup_page" %}" >Click here to sign up</a>
                                     </form>
+                                    
                                 </div>
                             </div>
                         </div>

@@ -137,11 +137,22 @@ def sign_up(request):
             messages.error(request, "Password should contain atleast 8 characters including atleast one special character, one lowercase letter, one uppercase letter and a number")
             return redirect('signup_page')
         else:
-           
             user = User.objects.create_user(username=email, password=pass1, email=email, first_name=fname, last_name=lname)
-            userprofile = UserProfile.objects.create(user=user)
-            user.userprofile.refered = referal
-            user.userprofile.save()
+            userprofile, created = UserProfile.objects.get_or_create(user=user)
+            userprofile.refered = referal
+            userprofile.save()
+
+            print(f"UserProfile UID: {userprofile.uid}")  # Add this line for debugging
+
+            # Creating Wallet, Cart, and Wishlist instances after userprofile.save()
+            # This ensures that the UserProfile is completely saved to the database
+            wallet, wallet_created = Wallet.objects.get_or_create(user=userprofile)
+
+            print(f"Wallet created: {wallet_created}")  # Add this line for debugging
+
+            cart, cart_created = Cart.objects.get_or_create(user=userprofile)
+            wishlist, wishlist_created = Wishlist.objects.get_or_create(user=userprofile)
+
             request.session['email'] = email
             request.session['password'] = pass1
             otp = random.randint(1000, 9999)
@@ -159,10 +170,7 @@ def sign_up(request):
                 request.session['otp_expiration'] = time.time() + expiration_time
             except Exception as e:
                 print(f"Error sending email: {e}")
-            
-            Wallet.objects.create(user = userprofile)
-            Cart.objects.create(user = userprofile)
-            Wishlist.objects.create(user = userprofile)
+
             return redirect(f'/userauth/verify_otp/{user.userprofile.uid}')
 
     return render(request, 'pages/signup.html')

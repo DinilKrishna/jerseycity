@@ -87,11 +87,10 @@ class Wallet(BaseModel):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def save(self, *args, **kwargs):
-        # Check if the instance has already been saved (update operation)
-        if self.pk is not None:
-            # Retrieve the previous state of the instance
+        try:
+            # Try to retrieve the existing wallet instance
             old_wallet = Wallet.objects.get(pk=self.pk)
-            
+
             # Determine the action based on the change in amount
             if self.amount > old_wallet.amount:
                 action = "Credited"
@@ -103,6 +102,10 @@ class Wallet(BaseModel):
             # Create a new entry in WalletHistory
             if action:
                 WalletHistory.objects.create(wallet=self, amount=abs(self.amount - old_wallet.amount), action=action)
+
+        except Wallet.DoesNotExist:
+            # If the wallet instance doesn't exist, create a new one
+            pass
 
         super(Wallet, self).save(*args, **kwargs)
 
