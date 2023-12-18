@@ -108,24 +108,45 @@
                         </nav>
                     </div>
                 </div>
+
+                <input type="hidden" name="category_id" value="{{ request.GET.category_id }}">
+                <input type="hidden" name="price_range" value="{{ request.GET.price_range }}">
+
+                
                 <div class="col-lg-3 primary-sidebar sticky-sidebar">
                     <div class="widget-category mb-30">
                         <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
                         <ul class="categories">
                             {% for category in categories %}
-                                <li><a href="{% url 'shop_page' %}?category_id={{ category.id }}">{{ category.category_name }}</a></li>
+                                <li>
+                                    <a href="{% url 'shop_page' %}?category_id={{ category.id }}&price_range={{ request.GET.price_range }}&q={{ request.GET.q }}">
+                                        {{ category.category_name }}
+                                    </a>
+                                </li>
                             {% endfor %}
                         </ul>
                     </div>
-                        <div class="widget-category mb-30">
+                    <div class="widget-category mb-30">
                             <h5 class="section-title style-1 mb-30 wow fadeIn animated">Price Range</h5>
                             <ul class="categories">
-                                <li><a href="?price_range=0-40"> $0-$40 </a></li>
-                                <li><a href="?price_range=40-60"> $40-$60 </a></li>
-                                <li><a href="?price_range=60+"> $60+ </a></li>
+                                <li>
+                                    <a href="?price_range=0-40{% if request.GET.category_id %}&category_id={{ request.GET.category_id }}{% endif %}&q={{ request.GET.q }}">
+                                        $0-$40
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="?price_range=40-60{% if request.GET.category_id %}&category_id={{ request.GET.category_id }}{% endif %}&q={{ request.GET.q }}">
+                                        $40-$60
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="?price_range=60+{% if request.GET.category_id %}&category_id={{ request.GET.category_id }}{% endif %}&q={{ request.GET.q }}">
+                                        $60+
+                                    </a>
+                                </li>
                             </ul>
                         </div>
-                        <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> Filter</a>
+                        <a href="{% url 'shop_page' %}" class="btn btn-sm btn-default"><i class="fi-rs-cross mr-5"></i> Clear Filter</a>
                 </div>
             </div>
         </div>

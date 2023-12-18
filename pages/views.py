@@ -74,27 +74,43 @@ def home_page(request):
     return redirect('landing_page')
 
 
+def apply_filters(products, category_id, price_range):
+    # Apply both category and price range filters
+    if category_id:
+        category = get_object_or_404(Category, pk=category_id)
+        products = products.filter(category=category)
+
+    if price_range:
+        price_ranges = {
+            '0-40': Q(selling_price__lte=40),
+            '40-60': Q(selling_price__gt=40, selling_price__lte=60),
+            '60+': Q(selling_price__gt=60),
+        }
+
+        selected_price_filter = price_ranges.get(price_range)
+        if selected_price_filter:
+            products = products.filter(selected_price_filter)
+
+    return products
+
+
 def shop_page(request):
     context = {}
     products = Product.objects.filter(is_selling=True).order_by('created_at')
     if request.user.is_authenticated and not request.user.is_staff:
         user_id = request.user.userprofile.uid
-        profile = UserProfile.objects.get(uid = user_id)
-        user_cart = Cart.objects.get(user_id = user_id)
-        cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
-        number_in_cart = 0
-        for item in cart_items:
-            number_in_cart += 1
-            print('111111111111111')
+        profile = UserProfile.objects.get(uid=user_id)
+        user_cart = Cart.objects.get(user_id=user_id)
+        cart_items = CartItems.objects.filter(cart=user_cart, product__is_selling=True,
+                                              product__category__is_listed=True).order_by("-created_at")
+        number_in_cart = cart_items.count()
         context['number_in_cart'] = number_in_cart
-        wishlist = Wishlist.objects.get(user = profile)
-        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
-        wishlist_items
-        number_in_wishlist = 0
-        for item in wishlist_items:
-            number_in_wishlist += 1
+        wishlist = Wishlist.objects.get(user=profile)
+        wishlist_items = WishlistItems.objects.filter(wishlist=wishlist)
+        number_in_wishlist = wishlist_items.count()
         context['number_in_wishlist'] = number_in_wishlist
-    categories = Category.objects.filter(is_listed = True)
+
+    categories = Category.objects.filter(is_listed=True)
     sizes = Size.objects.all()
 
     # Get the search query from the GET parameters
@@ -102,11 +118,14 @@ def shop_page(request):
 
     # Filter products based on the search query
     products = Product.objects.filter(
-        Q(category__is_listed = True) &
-        Q(is_selling = True) & 
+        Q(category__is_listed=True) &
+        Q(is_selling=True) &
         (Q(product_name__icontains=search_query) |
-        Q(description__icontains=search_query))
+         Q(description__icontains=search_query))
     ).order_by('created_at')
+
+    # Apply filters
+    products = apply_filters(products, request.GET.get('category_id'), request.GET.get('price_range'))
 
     # Initialize selected_category as None
     selected_category = None
@@ -185,6 +204,7 @@ def shop_page(request):
     if request.user.is_authenticated and request.user.is_staff:
         logout(request)
     return render(request, 'pages/shop.html', context)
+
 
 
 def product_details(request, uid):

@@ -89,10 +89,8 @@
                     </div>
                     <form method="get" action="{% url 'shop_page' %}">
                     <div class="header-action-right">
-                        <div class="search-style-2">                            
-                                <input type="text" name="q" placeholder="Search for items..." value="{{ request.GET.q }}" required>
-                                
-                            
+                        <div class="search-style-2">
+                            <input type="text" name="q" placeholder="Search for items..." value="{{ request.GET.q }}" >
                         </div>
                         <div class="header-action-2">
                             <div class="header-action-icon-2">

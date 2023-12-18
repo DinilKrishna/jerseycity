@@ -637,7 +637,7 @@ def wishlist(request):
     try:
         profile = UserProfile.objects.get(uid = uid)
         wishlist, created = Wishlist.objects.get_or_create(user = profile)
-        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)         
+        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist, product__is_selling=True)         
     
         context['user'] = profile
         context['products'] = wishlist_items

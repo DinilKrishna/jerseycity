@@ -131,7 +131,7 @@ class WishlistItems(BaseModel):
                                             
     
     def __str__(self) -> str:
-        return f'{self.quantity} x {self.product.product_name} in Cart'
+        return f'{self.wishlist.user.user.first_name} x {self.product.product_name} in Wishlist'
     
 
 class Return(BaseModel):

@@ -19,7 +19,7 @@ def add_to_cart(request):
             size = Size.objects.get(id = size_id)
             product_variant = Product_Variant.objects.get(product = product_obj, size = size_id)
             cart, created = Cart.objects.get_or_create(user = request.user.userprofile)
-            if product_variant.stock <= 1:
+            if product_variant.stock < 1:
                 return JsonResponse({'stock' : True})
             
             cart_item, item_created = CartItems.objects.get_or_create(
@@ -50,7 +50,7 @@ def add_quantity(request, uid):
     product_variant = Product_Variant.objects.get(product=cart_item.product, size=cart_item.size)
     
     if cart_item.quantity == product_variant.stock:
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False,'message':"Maximum Quantity Reached"})
         
     else:
         cart_item.quantity += 1
@@ -77,7 +77,7 @@ def decrease_quantity(request, uid):
     cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
     
     if cart_item.quantity == 1:
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False,'message':"Minimum Quantity Reached"})
     else:
         cart_item.quantity -= 1
         cart_item.save()
