@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import re
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -194,7 +194,6 @@ def categories(request):
     if request.method == "POST":
         category_name = request.POST.get('category_name')
         category_slug = request.POST.get('category_slug')
-        category_description = request.POST.get('category_description')
         if Category.objects.filter(category_name = category_name).exists():
             messages.error(request, 'Categorie already exists!!')
         elif Category.objects.filter(category_slug = category_slug).exists():
@@ -203,7 +202,6 @@ def categories(request):
             new_category = Category(
                 category_name=category_name,
                 category_slug=category_slug,
-                category_description=category_description
             )
             new_category.save()
 
@@ -607,9 +605,32 @@ def edit_category(request, id):
         category_name = request.POST.get('category_name')
         category_slug = request.POST.get('category_slug')
         # category_description = request.POST.get('category_description')
-        offer = request.POST.get('offer')
-        expiry_date = request.POST.get('offer_expiry_date')
-        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+        try:
+            offer = request.POST.get('offer')
+        except:
+            offer = 0
+        if offer == 'None':
+            offer = 0
+        elif offer == '':
+            offer = 0
+        x = 0
+        current_datetime = timezone.now()
+        tomorrow_datetime = current_datetime + timedelta(days=1)
+        try:
+            expiry_date = request.POST.get('offer_expiry_date')
+            expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+        except:
+            expiry_date = tomorrow_datetime
+            x = 'now'
+        if not expiry_date:
+            expiry_date = tomorrow_datetime
+            x = 'now'
+        # if expiry_date and not offer:
+        #     messages.error(request, 'Please enter an offer')
+        #     return redirect(request.META.get('HTTP_REFERER'))
+        if offer and not expiry_date:
+            messages.error(request, 'Please select an expiry date')
+            return redirect(request.META.get('HTTP_REFERER'))
 
         try:
             offer = float(offer)
@@ -632,11 +653,14 @@ def edit_category(request, id):
             category.category_name = category_name
             category.category_slug = category_slug
             category.save()
+            if offer == 0:
+                offer = None
+                expiry_date = None
             category_offer, created = CategoryOffer.objects.get_or_create(category=category)
             category_offer.percentage = offer
 
-            if expiry_date is not None:
-                category_offer.expiry_date = expiry_date
+            # if expiry_date is not None and x == 0:
+            category_offer.expiry_date = expiry_date
 
             category_offer.save()
 
@@ -653,7 +677,9 @@ def edit_category(request, id):
                 # print('1111111111111111111111111')
                 print(product_offer)
                 print('now price ==', product.selling_price)
-                if product_offer < category_offer.percentage:
+                if category_offer.percentage == None:
+                    product.selling_price = (float(product.price) - (float(product.price)*float(product_offer)/100))
+                elif product_offer < category_offer.percentage:
                     product.selling_price = (float(product.price) - (float(product.price)*float(category_offer.percentage)/100))
                 else:
                     product.selling_price = (float(product.price) - (float(product.price)*float(product_offer)/100))
@@ -661,6 +687,8 @@ def edit_category(request, id):
                 print('new price == ', product.selling_price)
                 product.save()
             # print('looooooooooop overrrrrrrrrrrrrr')
+            if x == 'now':
+                category_offer.expiry_date = None
             return redirect(reverse('categories'))
         except Exception as e:
             return HttpResponse(e)

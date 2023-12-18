@@ -13,9 +13,8 @@ from userauth.models import UserProfile
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50, unique=True)
-    offer = models.IntegerField(default = 0)
+    offer = models.IntegerField(null = True, blank=True)
     category_slug = models.SlugField(unique=True, null=True, blank=True)
-    # category_description = models.TextField(default=category_name)
     is_listed = models.BooleanField(default=True)
 
     def __str__(self) -> str:
@@ -141,8 +140,8 @@ class Return(BaseModel):
 
 class CategoryOffer(BaseModel):
     category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name="category_offer")
-    percentage = models.IntegerField(default=0)
-    expiry_date = models.DateField(default= timezone.now)
+    percentage = models.IntegerField(null=True, blank = True)
+    expiry_date = models.DateField(null = True, blank=True)
 
     def is_valid(self):
         return self.expiry_date >= timezone.now().date()

@@ -26,12 +26,12 @@
                             </div>
                             <div class = "mb-4">
                                 <label class="form-label">Offer Percentage</label>
-                                <textarea type="number" placeholder="Discount" class="form-control" name="offer" value="" required>{{categories.category_offer.percentage}}</textarea>
+                                <textarea type="number" placeholder="Discount" class="form-control" name="offer" value="" >{{categories.category_offer.percentage}}</textarea>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Expiry Date</label>
                                 <input class="form-control" type="date" id="offer_expiry_date" name="offer_expiry_date"
-                                    value="{{ category.category_offer.expiry_date|date:'Y-m-d' }}" required>
+                                    value="{{ categories.category_offer.expiry_date|date:'Y-m-d' }}">
                             </div>
                             {% for x in messages %}
                             <div class="alert alert-danger px-3" id="error">{{x}}</div>
