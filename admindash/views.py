@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
+from userauth.views import validate_image
 from products.models import *
 from django.urls import reverse
 from . decorators import admin_required
@@ -14,6 +15,8 @@ from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
 from checkout.models import *
+from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 
 # Create your views here.
 
@@ -472,40 +475,61 @@ def edit_product(request, uid):
         
         image_front = request.FILES.get('image_front') if 'image_front' in request.FILES else None
         category = request.POST.get('category')
-        print(price,"price", selling_price, "selling price")
-        print(cat_offer.percentage)
-        print('==================================================')
-        print(cat_off_percentage)
-        print('-----------------------------------------------')
+        if image_front:
+            try:
+                # Open the image file
+                img = Image.open(image_front.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
+        
         try:
             offer_name = request.POST.get('offer')
             if offer_name == 'none':
                 offer = None
                 selling_price = float(price) - (float(price) * float(cat_offer.percentage))/100
-                print('111', selling_price)
                 selling_price = float(selling_price)
-                print('222', selling_price)
             else:
                 offer = ProductOffer.objects.get(offer_name = offer_name)
-                print('3333', selling_price)
                 selling_price = float(selling_price) - (float(selling_price) * offer.percentage)/100
-                print('444', selling_price)
                 if(cat_off_percentage > offer.percentage):
                     selling_price = float(price) - (float(price) * cat_off_percentage)/100
-                print('555', selling_price)
         except ProductOffer.DoesNotExist:
             offer = None
             selling_price = float(price) - (float(price) * cat_off_percentage)/100
             selling_price = float(selling_price)  # Convert to float if not already
-            print('666', selling_price)
         except Exception as e:
             offer = None
             selling_price = float(price) - (float(price) * cat_off_percentage)/100
             selling_price = float(selling_price)  # Convert to float if not already
-            print('777', selling_price)
         image_back = request.FILES.get('image_back') if 'image_back' in request.FILES else None
         extra_image_one = request.FILES.get('extra_image_one') if 'extra_image_one' in request.FILES else None
         extra_image_two = request.FILES.get('extra_image_two') if 'extra_image_two' in request.FILES else None
+        if image_back:
+            try:
+                # Open the image file
+                img = Image.open(image_back.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
+        if extra_image_one:
+            try:
+                # Open the image file
+                img = Image.open(extra_image_one.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
+        if extra_image_two:
+            try:
+                # Open the image file
+                img = Image.open(extra_image_two.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
 
         try:
             
@@ -530,15 +554,13 @@ def edit_product(request, uid):
             
             if image_front is not None:
                 products.image_front = image_front
-                print('NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOt')
+                print('Valid Image Front')
             if image_front is None:
-                print('Noneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+                print('Image is not added')
             
             products.category = category_instance
             products.price = price
             products.selling_price = selling_price
-            print('888888', selling_price)
-            print('99999999', products.selling_price)
 
 
             if image_back is not None:
@@ -696,11 +718,9 @@ def edit_category(request, id):
                     product.selling_price = (float(product.price) - (float(product.price)*float(category_offer.percentage)/100))
                 else:
                     product.selling_price = (float(product.price) - (float(product.price)*float(product_offer)/100))
-                # product.selling_price = round(product.selling_price, 2)
                 print('new price == ', product.selling_price)
                 print("---------------------",product.selling_price)
                 product.save()
-            # print('looooooooooop overrrrrrrrrrrrrr')
             if x == 'now':
                 category_offer.expiry_date = None
             return redirect(reverse('categories'))
