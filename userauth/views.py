@@ -17,6 +17,8 @@ from checkout.models import Address, Order, OrderItems, Wallet, WalletHistory
 from userauth.decorator import login_required
 from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
+from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 
 # Create your views here.
 
@@ -359,41 +361,61 @@ def user_profile(request, uid):
     
     return redirect('login_page')
 
+
+def validate_image(image):
+    """
+    Validate the uploaded image.
+    """
+    max_width = 1000
+    max_height = 1000
+
+    try:
+        width, height = get_image_dimensions(image)
+
+        if width > max_width or height > max_height:
+            raise ValidationError("Image dimensions should not exceed {}x{} pixels.".format(max_width, max_height))
+
+    except AttributeError:
+        raise ValidationError("Invalid image file.")
+
+    return image
+
+
 @login_required
 def change_profile_image(request, uid):
     context = {}  
     profile = UserProfile.objects.get(uid=uid)
-    user_cart = Cart.objects.get(user_id = uid)
-    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
-    number_in_cart = 0
-    for item in cart_items:
-        number_in_cart += 1
-    wishlist = Wishlist.objects.get(user = profile)
-    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
-    wishlist_items
-    number_in_wishlist = 0
-    for item in wishlist_items:
-        number_in_wishlist += 1
+    user_cart = Cart.objects.get(user_id=uid)
+    cart_items = CartItems.objects.filter(cart=user_cart, product__is_selling=True, product__category__is_listed=True).order_by("-created_at")
+    number_in_cart = cart_items.count()
+    wishlist = Wishlist.objects.get(user=profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist=wishlist)
+    number_in_wishlist = wishlist_items.count()
     context['number_in_wishlist'] = number_in_wishlist
-    
+
     try:
         if request.method == 'POST':
             profile_image = request.FILES.get('profile_image') if 'profile_image' in request.FILES else None
 
             # Ensure the image is not None before attempting to save
             if profile_image:
+                # Validate the image
+                validate_image(profile_image)
+
                 # Add a timestamp to the image filename to make it unique
                 filename = f'profile_image_{timezone.now().timestamp()}.jpg'
                 profile.profile_image.save(filename, profile_image, save=True)
-                
+
                 return JsonResponse({
                     'status': 'success',
                     'uid': uid,
                 })
+    except ValidationError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
     except Exception as e:
-        return HttpResponse(e)
+        return JsonResponse({'status': 'error', 'message': str(e)})
 
-    context['profile'] = profile 
+    context['profile'] = profile
     context['number_in_cart'] = number_in_cart
     return render(request, 'userside/changeprofileimage.html', context)
 

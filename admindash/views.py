@@ -424,6 +424,8 @@ def edit_product(request, uid):
         cat_off_percentage = cat_offer.percentage
     except:
         cat_off_percentage = 0
+    if cat_offer.percentage is None:
+        cat_off_percentage = 0
     categories = Category.objects.all()
     current_datetime = datetime.now()
     product_offers = ProductOffer.objects.filter(expiry_date__gt=current_datetime)
@@ -440,11 +442,9 @@ def edit_product(request, uid):
         selling_price = price
         if not is_valid_product_title(product_name):
             messages.error(request, f'{product_name} Not a valid product Name')
-            print('1111111111111111111111111111111111111111111')
             return redirect(request.META.get("HTTP_REFERER"))
         if not is_valid_price(price):
             messages.error(request, 'Price should be a positive number')
-            print('2222222222222222222222222222222222222222222')
             return redirect(request.META.get("HTTP_REFERER"))
         if not is_valid_price(selling_price):
             messages.error(request, 'Price should be a positive number')
@@ -472,26 +472,37 @@ def edit_product(request, uid):
         
         image_front = request.FILES.get('image_front') if 'image_front' in request.FILES else None
         category = request.POST.get('category')
+        print(price,"price", selling_price, "selling price")
+        print(cat_offer.percentage)
+        print('==================================================')
+        print(cat_off_percentage)
+        print('-----------------------------------------------')
         try:
             offer_name = request.POST.get('offer')
             if offer_name == 'none':
                 offer = None
-                selling_price = float(price) - (float(price) * cat_offer.percentage)/100
+                selling_price = float(price) - (float(price) * float(cat_offer.percentage))/100
+                print('111', selling_price)
                 selling_price = float(selling_price)
+                print('222', selling_price)
             else:
                 offer = ProductOffer.objects.get(offer_name = offer_name)
+                print('3333', selling_price)
                 selling_price = float(selling_price) - (float(selling_price) * offer.percentage)/100
+                print('444', selling_price)
                 if(cat_off_percentage > offer.percentage):
-                    selling_price = float(price) - (float(price) * cat_offer.percentage)/100
-                print(selling_price)
+                    selling_price = float(price) - (float(price) * cat_off_percentage)/100
+                print('555', selling_price)
         except ProductOffer.DoesNotExist:
             offer = None
             selling_price = float(price) - (float(price) * cat_off_percentage)/100
             selling_price = float(selling_price)  # Convert to float if not already
+            print('666', selling_price)
         except Exception as e:
             offer = None
             selling_price = float(price) - (float(price) * cat_off_percentage)/100
             selling_price = float(selling_price)  # Convert to float if not already
+            print('777', selling_price)
         image_back = request.FILES.get('image_back') if 'image_back' in request.FILES else None
         extra_image_one = request.FILES.get('extra_image_one') if 'extra_image_one' in request.FILES else None
         extra_image_two = request.FILES.get('extra_image_two') if 'extra_image_two' in request.FILES else None
@@ -526,6 +537,8 @@ def edit_product(request, uid):
             products.category = category_instance
             products.price = price
             products.selling_price = selling_price
+            print('888888', selling_price)
+            print('99999999', products.selling_price)
 
 
             if image_back is not None:
@@ -683,8 +696,9 @@ def edit_category(request, id):
                     product.selling_price = (float(product.price) - (float(product.price)*float(category_offer.percentage)/100))
                 else:
                     product.selling_price = (float(product.price) - (float(product.price)*float(product_offer)/100))
-                product.selling_price = round(product.selling_price, 2)
+                # product.selling_price = round(product.selling_price, 2)
                 print('new price == ', product.selling_price)
+                print("---------------------",product.selling_price)
                 product.save()
             # print('looooooooooop overrrrrrrrrrrrrr')
             if x == 'now':
