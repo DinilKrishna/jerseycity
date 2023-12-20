@@ -113,7 +113,11 @@ def checkout(request):
 
             payment_method_instance = Payment_Method.objects.get(method='cash_on_delivery')            
             print('instance: ', payment_method_instance)
-
+            for item in cart_items:
+                product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
+                if product_stock.stock < item.quantity:
+                    messages.error(request, "Product Out of Stock")
+                    return redirect('cart')
             order = Order.objects.create(
                 user=request.user,
                 address=selected_address,
@@ -140,7 +144,7 @@ def checkout(request):
                     discounted_subtotal=sub_total,
                 )
 
-                product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
+                
                 product_stock.stock -= item.quantity
                 product_stock.sold += item.quantity
                 product_stock.save()
@@ -195,6 +199,11 @@ def wallet_payment(request):
         if wallet.amount < grand_total:
             messages.error(request, 'Not enough balance in wallet')
             return redirect(request.META.get("HTTP_REFERER"))
+        for item in cart_items:
+            product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
+            if product_stock.stock < item.quantity:
+                messages.error(request, "Product Out of Stock")
+                return redirect('cart')
         print('wallet.amount')
         wallet.amount = remaining_balance
         print('                   ',wallet.amount)
@@ -288,6 +297,11 @@ def create_order(request):
     print(payment_method_instance)
     cart = Cart.objects.get(user=profile)
     cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
+    for item in cart_items:
+        product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
+        if product_stock.stock < item.quantity:
+            messages.error(request, "Product Out of Stock")
+            return redirect('cart')
     order = Order.objects.create(
             user=request.user,
             address=selected_address,
