@@ -17,6 +17,8 @@ from django.shortcuts import render, redirect
 from checkout.models import *
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
+from django.db.models import F, Case, When, Value
+from django.db.models.functions import Now
 
 # Create your views here.
 
@@ -96,17 +98,6 @@ def admin_products(request):
         return render(request, 'adminside/adminproducts.html', context)
     return redirect('admin_login_page')
 
-
-# def users(request):
-#     context = {}
-#     if  request.user.is_authenticated and request.user.is_staff is True:
-#         user_obj = User.objects.all().order_by('-date_joined')
-#         profile_obj = UserProfile.objects.all()
-#         context['users'] = user_obj
-#         context['profiles'] = profile_obj
-#         return render(request, 'adminside/users.html', context)
-#     else:
-#         return redirect('admin_login_page')
 
 def users(request):
     context = {}
@@ -790,8 +781,33 @@ def order_info(request, uid):
 @admin_required
 def coupons(request):
     context = {}
-    coupons = Coupon.objects.all().order_by('expiry_date')
+
+    # Order by expiry date in ascending order, expired coupons go last
+    all_coupons = Coupon.objects.annotate(
+        is_expired=Case(
+            When(expiry_date__lt=timezone.now(), then=Value(True)),
+            default=Value(False),
+            output_field=models.BooleanField(),
+        )
+    ).order_by('is_expired', 'expiry_date')
+
+    # Pagination
+    items_per_page = 10
+    paginator = Paginator(all_coupons, items_per_page)
+    page = request.GET.get('page')
+
+    try:
+        coupons = paginator.page(page)
+    except PageNotAnInteger:
+        # If the page parameter is not an integer, deliver the first page.
+        coupons = paginator.page(1)
+    except EmptyPage:
+        # If the page is out of range (e.g., 9999), deliver the last page of results.
+        coupons = paginator.page(paginator.num_pages)
+
     context['coupons'] = coupons
+    now = timezone.now()
+    context['now'] = now
     return render(request, 'adminside/coupons.html', context)
 
 def unlist_coupon(request, uid):
@@ -870,6 +886,43 @@ def add_coupon(request):
         )
         return redirect('coupons')
     return render (request, 'adminside/addcoupon.html')
+
+
+def edit_coupon(request, uid):
+    context = {}
+    coupon = Coupon.objects.get(uid = uid)
+    if request.method == 'POST':
+        code = request.POST['coupon_code']
+        date = request.POST['expiry_date']
+        minimum_amount = request.POST['minimum_amount']
+        discount_percentage = request.POST['discount_percentage']
+        if not is_valid_coupon_name(code):
+            messages.error(request, 'Invalid coupon name')
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        if not is_valid_minimum_amount(minimum_amount):
+            messages.error(request, 'Minimum amount should be an integer above zero')
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        if not is_valid_discount_percentage(discount_percentage):
+            messages.error(request, 'Discount percentage should be an integer between 0 and 100')
+            return redirect(request.META.get('HTTP_REFERER'))
+        try:
+            existing_coupon = Coupon.objects.exclude(uid=uid).get(code=code)
+            messages.error(request, 'Coupon already exists')
+            return redirect(request.META.get('HTTP_REFERER'))
+        except:
+            pass
+        
+        coupon.code = code
+        coupon.expiry_date = date
+        coupon.minimum_amount = minimum_amount
+        coupon.discount_percentage = discount_percentage
+        coupon.save()
+        return redirect('coupons')
+        
+    context['coupon'] = coupon
+    return render(request, 'adminside/editcoupon.html', context)
 
 
 def product_offers(request):

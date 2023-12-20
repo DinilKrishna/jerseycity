@@ -33,6 +33,7 @@
                                 <th scope="col" class="text-center">Expiry</th>
                                 <th scope="col" class="text-center">Discount</th>
                                 <th scope="col" class="text-center">Minimum Amount</th>
+                                <th scope="col" class="text-center"> Status </th>
                                 <th scope="col" class="text-center"> Action </th>
                             </tr>
                         </thead>
@@ -44,6 +45,16 @@
                                 <td class="text-center">{{coupon.discount_percentage}} %</td>
                                 <td class="text-center">$ {{coupon.minimum_amount}}</td>
                                 <td class="text-center">
+                                    {% if coupon.expiry_date < now %}
+                                        <span class="badge rounded-pill alert-warning ">Expired</span>
+                                    {% elif coupon.unlisted  %}
+                                        <span class="badge rounded-pill alert-danger ">Unlisted</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill alert-success ">Active</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="/adminpanel/edit_coupon/{{coupon.uid}}" class="btn btn-sm font-sm rounded btn-brand">Edit</a>
                                     {% if coupon.unlisted %}
                                     <a href="/adminpanel/list_coupon/{{coupon.uid}}" class="btn btn-sm font-sm btn-light rounded">
                                         <i class="material-icons md-refresh"></i>List
@@ -63,18 +74,27 @@
                 </div> <!-- table-responsive //end -->
             </div> <!-- card-body end// -->
         </div> <!-- card end// -->
-        {% comment %} <div class="pagination-area mt-15 mb-50">
+        <div class="pagination-area mt-15 mb-50">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">
-                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                    <li class="page-item"><a class="page-link" href="#">03</a></li>
-                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                    <li class="page-item"><a class="page-link" href="#">16</a></li>
-                    <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    {% if coupons.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ coupons.previous_page_number }}">&larr;</a>
+                        </li>
+                    {% endif %}
+                    {% for i in coupons.paginator.page_range %}
+                        <li class="page-item {% if i == coupons.number %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if coupons.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ coupons.next_page_number }}">&rarr;</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </nav>
-        </div> {% endcomment %}
+        </div>
     </section> <!-- content-main end// -->
     <footer class="main-footer font-xs">
         <div class="row pb-30 pt-15">
