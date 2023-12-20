@@ -806,12 +806,55 @@ def list_coupon(request, uid):
     coupon.save()
     return redirect(request.META.get('HTTP_REFERER'))
 
+
+def is_valid_coupon_name(coupon_name):
+    if isinstance(coupon_name, str) and len(coupon_name) >= 5 and coupon_name.isalnum():
+        return True
+    else:
+        return False
+    
+
+def is_valid_minimum_amount(minimum_amount):
+    try:
+        minimum_amount = int(minimum_amount)
+        if minimum_amount >= 0:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+    
+
+def is_valid_discount_percentage(discount_percentage):
+    try:
+        discount_percentage = float(discount_percentage)
+        if 0 <= discount_percentage <= 100:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+
+
 def add_coupon(request):
     if request.method == 'POST':
         code = request.POST['coupon_code']
         date = request.POST['expiry_date']
         minimum_amount = request.POST['minimum_amount']
         discount_percentage = request.POST['discount_percentage']
+        if not is_valid_coupon_name(code):
+            messages.error(request, 'Invalid coupon name')
+            return redirect(request.META.get('HTTP_REFERER'))
+        
+
+        if not is_valid_minimum_amount(minimum_amount):
+            messages.error(request, 'Minimum amount should be an integer above zero')
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        if is_valid_discount_percentage(discount_percentage):
+            messages.error(request, 'Discount percentage should be an integer between 0 and 100')
+            return redirect(request.META.get('HTTP_REFERER'))
+        
         try:
             existing_coupon = Coupon.objects.get(code = code)
             messages.error(request, 'Coupon already exists')

@@ -42,4 +42,19 @@
     </div>
 </div>
 
+<script>
+    // Get the current date
+    var today = new Date();
+
+    // Set the minimum date to tomorrow
+    var tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Format the date as "YYYY-MM-DD"
+    var formattedDate = tomorrow.toISOString().split('T')[0];
+
+    // Set the minimum attribute of the input element
+    document.getElementById('expiry_date').min = formattedDate;
+</script>
+
 {% endblock %}
