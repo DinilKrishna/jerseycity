@@ -178,6 +178,25 @@ def sign_up(request):
     return render(request, 'pages/signup.html')
 
 
+def google_signup(request):
+    user = request.user
+    # Ensure that the UserProfile object is created
+    userprofile, created = UserProfile.objects.get_or_create(user=user)
+    
+    if created:
+        # If the UserProfile was just created, you might want to set additional fields
+        userprofile.generate_reference_code()
+        userprofile.is_verified = True
+        userprofile.save()
+
+        # Create Wallet, Cart, and Wishlist instances
+        Wallet.objects.get_or_create(user=userprofile)
+        Cart.objects.get_or_create(user=userprofile)
+        Wishlist.objects.get_or_create(user=userprofile)
+
+    return redirect('home_page')
+
+
 def verify_otp(request, uid):
     if request.user.is_staff:
         logout(request)

@@ -9,6 +9,7 @@ urlpatterns = [
 
     path('verify_otp/<uid>/', views.verify_otp, name='verify_otp'),
     path('otp_login/',views.otp_login, name = 'otp_login'),
+    path('google_signup/',views.google_signup, name = 'google_signup'),
     path('otp_login_verify/',views.otp_login_verify, name = 'otp_login_verify'),
     path('resend_otp/',views.resend_otp, name = 'resend_otp'),
 

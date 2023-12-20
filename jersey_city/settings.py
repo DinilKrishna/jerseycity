@@ -170,5 +170,5 @@ AUTHENTICATION_BACKENDS = {
     "allauth.account.auth_backends.AuthenticationBackend"
 }
 
-LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/home/"
+LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/google_signup/"
 LOGOUT_REDIRECT_URL = "http://127.0.0.1:8000/"

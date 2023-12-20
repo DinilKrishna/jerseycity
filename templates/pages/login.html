@@ -52,7 +52,7 @@
                                                 <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Login</button>
                                             </div>
                                             <div class="col-md-7">
-                                                <a href="{% provider_login_url 'google' %}?next=http://127.0.0.1:8000/home/" class="btn btn-google hover-up">Login With Google</a>
+                                                <a href="{% provider_login_url 'google' %}?next=http://127.0.0.1:8000/userauth/google_signup/" class="btn btn-google hover-up">Login With Google</a>
                                             </div>
                                         </div>
                                         <a href="{% url "otp_login" %}">Login using OTP</a>

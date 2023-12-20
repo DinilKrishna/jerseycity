@@ -209,7 +209,6 @@ def wallet_payment(request):
         print('                   ',wallet.amount)
         wallet.save()
         print('                                       ',wallet.amount)
-        uid = request.user.userprofile.uid
         selected_address_id = request.session.get('selected_address_id')
         request.session.pop('selected_address_id', None)
         print(selected_address_id)
@@ -221,7 +220,7 @@ def wallet_payment(request):
         if cart.coupon:
             discounted_total = grand_total - (grand_total * cart.coupon.discount_percentage)/100
             discounted_total = round(discounted_total, 2)
-        cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
+        
         order = Order.objects.create(
                 user=request.user,
                 address=selected_address,
