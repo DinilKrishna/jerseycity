@@ -285,6 +285,7 @@ def wallet_payment(request):
     return render(request, 'checkout/wallet.html', context)
 
 
+
 def create_order(request):
     uid = request.user.userprofile.uid
     selected_address_id = request.session.get('selected_address_id')
@@ -293,13 +294,21 @@ def create_order(request):
     selected_address = Address.objects.get(uid=selected_address_id)
     payment_method_instance = Payment_Method.objects.get(method='razorpay')
     profile = UserProfile.objects.get(uid=uid)
+    wallet = Wallet.objects.get(user=profile)
     print(payment_method_instance)
     cart = Cart.objects.get(user=profile)
     cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
+    grand_total = 0
+    for cart_item in cart_items:
+        sub_total = cart_item.calculate_sub_total()
+        grand_total += sub_total
     for item in cart_items:
         product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
         if product_stock.stock < item.quantity:
             messages.error(request, "Product Out of Stock")
+            messages.error(request, "The amount has been credited back to your wallet")
+            wallet.amount += grand_total
+            wallet.save()
             return redirect('cart')
     order = Order.objects.create(
             user=request.user,
