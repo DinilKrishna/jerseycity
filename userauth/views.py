@@ -8,7 +8,7 @@ from django.urls import reverse
 from . models import UserProfile
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
 from django.shortcuts import get_object_or_404
 import random
 from django.core.mail import send_mail
@@ -228,7 +228,7 @@ def verify_otp(request, uid):
                 
                 refered_wallet.amount += 100
                 refered_wallet.save()
-            messages.success(request, "signup successful!")
+            messages.success(request, "Signup successful!")
             return redirect('login_page')
         else:
             messages.error(request, "Invalid otp")
@@ -266,11 +266,12 @@ def otp_login(request):
         message = f"{otp} - OTP"
         from_email = "dinilkrishna594@gmail.com"
         recipient_list = [email]
-        expiration_time = 30  
+        expiration_time = 100  
         try:
             
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             request.session['otp_expiration'] = time.time() + expiration_time   
+
         except Exception as e:
             print(f"Error sending email: {e}")
         return redirect('otp_login_verify')
@@ -281,38 +282,43 @@ def otp_login(request):
 def otp_login_verify(request):
     if request.user.is_staff:
         logout(request)
+
     real_otp = str(request.session.get('otp')).strip()
+    
     print('The OTP in session is  ========================================================', real_otp)
     email = request.session.get('email')
     otp_timestamp = request.session.get('otp_timestamp')
     expiration_time = request.session.get('otp_expiration')
-    
     remaining_time = max(0, expiration_time - time.time())
 
     if request.method == 'POST':
         otp = request.POST.get('otp')
-
         if remaining_time <= 0:
             messages.error(request, 'OTP has expired. Please request a new OTP.')
             return redirect('otp_login')
         
-        
         if otp == real_otp:
+            print('email', email)
             user = User.objects.get(username=email)
-            user_profile = UserProfile.objects.get(user = user)
-            try:
-                authenticated_user = authenticate(request, user = user_profile)
-            except Exception as e:
-                return HttpResponse(e)
+            print(user, '001')
+            # user_profile = UserProfile.objects.get(user = user)
+            # try:
+            #     print('UFGUGHFIU')
+            #     authenticated_user = authenticate(username = email , password = 'Jack@123')
+            #     print('UFGUGHFIU',authenticated_user)
+            # except Exception as e:
+            #     return HttpResponse(e)
+            
 
             if user is not None:
-                login(request, user)
+                login(request, user, backend ='django.contrib.auth.backends.ModelBackend')
+                print("reached here")
                 return redirect('home_page')  
             else:
                 messages.error(request, 'Invalid Credentials')  
         else:
             messages.error(request, 'Invalid OTP')
-            
+
     return render(request, 'pages/otploginverify.html', {'remaining_time': remaining_time})
 
 
@@ -497,6 +503,11 @@ def change_password(request, uid):
         
         user_profile.user.set_password(pass1)
         user_profile.user.save()
+        # Update the session with the new user credentials
+        login(request, user_profile.user, backend= 'django.contrib.auth.backends.ModelBackend')
+
+        # Update the session's password hash to match the new password
+        update_session_auth_hash(request, user_profile.user)
         return redirect(reverse('user_profile', kwargs={'uid': id}))
 
     return render(request, 'userside/changepassword.html', context)        

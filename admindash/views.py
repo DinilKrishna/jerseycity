@@ -19,6 +19,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 from django.db.models import F, Case, When, Value
 from django.db.models.functions import Now
+from django.db.models import Sum
 
 # Create your views here.
 
@@ -37,7 +38,35 @@ def admin_log_out(request):
 
 def admin_dashboard(request):
     if request.user.is_authenticated and request.user.is_staff:
-        return render (request, 'adminside/adminpanel.html')
+        context = {}
+        total_users = UserProfile.objects.count()
+        total_orders = Order.objects.filter(payed=True).count()
+        paid_orders = Order.objects.filter(payed=True)
+        total_products = Product.objects.count()
+        total_categories = Category.objects.count()
+        total_amount = paid_orders.aggregate(total_amount=Sum('amount_to_pay'))['total_amount'] or 0
+
+        current_month = timezone.now().month
+        current_year = timezone.now().year
+        monthly_sales_sum = Order.objects.filter(created_at__month=current_month).aggregate(monthly_sales=Sum('amount_to_pay'))['monthly_sales'] or 0
+        yearly_sales_sum = Order.objects.filter(created_at__year=current_year).aggregate(yearly_sales=Sum('amount_to_pay'))['yearly_sales'] or 0
+
+        context['total_orders'] = total_orders
+        context['total_users'] = total_users
+        context['paid_orders'] = paid_orders
+        context['total_amount'] = total_amount
+        context['total_products'] = total_products
+        context['total_categories'] = total_categories
+        context['monthly_sales'] = monthly_sales_sum
+        context['yearly_sales'] = yearly_sales_sum
+
+        # Monthly sales data
+        monthly_sales_data = Order.objects.filter(created_at__year=current_year).values('created_at__month').annotate(monthly_sales=Sum('amount_to_pay'))
+        months = [entry['created_at__month'] for entry in monthly_sales_data]
+        monthly_sales = [entry['monthly_sales'] or 0 for entry in monthly_sales_data]
+
+        
+        return render(request, 'adminside/adminpanel.html', context)
     return redirect('admin_login_page')
 
 

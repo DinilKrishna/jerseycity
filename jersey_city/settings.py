@@ -165,10 +165,10 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTHENTICATION_BACKENDS = {
+AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend"
-}
+]
 
 LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/google_signup/"
 LOGOUT_REDIRECT_URL = "http://127.0.0.1:8000/"
