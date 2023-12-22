@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 import re
+import json
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -20,6 +21,8 @@ from django.core.files.images import get_image_dimensions
 from django.db.models import F, Case, When, Value
 from django.db.models.functions import Now
 from django.db.models import Sum
+from decimal import Decimal
+from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
 
@@ -41,7 +44,7 @@ def admin_dashboard(request):
         context = {}
         total_users = UserProfile.objects.count()
         total_orders = Order.objects.filter(payed=True).count()
-        paid_orders = Order.objects.filter(payed=True)
+        paid_orders = Order.objects.all()
         total_products = Product.objects.count()
         total_categories = Category.objects.count()
         total_amount = paid_orders.aggregate(total_amount=Sum('amount_to_pay'))['total_amount'] or 0
@@ -51,6 +54,9 @@ def admin_dashboard(request):
         monthly_sales_sum = Order.objects.filter(created_at__month=current_month).aggregate(monthly_sales=Sum('amount_to_pay'))['monthly_sales'] or 0
         yearly_sales_sum = Order.objects.filter(created_at__year=current_year).aggregate(yearly_sales=Sum('amount_to_pay'))['yearly_sales'] or 0
 
+        # New: Calculate total order amount for the current year
+        total_yearly_sales = Order.objects.filter(created_at__year=current_year).aggregate(total_yearly_sales=Sum('amount_to_pay'))['total_yearly_sales'] or 0
+
         context['total_orders'] = total_orders
         context['total_users'] = total_users
         context['paid_orders'] = paid_orders
@@ -59,13 +65,21 @@ def admin_dashboard(request):
         context['total_categories'] = total_categories
         context['monthly_sales'] = monthly_sales_sum
         context['yearly_sales'] = yearly_sales_sum
+        context['total_yearly_sales'] = total_yearly_sales  # Add total yearly sales to the context
 
         # Monthly sales data
         monthly_sales_data = Order.objects.filter(created_at__year=current_year).values('created_at__month').annotate(monthly_sales=Sum('amount_to_pay'))
+
+        # Yearly sales data
+        yearly_sales_data = Order.objects.filter(created_at__year=current_year).values('created_at__year').annotate(yearly_sales=Sum('amount_to_pay'))
         months = [entry['created_at__month'] for entry in monthly_sales_data]
         monthly_sales = [entry['monthly_sales'] or 0 for entry in monthly_sales_data]
 
-        
+        context['monthly_sales'] = json.dumps([float(sale) for sale in monthly_sales], cls=DjangoJSONEncoder)
+        context['months'] = json.dumps(months)
+        print(monthly_sales)
+        print(monthly_sales_data)
+
         return render(request, 'adminside/adminpanel.html', context)
     return redirect('admin_login_page')
 
