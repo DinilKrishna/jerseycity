@@ -37,60 +37,65 @@ def add_to_cart(request):
                     return JsonResponse({'stock' : True})
             return JsonResponse({'success': True})
     except Exception as e:
-        print('excepteddddddddddddddddddddddddddddddddddddddddddddd')
         return JsonResponse({'success': False, 'error_message': str(e)})
     
 
 def add_quantity(request, uid):
-    user_uid = request.user.userprofile.uid
-    profile = get_object_or_404(UserProfile, uid=user_uid)
-    cart = Cart.objects.get(user = profile)
-    cart_item = CartItems.objects.get(uid=uid)
-    cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
-    product_variant = Product_Variant.objects.get(product=cart_item.product, size=cart_item.size)
-    
-    if cart_item.quantity == product_variant.stock:
-        return JsonResponse({'success': False,'message':"Maximum Quantity Reached"})
-        
-    else:
-        cart_item.quantity += 1
-        cart_item.save()
-        subtotal = cart_item.calculate_sub_total()
-    grand_total = 0
     try:
-        for item in cart_items:
-            sub_total = item.calculate_sub_total()
-            grand_total += sub_total
+        user_uid = request.user.userprofile.uid
+        profile = get_object_or_404(UserProfile, uid=user_uid)
+        cart = Cart.objects.get(user = profile)
+        cart_item = CartItems.objects.get(uid=uid)
+        cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
+        product_variant = Product_Variant.objects.get(product=cart_item.product, size=cart_item.size)
+        
+        if cart_item.quantity == product_variant.stock:
+            return JsonResponse({'success': False,'message':"Maximum Quantity Reached"})
             
-    except Exception as e:
-        return HttpResponse(e)
+        else:
+            cart_item.quantity += 1
+            cart_item.save()
+            subtotal = cart_item.calculate_sub_total()
+        grand_total = 0
+        try:
+            for item in cart_items:
+                sub_total = item.calculate_sub_total()
+                grand_total += sub_total
+                
+        except Exception as e:
+            return HttpResponse(e)
 
-    return JsonResponse({'success': True, 'quantity': cart_item.quantity, 'subtotal': subtotal, 'grand_total': grand_total})
+        return JsonResponse({'success': True, 'quantity': cart_item.quantity, 'subtotal': subtotal, 'grand_total': grand_total})
+    except:
+        return redirect('/404error/')
 
 
 
 def decrease_quantity(request, uid):
-    user_uid = request.user.userprofile.uid
-    profile = get_object_or_404(UserProfile, uid=user_uid)
-    cart = Cart.objects.get(user = profile)
-    cart_item = CartItems.objects.get(uid=uid)
-    cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
-    
-    if cart_item.quantity == 1:
-        return JsonResponse({'success': False,'message':"Minimum Quantity Reached"})
-    else:
-        cart_item.quantity -= 1
-        cart_item.save()
-        subtotal = cart_item.calculate_sub_total()
-    grand_total = 0
     try:
-        for item in cart_items:
-            sub_total = item.calculate_sub_total()
-            grand_total += sub_total
-    except Exception as e:
-        return HttpResponse(e)
+        user_uid = request.user.userprofile.uid
+        profile = get_object_or_404(UserProfile, uid=user_uid)
+        cart = Cart.objects.get(user = profile)
+        cart_item = CartItems.objects.get(uid=uid)
+        cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
+        
+        if cart_item.quantity == 1:
+            return JsonResponse({'success': False,'message':"Minimum Quantity Reached"})
+        else:
+            cart_item.quantity -= 1
+            cart_item.save()
+            subtotal = cart_item.calculate_sub_total()
+        grand_total = 0
+        try:
+            for item in cart_items:
+                sub_total = item.calculate_sub_total()
+                grand_total += sub_total
+        except Exception as e:
+            return HttpResponse(e)
 
-    return JsonResponse({'success': True, 'quantity': cart_item.quantity, 'subtotal': subtotal, 'grand_total': grand_total})
+        return JsonResponse({'success': True, 'quantity': cart_item.quantity, 'subtotal': subtotal, 'grand_total': grand_total})
+    except:
+        return redirect('/404error/')
 
 
 def remove_from_cart(request, uid):
@@ -137,44 +142,47 @@ def remove_from_wishlist(request, uid):
     except Wishlist.DoesNotExist:
         return HttpResponse("Wishlist not found")
     except Exception as e:
-        return HttpResponse(e)
+        return redirect('/404error/')
     
 
 @login_required
 def return_order(request, uid):
-    context = {}
-    print('funvtion')
-    if request.method == 'POST':
-        print('entereed')
-        description = request.POST.get('return_description')
-        print(description)
-        order = Order.objects.get(uid=uid)
-        print(order)
-        order.status = 'Returned'
-        print('order status changed to returned')
-        order.save()
-        print('savedd')
-        returned = Return.objects.create(order = order, description = description)
-        print('return created --- ', returned)
-        amount = order.amount_to_pay
-        print('amount --', amount)
-        user = UserProfile.objects.get(uid = request.user.userprofile.uid)
-        print(user)
-        wallet = Wallet.objects.get(user = user)
-        print(wallet.amount)
-        order_items = OrderItems.objects.filter(order = order)
-        wallet.amount += amount
-        wallet.save()
-        print(wallet.amount)
-        for item in order_items:
-            product_variant = Product_Variant.objects.get(product=item.product, size=item.size)
-            product_variant.stock += item.quantity  # Increase stock by the quantity returned
-            product_variant.save()
-            print('quantity updated')
-        user_id = request.user.userprofile.uid
-        return redirect(f'/userauth/userprofile/{user_id}')
+    try:
+        context = {}
+        print('funvtion')
+        if request.method == 'POST':
+            print('entereed')
+            description = request.POST.get('return_description')
+            print(description)
+            order = Order.objects.get(uid=uid)
+            print(order)
+            order.status = 'Returned'
+            print('order status changed to returned')
+            order.save()
+            print('savedd')
+            returned = Return.objects.create(order = order, description = description)
+            print('return created --- ', returned)
+            amount = order.amount_to_pay
+            print('amount --', amount)
+            user = UserProfile.objects.get(uid = request.user.userprofile.uid)
+            print(user)
+            wallet = Wallet.objects.get(user = user)
+            print(wallet.amount)
+            order_items = OrderItems.objects.filter(order = order)
+            wallet.amount += amount
+            wallet.save()
+            print(wallet.amount)
+            for item in order_items:
+                product_variant = Product_Variant.objects.get(product=item.product, size=item.size)
+                product_variant.stock += item.quantity  # Increase stock by the quantity returned
+                product_variant.save()
+                print('quantity updated')
+            user_id = request.user.userprofile.uid
+            return redirect(f'/userauth/userprofile/{user_id}')
 
-    context['product_uid'] = uid
-    return render(request, 'userside/returnorder.html', context)
+        context['product_uid'] = uid
+        return render(request, 'userside/returnorder.html', context)
+    except:
+        return redirect('/404error/')
 
     
