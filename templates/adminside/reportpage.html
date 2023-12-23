@@ -1,0 +1,46 @@
+{% extends "base/adminbase.html" %}
+{% load static %}
+{% block title %}Create Report{% endblock  %}
+{% block content %}
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order Data </h2>
+                <p>Generate Report</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-lg-3 mb-4">
+                                    <label class="form-label">Start Date</label>
+                                    <input class="form-control" type="date" id="start_date" name="start_date" required>
+                                </div>
+                                
+                                <div class="col-lg-3 mb-4">
+                                    <label class="form-label">End Date</label>
+                                    <input class="form-control" type="date" id="end_date" name="end_date" required>
+                                </div>
+                            </div>
+                            {% include "base/messages.html" %}
+                            <div>
+                                <button type="submit" class="btn btn-brand">Generate Report</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+
+</main>
+
+{% endblock %}
+
+

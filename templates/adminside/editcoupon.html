@@ -1,0 +1,61 @@
+{% extends "base/adminbase.html" %}
+{% load static %}
+{% block title %}Edit Coupon{% endblock  %}
+{% block content %}
+
+<div class= "container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Edit Coupon</h5>
+                </div>
+                <div class="card-body">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="coupon_code" class="form-label">Coupon Code</label>
+                            <input type="text" placeholder="Coupon Code" class="form-control" name="coupon_code" value="{{coupon.code}}" required />
+                        </div>
+                        <div class="mb-4">
+                            <label for="expiry_date" class="form-label">Expiry Date</label>
+                            <input class="form-control" type="date" id="expiry_date" name="expiry_date" 
+                            value="{{ coupon.expiry_date|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="discount_percentage" class="form-label">Discount Percentage</label>
+                            <input type="number" placeholder="Discount Percentage" class="form-control" name="discount_percentage" value="{{coupon.discount_percentage}}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="minimum_amount" class="form-label">Minimum Amount</label>
+                            <input type="number" placeholder="Minimum Amount" class="form-control" name="minimum_amount" value="{{coupon.minimum_amount}}">
+                        </div>
+                        {% for x in messages %}
+                        <div class="alert alert-danger px-3" id="error">{{ x }}</div>
+                        {% endfor %}
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-brand hover-up" name="edit_category">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get the current date
+    var today = new Date();
+
+    // Set the minimum date to tomorrow
+    var tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Format the date as "YYYY-MM-DD"
+    var formattedDate = tomorrow.toISOString().split('T')[0];
+
+    // Set the minimum attribute of the input element
+    document.getElementById('expiry_date').min = formattedDate;
+</script>
+
+{% endblock %}
