@@ -234,6 +234,102 @@ def verify_otp(request, uid):
     return render(request,'pages/otpverification.html', {'remaining_time': remaining_time})
 
 
+def forgot_password(request):
+    if request.user.is_staff:
+        logout(request)
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            users = User.objects.get(username=email)
+        except User.DoesNotExist:
+            messages.error(request, "User Not found!")
+            return redirect('forgot_password')
+        try:
+            user = UserProfile.objects.get(user = users)
+            if user.is_verified is False:
+                raise user.DoesNotExist
+        except UserProfile.DoesNotExist:
+            messages.warning(request, "User Not Verified !")
+            return redirect('forgot_password')      
+        
+        if user.is_blocked:
+            messages.warning(request, 'Your account has been blocked.')
+            return redirect('forgot_password')
+
+        otp = random.randint(1000, 9999)
+        request.session['email'] = email
+        request.session['otp'] = otp
+        print('The OTP in session is  ========================================================', otp)
+        subject = "JERSEY CITY OTP AUTHENTICATION"
+        message = f"{otp} - OTP"
+        from_email = "dinilkrishna594@gmail.com"
+        recipient_list = [email]
+        expiration_time = 100  
+        try:
+            
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            request.session['otp_expiration'] = time.time() + expiration_time   
+
+        except Exception as e:
+            print(f"Error sending email: {e}")
+        return redirect('forgot_pass_otp')
+    
+    return render(request, 'pages/forgotpass.html')
+
+
+def forgot_pass_otp(request):
+    if request.user.is_staff:
+        logout(request)
+
+    real_otp = str(request.session.get('otp')).strip()
+    
+    print('The OTP in session is  ========================================================', real_otp)
+    email = request.session.get('email')
+    otp_timestamp = request.session.get('otp_timestamp')
+    expiration_time = request.session.get('otp_expiration')
+    remaining_time = max(0, expiration_time - time.time())
+
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        if remaining_time <= 0:
+            messages.error(request, 'OTP has expired. Please request a new OTP.')
+            return redirect('otp_login')
+        
+        if otp == real_otp:
+            user = User.objects.get(username=email)
+            uid = user.userprofile.uid
+            if user is not None:
+                return redirect(f"/userauth/forgot_pass_change/{uid}/")
+            else:
+                messages.error(request, 'Invalid Credentials')  
+        else:
+            messages.error(request, 'Invalid OTP')
+
+    return render(request, 'pages/forgotpassotp.html', {'remaining_time': remaining_time})
+
+
+def forgot_pass_change(request, uid):
+    user_profile = UserProfile.objects.get(uid = uid)
+    print(user_profile)
+    if request.method == 'POST':
+        pass1 = request.POST['password']
+        pass2 = request.POST['cpassword']
+
+        if pass1 != pass2:
+            messages.error(request, 'Both passwords does not match')
+            return redirect(request.META.get("HTTP_REFERER"))
+        
+        elif not is_valid_password(pass1):
+            messages.error(request, "Password should contain atleast 8 characters including atleast one special character, one lowercase letter, one uppercase letter and a number")
+            return redirect(request.META.get("HTTP_REFERER"))
+        user_profile.user.set_password(pass1)
+        user_profile.user.save()
+        return redirect('login_page')
+    return render (request, 'pages/forgotpasschange.html')
+
+
+
+
 def otp_login(request):
     if request.user.is_staff:
         logout(request)
@@ -299,14 +395,6 @@ def otp_login_verify(request):
             print('email', email)
             user = User.objects.get(username=email)
             print(user, '001')
-            # user_profile = UserProfile.objects.get(user = user)
-            # try:
-            #     print('UFGUGHFIU')
-            #     authenticated_user = authenticate(username = email , password = 'Jack@123')
-            #     print('UFGUGHFIU',authenticated_user)
-            # except Exception as e:
-            #     return HttpResponse(e)
-            
 
             if user is not None:
                 login(request, user, backend ='django.contrib.auth.backends.ModelBackend')

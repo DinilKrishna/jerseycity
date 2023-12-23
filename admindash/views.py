@@ -395,9 +395,41 @@ def add_product(request):
             return redirect('add_product_page')
 
         image_front = request.FILES.get('image_front')
+        if image_front:
+            try:
+                # Open the image file
+                img = Image.open(image_front.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
         image_back = request.FILES.get('image_back')
         extra_image_one = request.FILES.get('extra_image_one')
         extra_image_two = request.FILES.get('extra_image_two')
+        if image_back:
+            try:
+                # Open the image file
+                img = Image.open(image_back.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
+        if extra_image_one:
+            try:
+                # Open the image file
+                img = Image.open(extra_image_one.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
+        if extra_image_two:
+            try:
+                # Open the image file
+                img = Image.open(extra_image_two.file)
+                img.verify()  # This will raise an exception if the image is not valid
+            except Exception as e:
+                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                return redirect(request.META.get("HTTP_REFERER"))
 
         try:
             category_obj = Category.objects.get(category_name=category)

@@ -6,6 +6,9 @@ urlpatterns = [
     path('log_in/',views.log_in, name='log_in'),
     path('sign_up/',views.sign_up, name='sign_up'),
     path('log_out/',views.log_out, name='log_out'),
+    path('forgot_password/',views.forgot_password, name='forgot_password'),
+    path('forgot_pass_otp/',views.forgot_pass_otp, name='forgot_pass_otp'),
+    path('forgot_pass_change/<uid>/',views.forgot_pass_change, name='forgot_pass_change'),
 
     path('verify_otp/<uid>/', views.verify_otp, name='verify_otp'),
     path('otp_login/',views.otp_login, name = 'otp_login'),

@@ -1,0 +1,83 @@
+{% extends "base/userbase.html" %}
+{% load static %}
+{% block title %}Forgot Password{% endblock  %}
+{% block content %}
+
+<section class="pt-150 pb-150">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 m-auto">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
+                            <div class="padding_eight_all bg-white">
+                                <div class="heading_s1">
+                                    <h3 class="mb-30">Otp verification</h3>
+                                </div>
+                                <div class="form-group">
+                                    {% for message in messages %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{message}}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <input type="text" name="otp" placeholder="Enter your OTP here" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-fill-out btn-block hover-up" name="">Verify</button>
+                                    </div>
+
+                                </form>
+                                <a href="{% url "resend_otp" %}">
+                                    <button type="submit" id="resendOTP" class="btn btn-danger h-auto d-none">
+                                        Resend OTP
+                                    </button>
+                                </a>
+                                <p id="countdowntext"><span id="countdown" class="countdown"></span> seconds remaining</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-6">
+                     
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const resendOTPButton = document.getElementById("resendOTP");
+        const countdownDisplay = document.getElementById("countdown");
+        const countdownText = document.getElementById("countdowntext");
+        let countdown = {{ remaining_time }};  // Pass the remaining time from the view
+
+        function startCountdown() {
+            const interval = setInterval(function () {
+                countdown--;
+                countdownDisplay.textContent = Math.floor(countdown);  // Convert to integer
+
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    countdownDisplay.textContent = "0";
+                    resendOTPButton.classList.remove("d-none");
+                    countdownText.classList.add("d-none");
+                }
+            }, 1000);
+        }
+
+        startCountdown();
+
+        resendOTPButton.addEventListener("click", function () {
+            countdown = {{ remaining_time }};  // Reset the countdown to the remaining time
+            startCountdown();
+        });
+    });
+</script>
+{% endblock %}

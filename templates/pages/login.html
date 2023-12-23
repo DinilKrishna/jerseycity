@@ -41,7 +41,7 @@
                                                     <label class="form-check-label" for="exampleCheckbox1"><span>Remember me</span></label>
                                                 </div>
                                             </div>
-                                            <a class="text-muted" href="#">Forgot password?</a>
+                                            <a class="text-muted" href="{% url "forgot_password" %}">Forgot password?</a>
                                         </div>
                                         {% include "base/messages.html" %}
                                         {% comment %} {% for x in messages %}
