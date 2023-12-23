@@ -940,7 +940,7 @@ def add_coupon(request):
             messages.error(request, 'Minimum amount should be an integer above zero')
             return redirect(request.META.get('HTTP_REFERER'))
 
-        if is_valid_discount_percentage(discount_percentage):
+        if not is_valid_discount_percentage(discount_percentage):
             messages.error(request, 'Discount percentage should be an integer between 0 and 100')
             return redirect(request.META.get('HTTP_REFERER'))
         

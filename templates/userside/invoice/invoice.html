@@ -1,10 +1,12 @@
 <!-- invoice_pdf.html -->
 
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
     <title>Invoice</title>
     <style>
         body {
@@ -86,7 +88,10 @@
     </style>
 </head>
 <body>
-    <div class="invoice-container">
+    <button type="button" class="btn btn-brand btn_print m-3 h-auto" onclick="exportToPDF()" value="Export to PDF">
+        <i class="fas fa-file-pdf"></i> Download as PDF
+      </button>
+    <div class="invoice-container" id ='container_content'>
         <h1>Invoice</h1>
         
         <h3>Order Id: {{order.uid}}</h3>
@@ -98,7 +103,7 @@
             </h3>
         </div>
 
-        <div class="table-container">
+        <div class="table-container" >
             <table>
                 <thead>
                     <tr>
@@ -132,4 +137,23 @@
         </div>
     </div>
 </body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+<script>
+    function exportToPDF() {
+        const element = document.getElementById('container_content');
+        const opt = {
+          margin: 10,
+          filename: 'invoice.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'Landscape' },
+        };
+    
+        html2pdf().from(element).set(opt).save();
+      }
+</script>
 </html>
