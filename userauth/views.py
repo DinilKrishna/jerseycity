@@ -1,6 +1,7 @@
 from decimal import Decimal
 import re
 import time
+from django.conf import settings
 from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -19,6 +20,7 @@ from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
+from base.helpers import save_pdf
 
 # Create your views here.
 
@@ -781,6 +783,34 @@ def order_details(request, uid):
     context['order'] = order
     context['order_items'] = order_items
     return render(request, 'userside/orderdetails.html', context)
+
+
+def download_invoice(request, uid):
+    # Retrieve the order and other data needed for the invoice
+    order = Order.objects.get(uid=uid)
+    order_items = OrderItems.objects.filter(order=order)
+    discount = order.bill_amount - order.amount_to_pay
+
+    # Prepare parameters for the PDF template
+    params = {
+        'order': order,
+        'order_items': order_items,
+        'discount': discount,
+    }
+
+    # Generate and save the PDF
+    file_name, success = save_pdf(params)
+
+    if success:
+        # Open the generated PDF file
+        with open(str(settings.BASE_DIR) + f"/media/pdf/{file_name}.pdf", 'rb') as pdf_file:
+            # Create a response with PDF content type
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename={file_name}.pdf'
+            return response
+
+    # Handle the case where PDF generation fails
+    return HttpResponse("Failed to generate PDF", status=500)
 
 
 def cancel_order(request, uid):

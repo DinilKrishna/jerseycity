@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 import re
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -42,15 +42,22 @@ def admin_log_out(request):
 def admin_dashboard(request):
     if request.user.is_authenticated and request.user.is_staff:
         context = {}
+        
         total_users = UserProfile.objects.count()
-        total_orders = Order.objects.filter(payed=True).count()
-        paid_orders = Order.objects.all()
+        active_users = UserProfile.objects.filter(is_blocked=False).count()
+        total_orders = Order.objects.count()
+        returned_orders = Order.objects.filter(status='Returned').count()
+        cancelled_orders = Order.objects.filter(status='Cancelled').count()
         total_products = Product.objects.count()
+        selling_products = Product.objects.filter(is_selling=True).count()
         total_categories = Category.objects.count()
-        total_amount = paid_orders.aggregate(total_amount=Sum('amount_to_pay'))['total_amount'] or 0
-
+        all_orders = Order.objects.all()
+        completed_orders = Order.objects.filter(payed=True).exclude(status__in=['Returned', 'Cancelled'])
+        total_amount = all_orders.aggregate(total_amount=Sum('amount_to_pay'))['total_amount'] or 0
+        profit_amount = completed_orders.aggregate(total_amount=Sum('amount_to_pay'))['total_amount'] or 0
         current_month = timezone.now().month
         current_year = timezone.now().year
+        years = list(range(2022, current_year + 1))
         monthly_sales_sum = Order.objects.filter(created_at__month=current_month).aggregate(monthly_sales=Sum('amount_to_pay'))['monthly_sales'] or 0
         yearly_sales_sum = Order.objects.filter(created_at__year=current_year).aggregate(yearly_sales=Sum('amount_to_pay'))['yearly_sales'] or 0
 
@@ -58,39 +65,67 @@ def admin_dashboard(request):
         total_yearly_sales = Order.objects.filter(created_at__year=current_year).aggregate(total_yearly_sales=Sum('amount_to_pay'))['total_yearly_sales'] or 0
 
         context['total_orders'] = total_orders
+        context['returned_orders'] = returned_orders
+        context['cancelled_orders'] = cancelled_orders
         context['total_users'] = total_users
-        context['paid_orders'] = paid_orders
+        context['active_users'] = active_users
         context['total_amount'] = total_amount
+        context['profit_amount'] = profit_amount
         context['total_products'] = total_products
+        context['selling_products'] = selling_products
         context['total_categories'] = total_categories
         context['monthly_sales'] = monthly_sales_sum
         context['yearly_sales'] = yearly_sales_sum
-        context['total_yearly_sales'] = total_yearly_sales  # Add total yearly sales to the context
+        context['total_yearly_sales'] = total_yearly_sales  
+        context['year'] = current_year
+        context['years'] = years
 
-        # Monthly sales data
-        monthly_sales_data = Order.objects.filter(created_at__year=current_year).values('created_at__month').annotate(monthly_sales=Sum('amount_to_pay'))
+        if request.method == 'POST':
+            selected_year = int(request.POST.get('selected_year', current_year))
+            context['year'] = selected_year
 
-        # Yearly sales data
-        yearly_sales_data = Order.objects.filter(created_at__year=current_year).values('created_at__year').annotate(yearly_sales=Sum('amount_to_pay'))
+        monthly_sales_data = Order.objects.filter(created_at__year=context['year']).values('created_at__month').annotate(monthly_sales=Sum('amount_to_pay'))
         months = [entry['created_at__month'] for entry in monthly_sales_data]
         monthly_sales = [entry['monthly_sales'] or 0 for entry in monthly_sales_data]
 
         context['monthly_sales'] = json.dumps([float(sale) for sale in monthly_sales], cls=DjangoJSONEncoder)
         context['months'] = json.dumps(months)
-        print(monthly_sales)
-        print(monthly_sales_data)
 
         return render(request, 'adminside/adminpanel.html', context)
     return redirect('admin_login_page')
 
 
+def report(request):
+    context = {}
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        try:
+            if start_date > end_date:
+                messages.error(request, 'Use a valid date range')
+                return redirect(request.META.get('HTTP_REFERER'))  # Redirect to the same page to display the error message
+            
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+
+            # Retrieve orders between the specified start and end dates
+            orders = Order.objects.filter(created_at__range=[start_date, end_date]).order_by('created_at')
+            context['orders'] =orders
+            for order in orders:
+                print("----------------", order.amount_to_pay)
+        except ValueError:
+            messages.error(request, 'Invalid date format. Please use YYYY-MM-DD.')
+            return HttpResponseRedirect(request.path_info)  # Redirect to the same page to display the error message
+
+    return render(request, 'adminside/reportpage.html', context)
+
+
 def admin_products(request):
     if request.user.is_authenticated and request.user.is_staff:
         context = {}
-        # Get the search query from the form
         search_query = request.GET.get('search', '')
         
-        # Filter products based on the search query
         if search_query:
             products = Product.objects.filter(
                 Q(product_name__icontains=search_query) |
@@ -112,20 +147,15 @@ def admin_products(request):
         try:
             products = paginator.page(page)
         except PageNotAnInteger:
-            # If the page parameter is not an integer, deliver the first page.
             products = paginator.page(1)
         except EmptyPage:
-            # If the page is out of range (e.g., 9999), deliver the last page of results.
             products = paginator.page(paginator.num_pages)
 
-        # Get the current page number
         current_page = products.number
 
-        # Calculate the range of page numbers to display
         start_page = max(1, current_page - 1)
         end_page = min(paginator.num_pages, current_page + 1)
 
-        # Adjust the start and end page if there are not enough pages to display
         if end_page - start_page < 2:
             if start_page == 1:
                 end_page = min(3, paginator.num_pages)

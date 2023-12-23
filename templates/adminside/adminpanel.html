@@ -16,7 +16,7 @@
         <p>Whole data about your business here</p>
       </div>
       <div>
-        <a href="#" class="btn btn-primary"
+        <a href="{% url "report" %}" class="btn btn-primary"
           ><i class="text-muted material-icons md-post_add"></i>Create
           report</a
         >
@@ -30,9 +30,10 @@
               ><i class="text-primary material-icons md-monetization_on"></i
             ></span>
             <div class="text">
-              <h6 class="mb-1 card-title">Revenue</h6>
-              <span>${{total_amount}}</span>
-              <span class="text-sm"> Shipping fees are not included </span>
+              <h6 class="mb-1 card-title">Purchase Amount</h6>
+              <span style="font-size: 14px;">Total - ${{total_amount}}</span>
+              <span style="font-size: 14px;">Profit - ${{profit_amount}}</span>
+              {% comment %} <span class="text-sm"> Shipping fees are not included </span> {% endcomment %}
             </div>
           </article>
         </div>
@@ -44,9 +45,11 @@
               ><i class="text-success material-icons md-local_shipping"></i
             ></span>
             <div class="text">
-              <h6 class="mb-1 card-title">Orders</h6>
-              <span>{{total_orders}}</span>
-              <span class="text-sm"> Excluding orders in transit </span>
+              <h6 class="mb-1 card-title">Orders Placed</h6>
+              <span style="font-size: 14px;" >Total - {{total_orders}}</span>
+              <span style="font-size: 14px;">Returned - {{returned_orders}}</span>
+              <span style="font-size: 14px;">Cancelled - {{cancelled_orders}}</span>
+              {% comment %} <span class="text-sm"> Excluding orders in transit </span> {% endcomment %}
             </div>
           </article>
         </div>
@@ -59,7 +62,8 @@
             ></span>
             <div class="text">
               <h6 class="mb-1 card-title">Products</h6>
-              <span>{{total_products}}</span>
+              <span style="font-size: 14px;">Total - {{total_products}}</span>
+              <span style="font-size: 14px;">Selling - {{selling_products}}</span>
               <span class="text-sm"> In {{total_categories}} Categories </span>
             </div>
           </article>
@@ -73,7 +77,8 @@
             ></span>
             <div class="text">
               <h6 class="mb-1 card-title">Users</h6>
-              <span>{{total_users}}</span>
+              <span style="font-size: 14px;">Total - {{total_users}}</span>
+              <span style="font-size: 14px;">Active - {{active_users}}</span>
             </div>
           </article>
         </div>
@@ -83,18 +88,23 @@
       <div class="col-xl-12 col-lg-12">
         <div class="card mb-4">
           <article class="card-body">
-            <h5 class="card-title">Sale statistics</h5>
-            {% comment %} <canvas id="myChart" height="120px"></canvas> {% endcomment %}
+
+            <form method="post">
+              {% csrf_token %}
+              <h5 class="card-title">Sale statistics</h5>
+              <select name="selected_year">
+                  {% for yer in years %}
+                      <option value="{{ yer }}" {% if yer == year %}selected{% endif %}>{{ yer }}</option>
+                  {% endfor %}
+              </select> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <button type="submit" class="btn border-1">Get Data</button>
+          </form>
+            <div style="width: 80%;">
+              <canvas id="yearlySalesChart"></canvas>
+            </div>
           </article>
         </div>
-        <div style="width: 80%;">
-          <!-- Monthly Sales Bar Graph -->
-          
-          {% comment %} <canvas id="monthlySalesChart"></canvas> {% endcomment %}
-          
-          <!-- Yearly Sales Bar Graph -->
-          <canvas id="yearlySalesChart"></canvas>
-      </div>
+        
         
   </section>
 </main>
@@ -130,7 +140,7 @@
 
     // Monthly Sales Dataset
     var monthlySalesDataset = {
-      label: 'Monthly Sales Amount',
+      label: 'Monthly Sales Amount {{ year }}',
       data: monthlySales,
       backgroundColor: 'rgba(255, 99, 132, 0.8)',
       borderColor: 'rgba(255, 99, 132, 0.8)',
