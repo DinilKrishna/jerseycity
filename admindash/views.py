@@ -539,13 +539,15 @@ def edit_product(request, uid):
     products = Product.objects.get(uid = uid)
     image = Product_Image.objects.get(product = products)
     categ = products.category
+    cat_offer = None  # Initialize cat_offer outside the try block
+
     try:
-        cat_offer = CategoryOffer.objects.get(category = categ)
-        cat_off_percentage = cat_offer.percentage
-    except:
-        cat_off_percentage = 0
-    if cat_offer.percentage is None:
-        cat_off_percentage = 0
+        cat_offer = CategoryOffer.objects.get(category=categ)
+    except CategoryOffer.DoesNotExist:
+        pass  # You can leave this block empty since cat_offer is already initialized to None
+
+    # Set cat_off_percentage directly inside the try block
+    cat_off_percentage = cat_offer.percentage if cat_offer else 0
     categories = Category.objects.all()
     current_datetime = datetime.now()
     product_offers = ProductOffer.objects.filter(expiry_date__gt=current_datetime)
