@@ -284,49 +284,51 @@ def get_stock(request, product_id, size_id):
 
 
 def about_page(request):
-    # try:
-    if request.user.is_authenticated and request.user.is_staff:
-        logout(request)
-    context = {}
-    user_id = request.user.userprofile.uid
-    profile = UserProfile.objects.get(uid = user_id)
-    user_cart = Cart.objects.get(user_id = user_id)
-    cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
-    number_in_cart = 0
-    for item in cart_items:
-        number_in_cart += 1
-    context['number_in_cart'] = number_in_cart
-    wishlist = Wishlist.objects.get(user = profile)
-    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
-    wishlist_items
-    number_in_wishlist = 0
-    for item in wishlist_items:
-        number_in_wishlist += 1
-    context['number_in_wishlist'] = number_in_wishlist
-    return render(request, 'pages/about.html', context)
-    # except:
-    #     return redirect('/404error/')
+    try:
+        if request.user.is_authenticated and request.user.is_staff:
+            logout(request)
+        context = {}
+        if request.user.is_authenticated:
+            user_id = request.user.userprofile.uid
+            profile = UserProfile.objects.get(uid = user_id)
+            user_cart = Cart.objects.get(user_id = user_id)
+            cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
+            number_in_cart = 0
+            for item in cart_items:
+                number_in_cart += 1
+            context['number_in_cart'] = number_in_cart
+            wishlist = Wishlist.objects.get(user = profile)
+            wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+            wishlist_items
+            number_in_wishlist = 0
+            for item in wishlist_items:
+                number_in_wishlist += 1
+            context['number_in_wishlist'] = number_in_wishlist
+        return render(request, 'pages/about.html', context)
+    except:
+        return redirect('/404error/')
 
 def contact_page(request):
     try:
         if request.user.is_authenticated and request.user.is_staff:
             logout(request)
         context = {}
-        user_id = request.user.userprofile.uid
-        profile = UserProfile.objects.get(uid = user_id)
-        user_cart = Cart.objects.get(user_id = user_id)
-        cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
-        number_in_cart = 0
-        for item in cart_items:
-            number_in_cart += 1
-        context['number_in_cart'] = number_in_cart
-        wishlist = Wishlist.objects.get(user = profile)
-        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
-        wishlist_items
-        number_in_wishlist = 0
-        for item in wishlist_items:
-            number_in_wishlist += 1
-        context['number_in_wishlist'] = number_in_wishlist
+        if request.user.is_authenticated:
+            user_id = request.user.userprofile.uid
+            profile = UserProfile.objects.get(uid = user_id)
+            user_cart = Cart.objects.get(user_id = user_id)
+            cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
+            number_in_cart = 0
+            for item in cart_items:
+                number_in_cart += 1
+            context['number_in_cart'] = number_in_cart
+            wishlist = Wishlist.objects.get(user = profile)
+            wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+            wishlist_items
+            number_in_wishlist = 0
+            for item in wishlist_items:
+                number_in_wishlist += 1
+            context['number_in_wishlist'] = number_in_wishlist
         return render(request, 'pages/contact.html', context)
     except:
         return redirect('/404error/')
