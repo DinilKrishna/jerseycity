@@ -1,0 +1,5 @@
+.env
+media
+db.sqlite3
+__pycache__/
+../virtualenv/
