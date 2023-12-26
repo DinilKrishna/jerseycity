@@ -32,7 +32,7 @@ def landing_page(request):
 
 def login_page(request):
     try:
-        if request.user.is_authenticated and not request.user.is_staff:
+        if request.user.is_authenticated:
             return redirect('user_profile')
         elif request.user.is_authenticated:
             logout(request)
