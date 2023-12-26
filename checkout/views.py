@@ -15,159 +15,159 @@ import razorpay
 
 @login_required
 def checkout(request):
-    try:
-        uid = request.user.userprofile.uid
-        context = {}
-        profile = UserProfile.objects.get(uid=uid)
-        cart = Cart.objects.get(user=profile)
-        cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
-        number_in_cart = 0
-        for item in cart_items:
-            number_in_cart += 1
-        context['number_in_cart'] = number_in_cart
-        wishlist = Wishlist.objects.get(user = profile)
-        wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
-        number_in_wishlist = 0
-        for item in wishlist_items:
-            number_in_wishlist += 1
-        context['number_in_wishlist'] = number_in_wishlist
-        addresses = Address.objects.filter(unlisted=False, user=request.user)
-        if not cart_items:
-            messages.warning(request, "Cart is empty!")
-            return redirect(f'/userauth/cart/{uid}')
-        out_of_stock = False
-        grand_total = 0
-        for cart_item in cart_items:
-            sub_total = cart_item.calculate_sub_total()
-            grand_total += sub_total
-            variant = Product_Variant.objects.get(product = cart_item.product, size = cart_item.size)
-            if cart_item.quantity > variant.stock:
-                out_of_stock = True
-        discounted_total = grand_total
-        if cart.coupon:
-            discounted_total = grand_total - (grand_total * cart.coupon.discount_percentage)/100
-            discounted_total = round(discounted_total, 2)
-        context['discounted_total'] = discounted_total
-        context['cart'] = cart
-        context['out_of_stock'] = out_of_stock
-        context['products'] = cart_items
-        context['grand_total'] = grand_total
-        context['user'] = profile
-        context['addresses'] = addresses
-        if request.method == 'POST':
-            selected_address_id = request.POST.get('selected_address')
-            request.session['selected_address_id'] = selected_address_id
-            payment_option = request.POST.get('payment_option')
-            if payment_option:
-                print(payment_option)
-            else:
-                messages.warning(request, "Please select a payment option.")
-            if selected_address_id:
-                selected_address = Address.objects.get(uid=selected_address_id)
-                print(selected_address.address,' : ', selected_address.pincode)
+    # try:
+    uid = request.user.userprofile.uid
+    context = {}
+    profile = UserProfile.objects.get(uid=uid)
+    cart = Cart.objects.get(user=profile)
+    cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
+    wishlist = Wishlist.objects.get(user = profile)
+    wishlist_items = WishlistItems.objects.filter(wishlist = wishlist)       
+    number_in_wishlist = 0
+    for item in wishlist_items:
+        number_in_wishlist += 1
+    context['number_in_wishlist'] = number_in_wishlist
+    addresses = Address.objects.filter(unlisted=False, user=request.user)
+    if not cart_items:
+        messages.warning(request, "Cart is empty!")
+        return redirect(f'/userauth/cart/{uid}')
+    out_of_stock = False
+    grand_total = 0
+    for cart_item in cart_items:
+        sub_total = cart_item.calculate_sub_total()
+        grand_total += sub_total
+        variant = Product_Variant.objects.get(product = cart_item.product, size = cart_item.size)
+        if cart_item.quantity > variant.stock:
+            out_of_stock = True
+    discounted_total = grand_total
+    if cart.coupon:
+        discounted_total = grand_total - (grand_total * cart.coupon.discount_percentage)/100
+        discounted_total = round(discounted_total, 2)
+    context['discounted_total'] = discounted_total
+    context['cart'] = cart
+    context['out_of_stock'] = out_of_stock
+    context['products'] = cart_items
+    context['grand_total'] = grand_total
+    context['user'] = profile
+    context['addresses'] = addresses
+    if request.method == 'POST':
+        selected_address_id = request.POST.get('selected_address')
+        request.session['selected_address_id'] = selected_address_id
+        payment_option = request.POST.get('payment_option')
+        if payment_option:
+            print(payment_option)
+        else:
+            messages.warning(request, "Please select a payment option.")
+        if selected_address_id:
+            selected_address = Address.objects.get(uid=selected_address_id)
+            print(selected_address.address,' : ', selected_address.pincode)
 
-            else:
-                messages.warning(request, "Please select an address.")
+        else:
+            messages.warning(request, "Please select an address.")
 
-            if payment_option == 'wallet':
-                # Handle Direct Bank Transfer logic
-                
-                messages.warning(request, 'You chose ', payment_option)
-                print("Selected Payment Option: Direct Bank Transfer")
-                return redirect('wallet_payment')
+        if payment_option == 'wallet':
+            # Handle Direct Bank Transfer logic
             
-            elif payment_option == 'razorpay':
-                
-                print("Selected Payment Option: RazorPay")
-                discounted_total = float(discounted_total)
-                request.session['discounted_total'] = discounted_total
-                discounted_total = int(discounted_total * 100)
-                
-                
-                client = razorpay.Client(auth=("rzp_test_KSJKvKAn2yU3LA", "1aqi5ebdJfkUFfAiXFOFuALn"))
+            messages.warning(request, 'You chose ', payment_option)
+            print("Selected Payment Option: Direct Bank Transfer")
+            return redirect('wallet_payment')
+        
+        elif payment_option == 'razorpay':
+            
+            print("Selected Payment Option: RazorPay")
+            discounted_total = float(discounted_total)
+            request.session['discounted_total'] = discounted_total
+            discounted_total = int(discounted_total * 100)
+            
+            
+            client = razorpay.Client(auth=("rzp_test_KSJKvKAn2yU3LA", "1aqi5ebdJfkUFfAiXFOFuALn"))
 
-                DATA = {
-                    "amount": int(discounted_total),
-                    "currency": "INR",
-                    "payment_capture":'1'
-                    
-                }
-                client.order.create(data=DATA)
+            DATA = {
+                "amount": int(discounted_total),
+                "currency": "INR",
+                "payment_capture":'1'
+                
+            }
+            client.order.create(data=DATA)
 
-                return render(request,"checkout/razorpay.html", {"grand_total":discounted_total})
-            elif payment_option == 'cash_on_delivery':
-                # Handle Cash on Delivery logic
-                print("Selected Payment Option: Cash on Delivery")
+            return render(request,"checkout/razorpay.html", {"grand_total":discounted_total})
+        elif payment_option == 'cash_on_delivery':
+            # Handle Cash on Delivery logic
+            print("Selected Payment Option: Cash on Delivery")
 
-                payment_method_instance = Payment_Method.objects.get(method='cash_on_delivery')            
-                print('instance: ', payment_method_instance)
-                for item in cart_items:
-                    product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
-                    if product_stock.stock < item.quantity:
-                        messages.error(request, "Product Out of Stock")
-                        return redirect('cart')
-                order = Order.objects.create(
-                    user=request.user,
-                    address=selected_address,
-                    phone_number=selected_address.phone_number,
-                    city=selected_address.city,
-                    district=selected_address.district,
-                    state=selected_address.state,
-                    pincode=selected_address.pincode,
-                    payment_method=payment_method_instance
+            payment_method_instance = Payment_Method.objects.get(method='cash_on_delivery')            
+            print('instance: ', payment_method_instance)
+            for item in cart_items:
+                product_stock = Product_Variant.objects.get(product=item.product, size=item.size)
+                if product_stock.stock < item.quantity:
+                    messages.error(request, "Product Out of Stock")
+                    return redirect('cart')
+            order = Order.objects.create(
+                user=request.user,
+                address=selected_address,
+                phone_number=selected_address.phone_number,
+                city=selected_address.city,
+                district=selected_address.district,
+                state=selected_address.state,
+                pincode=selected_address.pincode,
+                payment_method=payment_method_instance
+            )
+
+            print('Order created:', order.city)
+
+            for item in cart_items:
+                sub_total = item.quantity * item.product.selling_price
+
+                order_item = OrderItems.objects.create(
+                    order=order,  
+                    product=item.product,
+                    quantity=item.quantity,
+                    product_price=item.product.selling_price,
+                    size=item.size,
+                    sub_total=sub_total,
+                    discounted_subtotal=sub_total,
                 )
 
-                print('Order created:', order.city)
+                
+                product_stock.stock -= item.quantity
+                product_stock.sold += item.quantity
+                product_stock.save()
+                print('Product stock updated')
 
-                for item in cart_items:
-                    sub_total = item.quantity * item.product.selling_price
-
-                    order_item = OrderItems.objects.create(
-                        order=order,  
-                        product=item.product,
-                        quantity=item.quantity,
-                        product_price=item.product.selling_price,
-                        size=item.size,
-                        sub_total=sub_total,
-                        discounted_subtotal=sub_total,
-                    )
-
-                    
-                    product_stock.stock -= item.quantity
-                    product_stock.sold += item.quantity
-                    product_stock.save()
-                    print('Product stock updated')
-
-                order.calculate_bill_amount()
-                if cart.coupon:
-                    if cart.coupon.unlisted is False:
-                        order.amount_to_pay = discounted_total
-                        print(discounted_total, 'discounttttt')
-                    else:
-                        order.amount_to_pay = order.bill_amount
-                        print(order.bill_amount, 'billlllllllllllllllll')
+            order.calculate_bill_amount()
+            if cart.coupon:
+                if cart.coupon.unlisted is False:
+                    order.amount_to_pay = discounted_total
+                    print(discounted_total, 'discounttttt')
                 else:
                     order.amount_to_pay = order.bill_amount
-                order.status = 'Confirmed'
-                order.save()
-                print('Order saved again')
-
-                # Clear the user's cart
-                cart_items.delete()
-                cart.coupon = None
-                cart.save()
-                print('Cart cleared')
-
-                return redirect(f'/checkout/success_page/')
-
+                    print(order.bill_amount, 'billlllllllllllllllll')
             else:
-                messages.warning(request, 'Please choose a payment option')
-            
-            return redirect(request.META.get("HTTP_REFERER"))
+                order.amount_to_pay = order.bill_amount
+            order.status = 'Confirmed'
+            order.save()
+            print('Order saved again')
+
+            # Clear the user's cart
+            cart_items.delete()
+            cart.coupon = None
+            cart.save()
+            print('Cart cleared')
+
+            return redirect(f'/checkout/success_page/')
+
+        else:
+            messages.warning(request, 'Please choose a payment option')
         
-        return render(request, 'checkout/checkout.html', context)
-    except:
-        return redirect('/404error/')
+        return redirect(request.META.get("HTTP_REFERER"))
+    
+    return render(request, 'checkout/checkout.html', context)
+    # except:
+    #     return redirect('/404error/')
 
 
 def wallet_payment(request):
