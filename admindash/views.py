@@ -534,193 +534,193 @@ def add_product(request):
 
 
 def edit_product(request, uid):
-    # try:
-    context = {}
-    products = Product.objects.get(uid = uid)
-    image = Product_Image.objects.get(product = products)
-    categ = products.category
-    cat_offer = None  # Initialize cat_offer outside the try block
-
     try:
-        cat_offer = CategoryOffer.objects.get(category=categ)
-    except CategoryOffer.DoesNotExist:
-        pass  # You can leave this block empty since cat_offer is already initialized to None
+        context = {}
+        products = Product.objects.get(uid = uid)
+        image = Product_Image.objects.get(product = products)
+        categ = products.category
+        cat_offer = None  # Initialize cat_offer outside the try block
 
-    # Set cat_off_percentage directly inside the try block
-    cat_off_percentage = cat_offer.percentage if cat_offer else 0
-    categories = Category.objects.all()
-    current_datetime = datetime.now()
-    product_offers = ProductOffer.objects.filter(expiry_date__gt=current_datetime)
-    sizes = Size.objects.all()
-    size_obj_s = Size.objects.get(size='S')
-    size_obj_m = Size.objects.get(size='M')
-    size_obj_l = Size.objects.get(size='L')
-    size_obj_xl = Size.objects.get(size='XL')
-
-    if request.method == "POST":
-        product_name = request.POST.get('product_name')
-        description = request.POST.get('description')
-        price = request.POST.get('price')
-        selling_price = price
-        if not is_valid_product_title(product_name):
-            messages.error(request, f'{product_name} Not a valid product Name')
-            return redirect(request.META.get("HTTP_REFERER"))
-        if not is_valid_price(price):
-            messages.error(request, 'Price should be a positive number')
-            return redirect(request.META.get("HTTP_REFERER"))
-        if not is_valid_price(selling_price):
-            messages.error(request, 'Price should be a positive number')
-            return redirect(request.META.get("HTTP_REFERER"))
-        s_stock = request.POST.get('s_stock')
-        m_stock = request.POST.get('m_stock')
-        l_stock = request.POST.get('l_stock')
-        xl_stock = request.POST.get('xl_stock')
-
-        if not is_valid_stock(s_stock):
-            messages.error(request, 'Stock should be a positive Integer')
-            return redirect('add_product_page')
-        if not is_valid_stock(m_stock):
-            messages.error(request, 'Stock should be a positive Integer')
-            return redirect(request.META.get("HTTP_REFERER"))
-        if not is_valid_stock(l_stock):
-            messages.error(request, 'Stock should be a positive Integer')
-            return redirect(request.META.get("HTTP_REFERER"))
-        if not is_valid_stock(xl_stock):
-            messages.error(request, 'Stock should be a positive Integer')
-            return redirect(request.META.get("HTTP_REFERER"))
-        if not is_valid_description(description):
-            messages.error(request, 'Invalid Description')
-            return redirect(request.META.get("HTTP_REFERER"))
-        
-        image_front = request.FILES.get('image_front') if 'image_front' in request.FILES else None
-        category = request.POST.get('category')
-        if image_front:
-            try:
-                # Open the image file
-                img = Image.open(image_front.file)
-                img.verify()  # This will raise an exception if the image is not valid
-            except Exception as e:
-                messages.error(request, 'Invalid image file. Please upload a valid image.')
-                return redirect(request.META.get("HTTP_REFERER"))
-        
         try:
-            offer_name = request.POST.get('offer')
-            if offer_name == 'none':
+            cat_offer = CategoryOffer.objects.get(category=categ)
+        except CategoryOffer.DoesNotExist:
+            pass  # You can leave this block empty since cat_offer is already initialized to None
+
+        # Set cat_off_percentage directly inside the try block
+        cat_off_percentage = cat_offer.percentage if cat_offer else 0
+        categories = Category.objects.all()
+        current_datetime = datetime.now()
+        product_offers = ProductOffer.objects.filter(expiry_date__gt=current_datetime)
+        sizes = Size.objects.all()
+        size_obj_s = Size.objects.get(size='S')
+        size_obj_m = Size.objects.get(size='M')
+        size_obj_l = Size.objects.get(size='L')
+        size_obj_xl = Size.objects.get(size='XL')
+
+        if request.method == "POST":
+            product_name = request.POST.get('product_name')
+            description = request.POST.get('description')
+            price = request.POST.get('price')
+            selling_price = price
+            if not is_valid_product_title(product_name):
+                messages.error(request, f'{product_name} Not a valid product Name')
+                return redirect(request.META.get("HTTP_REFERER"))
+            if not is_valid_price(price):
+                messages.error(request, 'Price should be a positive number')
+                return redirect(request.META.get("HTTP_REFERER"))
+            if not is_valid_price(selling_price):
+                messages.error(request, 'Price should be a positive number')
+                return redirect(request.META.get("HTTP_REFERER"))
+            s_stock = request.POST.get('s_stock')
+            m_stock = request.POST.get('m_stock')
+            l_stock = request.POST.get('l_stock')
+            xl_stock = request.POST.get('xl_stock')
+
+            if not is_valid_stock(s_stock):
+                messages.error(request, 'Stock should be a positive Integer')
+                return redirect('add_product_page')
+            if not is_valid_stock(m_stock):
+                messages.error(request, 'Stock should be a positive Integer')
+                return redirect(request.META.get("HTTP_REFERER"))
+            if not is_valid_stock(l_stock):
+                messages.error(request, 'Stock should be a positive Integer')
+                return redirect(request.META.get("HTTP_REFERER"))
+            if not is_valid_stock(xl_stock):
+                messages.error(request, 'Stock should be a positive Integer')
+                return redirect(request.META.get("HTTP_REFERER"))
+            if not is_valid_description(description):
+                messages.error(request, 'Invalid Description')
+                return redirect(request.META.get("HTTP_REFERER"))
+            
+            image_front = request.FILES.get('image_front') if 'image_front' in request.FILES else None
+            category = request.POST.get('category')
+            if image_front:
+                try:
+                    # Open the image file
+                    img = Image.open(image_front.file)
+                    img.verify()  # This will raise an exception if the image is not valid
+                except Exception as e:
+                    messages.error(request, 'Invalid image file. Please upload a valid image.')
+                    return redirect(request.META.get("HTTP_REFERER"))
+            
+            try:
+                offer_name = request.POST.get('offer')
+                if offer_name == 'none':
+                    offer = None
+                    selling_price = float(price) - (float(price) * float(cat_offer.percentage))/100
+                    selling_price = float(selling_price)
+                else:
+                    offer = ProductOffer.objects.get(offer_name = offer_name)
+                    selling_price = float(selling_price) - (float(selling_price) * offer.percentage)/100
+                    if(cat_off_percentage > offer.percentage):
+                        selling_price = float(price) - (float(price) * cat_off_percentage)/100
+            except ProductOffer.DoesNotExist:
                 offer = None
-                selling_price = float(price) - (float(price) * float(cat_offer.percentage))/100
-                selling_price = float(selling_price)
-            else:
-                offer = ProductOffer.objects.get(offer_name = offer_name)
-                selling_price = float(selling_price) - (float(selling_price) * offer.percentage)/100
-                if(cat_off_percentage > offer.percentage):
-                    selling_price = float(price) - (float(price) * cat_off_percentage)/100
-        except ProductOffer.DoesNotExist:
-            offer = None
-            selling_price = float(price) - (float(price) * cat_off_percentage)/100
-            selling_price = float(selling_price)  # Convert to float if not already
-        except Exception as e:
-            offer = None
-            selling_price = float(price) - (float(price) * cat_off_percentage)/100
-            selling_price = float(selling_price)  # Convert to float if not already
-        image_back = request.FILES.get('image_back') if 'image_back' in request.FILES else None
-        extra_image_one = request.FILES.get('extra_image_one') if 'extra_image_one' in request.FILES else None
-        extra_image_two = request.FILES.get('extra_image_two') if 'extra_image_two' in request.FILES else None
-        if image_back:
-            try:
-                # Open the image file
-                img = Image.open(image_back.file)
-                img.verify()  # This will raise an exception if the image is not valid
+                selling_price = float(price) - (float(price) * cat_off_percentage)/100
+                selling_price = float(selling_price)  # Convert to float if not already
             except Exception as e:
-                messages.error(request, 'Invalid image file. Please upload a valid image.')
-                return redirect(request.META.get("HTTP_REFERER"))
-        if extra_image_one:
+                offer = None
+                selling_price = float(price) - (float(price) * cat_off_percentage)/100
+                selling_price = float(selling_price)  # Convert to float if not already
+            image_back = request.FILES.get('image_back') if 'image_back' in request.FILES else None
+            extra_image_one = request.FILES.get('extra_image_one') if 'extra_image_one' in request.FILES else None
+            extra_image_two = request.FILES.get('extra_image_two') if 'extra_image_two' in request.FILES else None
+            if image_back:
+                try:
+                    # Open the image file
+                    img = Image.open(image_back.file)
+                    img.verify()  # This will raise an exception if the image is not valid
+                except Exception as e:
+                    messages.error(request, 'Invalid image file. Please upload a valid image.')
+                    return redirect(request.META.get("HTTP_REFERER"))
+            if extra_image_one:
+                try:
+                    # Open the image file
+                    img = Image.open(extra_image_one.file)
+                    img.verify()  # This will raise an exception if the image is not valid
+                except Exception as e:
+                    messages.error(request, 'Invalid image file. Please upload a valid image.')
+                    return redirect(request.META.get("HTTP_REFERER"))
+            if extra_image_two:
+                try:
+                    # Open the image file
+                    img = Image.open(extra_image_two.file)
+                    img.verify()  # This will raise an exception if the image is not valid
+                except Exception as e:
+                    messages.error(request, 'Invalid image file. Please upload a valid image.')
+                    return redirect(request.META.get("HTTP_REFERER"))
+
             try:
-                # Open the image file
-                img = Image.open(extra_image_one.file)
-                img.verify()  # This will raise an exception if the image is not valid
+                
+                sizess = [size_obj_s, size_obj_m, size_obj_l, size_obj_xl]
+                quantity_of_s =  Product_Variant.objects.get(product = products, size = size_obj_s)  
+                quantity_of_m = Product_Variant.objects.get(product = products, size = size_obj_m)
+                quantity_of_l = Product_Variant.objects.get(product = products, size = size_obj_l)
+                quantity_of_xl =  Product_Variant.objects.get(product = products, size = size_obj_xl)  
+                quantity_of_s.stock = s_stock
+                quantity_of_m.stock = m_stock
+                quantity_of_l.stock = l_stock
+                quantity_of_xl.stock = xl_stock
+                quantity_of_s.save()
+                quantity_of_m.save()
+                quantity_of_l.save()
+                quantity_of_xl.save()  
+                category_instance = Category.objects.get(category_name=category)
+                products.offer = offer
+                products.product_name = product_name
+                products.description = description
+
+                
+                if image_front is not None:
+                    products.image_front = image_front
+                    print('Valid Image Front')
+                if image_front is None:
+                    print('Image is not added')
+                
+                products.category = category_instance
+                products.price = price
+                products.selling_price = selling_price
+
+
+                if image_back is not None:
+                    image.image_back = image_back
+                if extra_image_one is not None:
+                    image.extra_image_one = extra_image_one
+                if extra_image_two is not None:
+                    image.extra_image_two = extra_image_two
+
+                products.save()
+                if image_front is not None:
+                    products.image_front.save(image_front.name, image_front)
+
+                image.save()
+                if image_back is not None:
+                    image.image_back.save(image_back.name, image_back)
+                if extra_image_one is not None:
+                    image.extra_image_one.save(extra_image_one.name, extra_image_one)
+                if extra_image_two is not None:
+                    image.extra_image_two.save(extra_image_two.name, extra_image_two)
+                
+                
+                return redirect(reverse('admin_products'))
+                
             except Exception as e:
-                messages.error(request, 'Invalid image file. Please upload a valid image.')
+                messages.error(request, str(e))
                 return redirect(request.META.get("HTTP_REFERER"))
-        if extra_image_two:
-            try:
-                # Open the image file
-                img = Image.open(extra_image_two.file)
-                img.verify()  # This will raise an exception if the image is not valid
-            except Exception as e:
-                messages.error(request, 'Invalid image file. Please upload a valid image.')
-                return redirect(request.META.get("HTTP_REFERER"))
+                
 
-        try:
-            
-            sizess = [size_obj_s, size_obj_m, size_obj_l, size_obj_xl]
-            quantity_of_s =  Product_Variant.objects.get(product = products, size = size_obj_s)  
-            quantity_of_m = Product_Variant.objects.get(product = products, size = size_obj_m)
-            quantity_of_l = Product_Variant.objects.get(product = products, size = size_obj_l)
-            quantity_of_xl =  Product_Variant.objects.get(product = products, size = size_obj_xl)  
-            quantity_of_s.stock = s_stock
-            quantity_of_m.stock = m_stock
-            quantity_of_l.stock = l_stock
-            quantity_of_xl.stock = xl_stock
-            quantity_of_s.save()
-            quantity_of_m.save()
-            quantity_of_l.save()
-            quantity_of_xl.save()  
-            category_instance = Category.objects.get(category_name=category)
-            products.offer = offer
-            products.product_name = product_name
-            products.description = description
-
-            
-            if image_front is not None:
-                products.image_front = image_front
-                print('Valid Image Front')
-            if image_front is None:
-                print('Image is not added')
-            
-            products.category = category_instance
-            products.price = price
-            products.selling_price = selling_price
-
-
-            if image_back is not None:
-                image.image_back = image_back
-            if extra_image_one is not None:
-                image.extra_image_one = extra_image_one
-            if extra_image_two is not None:
-                image.extra_image_two = extra_image_two
-
-            products.save()
-            if image_front is not None:
-                products.image_front.save(image_front.name, image_front)
-
-            image.save()
-            if image_back is not None:
-                image.image_back.save(image_back.name, image_back)
-            if extra_image_one is not None:
-                image.extra_image_one.save(extra_image_one.name, extra_image_one)
-            if extra_image_two is not None:
-                image.extra_image_two.save(extra_image_two.name, extra_image_two)
-            
-            
-            return redirect(reverse('admin_products'))
-            
-        except Exception as e:
-            messages.error(request, str(e))
-            return redirect(request.META.get("HTTP_REFERER"))
-            
-
-    context['categories'] = categories
-    context['product_offers'] = product_offers
-    context['sizes'] = sizes
-    context['stock_s'] = Product_Variant.objects.get(product = products, size = size_obj_s).stock
-    context['stock_m'] = Product_Variant.objects.get(product = products, size = size_obj_m).stock
-    context['stock_l'] = Product_Variant.objects.get(product = products, size = size_obj_l).stock
-    context['stock_xl'] = Product_Variant.objects.get(product = products, size = size_obj_xl).stock
-    context['product'] = products
-    context['image'] = image
-    return render(request, 'adminside/editproduct.html', context)
-    # except:
-    #     return redirect('/404error/')
+        context['categories'] = categories
+        context['product_offers'] = product_offers
+        context['sizes'] = sizes
+        context['stock_s'] = Product_Variant.objects.get(product = products, size = size_obj_s).stock
+        context['stock_m'] = Product_Variant.objects.get(product = products, size = size_obj_m).stock
+        context['stock_l'] = Product_Variant.objects.get(product = products, size = size_obj_l).stock
+        context['stock_xl'] = Product_Variant.objects.get(product = products, size = size_obj_xl).stock
+        context['product'] = products
+        context['image'] = image
+        return render(request, 'adminside/editproduct.html', context)
+    except:
+        return redirect('/404error/')
 
 @admin_required
 def delete_product(request, uid):
