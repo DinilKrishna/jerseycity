@@ -18,27 +18,6 @@
                     <div class="shop-product-fillter style-2">
                         <div class="totall-product">
                         </div>
-                        {% comment %} <div class="sort-by-product-area">
-                            <div class="sort-by-cover">
-                                <div class="sort-by-product-wrap">
-                                    <div class="sort-by">
-                                        <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
-                                    </div>
-                                    <div class="sort-by-dropdown-wrap">
-                                        <span> Featured <i class="fi-rs-angle-small-down"></i></span>
-                                    </div>
-                                </div>
-                                <div class="sort-by-dropdown">
-                                    <ul>
-                                        <li><a class="active" href="#">Featured</a></li>
-                                        <li><a href="#">Price: Low to High</a></li>
-                                        <li><a href="#">Price: High to Low</a></li>
-                                        <li><a href="#">Release Date</a></li>
-                                        <li><a href="#">Avg. Rating</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div> {% endcomment %}
                     </div>
                     <div class="product-list mb-50">
                         {% for product in products %}
@@ -52,11 +31,11 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="product-action-1">
+                                {% comment %} <div class="product-action-1">
                                     <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> 
                                 </div>
                                 <div class="product-badges product-badges-position product-badges-mrg">
-                                </div>
+                                </div> {% endcomment %}
                             </div>
                             <div class="product-content-wrap">
                                 <div class="product-category">
