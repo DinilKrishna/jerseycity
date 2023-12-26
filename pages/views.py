@@ -31,16 +31,13 @@ def landing_page(request):
 
 
 def login_page(request):
-    try:
-        if request.user.is_authenticated and not request.user.is_staff:
-            return redirect('user_profile')
-        # elif request.user.is_authenticated:
-        #     logout(request)
-        # return HttpResponse("hellow a")    
-        return render(request, 'pages/login_page.html')
-    except Exception as e:
-        print(e)
-        return HttpResponse(e)
+   
+    if request.user.is_authenticated and not request.user.is_staff:
+        return redirect('user_profile')
+    elif request.user.is_authenticated:
+        logout(request)
+    return render(request, 'pages/user_login.html')
+    
 
         # return redirect('/404error/')
 
