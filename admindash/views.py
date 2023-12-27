@@ -904,6 +904,8 @@ def order_info(request, uid):
             new_status = request.POST.get('status', None)
             if new_status:
                 order.status = new_status
+                if new_status == 'Delivered':
+                    order.payed = True
                 order.save()
             return redirect(request.META.get('HTTP_REFERER'))
         context['order'] = order
