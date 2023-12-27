@@ -266,7 +266,7 @@ def add_product_page(request):
 def categories(request):
     try:
         context = {}
-        categories = Category.objects.all()
+        categories = Category.objects.all().order_by('id')
         context['categories'] = categories
         if request.method == "POST":
             category_name = request.POST.get('category_name')
