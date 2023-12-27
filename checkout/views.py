@@ -56,6 +56,9 @@ def checkout(request):
         context['addresses'] = addresses
         context['offf'] = grand_total - discounted_total
         if request.method == 'POST':
+            if addresses == None:
+                messages.error(request, "Enter an address")
+                return redirect(request.META.get('HTTP_REFERER'))
             selected_address_id = request.POST.get('selected_address')
             request.session['selected_address_id'] = selected_address_id
             payment_option = request.POST.get('payment_option')
@@ -69,6 +72,7 @@ def checkout(request):
 
             else:
                 messages.warning(request, "Please select an address.")
+                return redirect(request.META.get('HTTP_REFERER'))
 
             if payment_option == 'wallet':
                 # Handle Direct Bank Transfer logic
