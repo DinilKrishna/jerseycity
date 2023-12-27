@@ -17,6 +17,7 @@ from userauth.decorator import login_required
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
+from checkout.models import Coupon
 
 # Create your views here.
 
@@ -899,7 +900,7 @@ def cart(request):
             for cart_item in cart_items:
                 sub_total = cart_item.calculate_sub_total()
                 grand_total += sub_total
-
+            
             context['out_of_stock'] = out_of_stock
             context['grand_total'] = grand_total
             context['user'] = profile
