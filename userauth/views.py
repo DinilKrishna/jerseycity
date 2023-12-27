@@ -568,7 +568,8 @@ def change_profile_image(request, uid):
                         'uid': uid,
                     })
         except ValidationError as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
+            messages.error(request, 'Invalid File Format')
+            return redirect(request.META.get('HTTP_REFERER'))
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
 
