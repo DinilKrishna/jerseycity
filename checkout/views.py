@@ -38,7 +38,7 @@ def checkout(request):
         addresses = Address.objects.filter(unlisted=False, user=request.user)
         if not cart_items:
             messages.warning(request, "Cart is empty!")
-            return redirect(f'/userauth/cart/{uid}')
+            return redirect(f'/userauth/cart/')
         out_of_stock = False
         grand_total = 0
         for cart_item in cart_items:
