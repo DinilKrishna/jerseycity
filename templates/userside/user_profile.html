@@ -3,15 +3,6 @@
 {% block title %}User Profile{% endblock  %}
 {% block content %}
 <main class="main">
-    <div class="page-header breadcrumb-wrap">
-        <div class="container">
-            <div class="breadcrumb">
-                <a href="index.html" rel="nofollow">Home</a>
-                <span></span> Pages
-                <span></span> My Account
-            </div>
-        </div>
-    </div>
     <div class="container text-center pt-30">
         <img src="{{ profile.profile_image.url }}?{{ profile.profile_image.date_added.timestamp }}" alt="Profile Image" width="150" class="rounded-circle">
         <br>
@@ -129,7 +120,9 @@
                                                             <td>${{order.amount_to_pay}}</td>
                                                             <td><a href="/userauth/order_details/{{order.uid}}" class="btn-small d-block">View</a></td>
                                                             {% if order.status == 'Confirmed' %}
-                                                            <td><a href="/userauth/cancel_order/{{order.uid}}" class="btn-danger p-2">Cancel</a></td>
+                                                            <td>
+                                                                <a href="#" class="btn-danger p-2" onclick="confirmCancel('{{ order.uid }}')">Cancel</a>
+                                                            </td>
                                                             {% else %}
                                                             <td>Already {{order.status}}</td>
                                                             {% endif %}
@@ -239,4 +232,26 @@
         </div>
     </section>
 </main>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    function confirmCancel(orderUid) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If the user clicks "Yes", redirect to the cancel_order URL
+                window.location.href = '/userauth/cancel_order/' + orderUid;
+            }
+        });
+    }
+</script>
 {% endblock  %}

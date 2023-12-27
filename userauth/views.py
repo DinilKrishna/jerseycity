@@ -176,7 +176,7 @@ def sign_up(request):
                 message = f"{otp} - OTP"
                 from_email = "dinilkrishna594@gmail.com"
                 recipient_list = [email]
-                expiration_time = 30
+                expiration_time = 60
 
                 try:
                     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
@@ -286,7 +286,7 @@ def forgot_password(request):
             message = f"{otp} - OTP"
             from_email = "dinilkrishna594@gmail.com"
             recipient_list = [email]
-            expiration_time = 100  
+            expiration_time = 60
             try:
                 
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
@@ -391,7 +391,7 @@ def otp_login(request):
             message = f"{otp} - OTP"
             from_email = "dinilkrishna594@gmail.com"
             recipient_list = [email]
-            expiration_time = 100  
+            expiration_time = 60
             try:
                 
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
@@ -454,7 +454,7 @@ def resend_otp(request):
         message = f"{otp} - OTP"
         from_email = "dinilkrishna594@gmail.com"
         recipient_list = [email]
-        expiration_time = 30  
+        expiration_time = 60  
         try:
             
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)

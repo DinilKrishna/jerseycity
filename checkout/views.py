@@ -54,6 +54,7 @@ def checkout(request):
         context['grand_total'] = grand_total
         context['user'] = profile
         context['addresses'] = addresses
+        context['offf'] = grand_total - discounted_total
         if request.method == 'POST':
             selected_address_id = request.POST.get('selected_address')
             request.session['selected_address_id'] = selected_address_id

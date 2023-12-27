@@ -4,15 +4,6 @@
 
 {% block content %}
 <main class="main">
-    <div class="page-header breadcrumb-wrap">
-        <div class="container">
-            <div class="breadcrumb">
-                <a href="index.html" rel="nofollow">Home</a>
-                <span></span> Shop
-                <span></span> Checkout
-            </div>
-        </div>
-    </div>
     <section class=" mb-50">
         <div class="container">
             <div class="row">
@@ -129,6 +120,10 @@
                                     <tr>
                                         <td class="cart_total_label font-lg fw-900 text-brand">Bill Amount</td>
                                         <td class="cart_total_amount"><span class="font-md fw-700">$<span id="cart-total">{{ grand_total }}</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cart_total_label font-lg fw-900 text-brand">Discount</td>
+                                        <td class="discount_amount"><span class="font-md fw-700">$<span id="cart-total">{{ offf  }}</span></span></td>
                                     </tr>
                                     <tr>
                                         <td class="cart_total_label font-lg fw-900 text-brand">Total Payable</td>
