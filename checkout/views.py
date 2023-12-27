@@ -21,7 +21,12 @@ def checkout(request):
         profile = UserProfile.objects.get(uid=uid)
         current_user_coupons = Coupon.objects.filter(users=profile)
 
-        coupons_not_associated_with_current_user = Coupon.objects.exclude(uid__in=current_user_coupons.values_list('uid', flat=True)).filter(expiry_date__gt=timezone.now())
+        coupons_not_associated_with_current_user = Coupon.objects.exclude(
+            id__in=current_user_coupons.values_list('id', flat=True)
+        ).filter(
+            expiry_date__gt=timezone.now(),
+            unlisted=False
+)
         context['coupons'] = coupons_not_associated_with_current_user
         cart = Cart.objects.get(user=profile)
         cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__is_listed = True)
