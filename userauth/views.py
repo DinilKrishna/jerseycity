@@ -557,7 +557,13 @@ def change_profile_image(request, uid):
                 # Ensure the image is not None before attempting to save
                 if profile_image:
                     # Validate the image
-                    validate_image(profile_image)
+                    try:
+                        # Open the image file
+                        img = Image.open(profile_image.file)
+                        img.verify()  # This will raise an exception if the image is not valid
+                    except Exception as e:
+                        messages.error(request, 'Invalid image file. Please upload a valid image.')
+                        return redirect(request.META.get("HTTP_REFERER"))
 
                     # Add a timestamp to the image filename to make it unique
                     filename = f'profile_image_{timezone.now().timestamp()}.jpg'
