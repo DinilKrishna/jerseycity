@@ -425,7 +425,11 @@ def validate_coupon(request):
         grand_total = 0
         for item in cart_items:
             grand_total += (item.quantity * item.product.selling_price)
-        coupon = Coupon.objects.get(code=coupon_code)
+        try:            
+            coupon = Coupon.objects.get(code=coupon_code)
+        except:
+            messages.error(request, 'Invalid coupon')
+            return redirect(request.META.get('HTTP_REFERER'))
         current_datetime = timezone.now()
         
         if user not in coupon.users.all():
