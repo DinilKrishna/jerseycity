@@ -414,44 +414,44 @@ def success_page(request):
 
 
 def validate_coupon(request):
-    try:
-        if request.method == 'POST':
-            response_data = {}
-            coupon_code = request.POST.get('coupon_code')
-            user_id = request.user.userprofile.uid
-            user = UserProfile.objects.get(uid = user_id)
-            user_cart = Cart.objects.get(user_id = user_id)
-            cart_items = CartItems.objects.filter(cart = user_cart, product__is_selling = True, product__category__is_listed = True)
-            grand_total = 0
-            for item in cart_items:
-                grand_total += (item.quantity * item.product.selling_price)
-            coupon = Coupon.objects.get(code=coupon_code)
-            current_datetime = timezone.now()
-            
-            if user not in coupon.users.all():
-                if user_cart.coupon:
-                    user_cart.coupon.users.remove(user)  # Mark the coupon as used by the current user      
-                    coupon.save()
-                coupon.users.add(user)  # Mark the coupon as used by the current user      
+    # try:
+    if request.method == 'POST':
+        response_data = {}
+        coupon_code = request.POST.get('coupon_code')
+        user_id = request.user.userprofile.uid
+        user = UserProfile.objects.get(uid = user_id)
+        user_cart = Cart.objects.get(user_id = user_id)
+        cart_items = CartItems.objects.filter(cart = user_cart, product__is_selling = True, product__category__is_listed = True)
+        grand_total = 0
+        for item in cart_items:
+            grand_total += (item.quantity * item.product.selling_price)
+        coupon = Coupon.objects.get(code=coupon_code)
+        current_datetime = timezone.now()
+        
+        if user not in coupon.users.all():
+            if user_cart.coupon:
+                user_cart.coupon.users.remove(user)  # Mark the coupon as used by the current user      
                 coupon.save()
-            else:
-                messages.error(request, 'Coupon already applied')
-                return redirect(request.META.get('HTTP_REFERER'))
-            if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and coupon.unlisted is False:
-                new_total = grand_total - (grand_total * coupon.discount_percentage)/100
-                new_total = round(new_total, 2)
-                response_data['new_total'] = new_total
-                user_cart.coupon = coupon
-                user_cart.save()
-                messages.success(request, 'Coupon applied succesfully')
-                return redirect(request.META.get('HTTP_REFERER'))
-                # return JsonResponse({'success' : True, 'new_total': new_total})
-            messages.error(request, 'Invalid coupon')
+            coupon.users.add(user)  # Mark the coupon as used by the current user      
+            coupon.save()
+        else:
+            messages.error(request, 'Coupon already applied')
             return redirect(request.META.get('HTTP_REFERER'))
-            # return JsonResponse({'success' : False})
-        return redirect('checkout')
-    except:
-        return redirect('/404error/')
+        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and coupon.unlisted is False:
+            new_total = grand_total - (grand_total * coupon.discount_percentage)/100
+            new_total = round(new_total, 2)
+            response_data['new_total'] = new_total
+            user_cart.coupon = coupon
+            user_cart.save()
+            messages.success(request, 'Coupon applied succesfully')
+            return redirect(request.META.get('HTTP_REFERER'))
+            # return JsonResponse({'success' : True, 'new_total': new_total})
+        messages.error(request, 'Invalid coupon')
+        return redirect(request.META.get('HTTP_REFERER'))
+        # return JsonResponse({'success' : False})
+    return redirect('checkout')
+    # except:
+    #     return redirect('/404error/')
 
 
 def remove_coupon(request, uid):
