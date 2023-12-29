@@ -903,10 +903,17 @@ def order_info(request, uid):
         if request.method == 'POST':
             new_status = request.POST.get('status', None)
             if new_status:
-                order.status = new_status
                 if new_status == 'Delivered':
                     order.payed = True
+                if new_status == 'Cancelled' and order.status != 'Cancelled':
+                    if order.payed == True:
+                        user = order.user
+                        wallet = Wallet.objects.get(user = user.userprofile)
+                        wallet.amount += order.amount_to_pay
+                        wallet.save()
+                order.status = new_status
                 order.save()
+
             return redirect(request.META.get('HTTP_REFERER'))
         context['order'] = order
         context['order_items'] = order_items

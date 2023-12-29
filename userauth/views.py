@@ -485,7 +485,7 @@ def user_profile(request, uid):
             context = {}  
             profile = UserProfile.objects.get(uid = uid)
             wallet = Wallet.objects.get(user = profile)
-            wallet_history = WalletHistory.objects.filter(wallet = wallet)
+            wallet_history = WalletHistory.objects.filter(wallet = wallet).order_by('-created_at')
             
             user_cart = Cart.objects.get(user_id = uid)
             cart_items = CartItems.objects.filter(cart=user_cart,product__is_selling = True,product__category__is_listed = True).order_by("-created_at")
@@ -662,15 +662,16 @@ def change_password(request, uid):
 
 def is_valid_phone_number(phone_number):
     try:
-        
+        # Remove non-digit characters, including spaces
         phone_number = re.sub(r'\D', '', phone_number)
         
+        # Check if the cleaned phone_number has exactly 10 digits
         if not re.match(r'^\d{10}$', phone_number):
             return False
         
         return True
     except:
-        return redirect('/404error/')
+        return False
 
 def is_valid_address(address):
     try:
@@ -751,6 +752,7 @@ def add_address(request):
             if not is_valid_phone_number(phone_number):
                 messages.error(request, "Not a valid phone number")
                 return redirect(request.META.get("HTTP_REFERER"))
+            phone_number = re.sub(r'\s', '', phone_number)
             address = request.POST.get('address')
             if not is_valid_address(address):
                 messages.error(request, "Not a valid address")

@@ -1,3 +1,4 @@
+import re
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from products.models import *
@@ -366,49 +367,51 @@ def create_order(request):
 
 
 def add_new_address(request):
-    try:
-        context = {}
-        user_id = request.user.userprofile.uid
-        user_cart = Cart.objects.get(user_id = user_id)
-        cart_items = CartItems.objects.filter(cart = user_cart)
-        number_in_cart = 0
-        for item in cart_items:
-            number_in_cart += 1
-        context['number_in_cart'] = number_in_cart
-        if request.method == "POST":
-            user = request.user
-            phone_number = request.POST.get('phone')
-            if not is_valid_phone_number(phone_number):
-                messages.error(request, "Not a valid phone number")
-                return redirect(request.META.get("HTTP_REFERER"))
-            address = request.POST.get('address')
-            if not is_valid_address(address):
-                messages.error(request, "Not a valid address")
-                return redirect(request.META.get("HTTP_REFERER"))
-            city = request.POST.get('city')
-            if not is_valid_city(city):
-                messages.error(request, "Not a valid city name")
-                return redirect(request.META.get("HTTP_REFERER"))
-            district = request.POST.get('district')
-            if not is_valid_district(district):
-                messages.error(request, "Not a valid district name")
-                return redirect(request.META.get("HTTP_REFERER"))
-            state = request.POST.get('state')
-            if not is_valid_state(state):
-                messages.error(request, "Not a valid state name")
-                return redirect(request.META.get("HTTP_REFERER"))
-            pincode = request.POST.get('pincode')
-            if not is_valid_pincode(pincode):
-                messages.error(request, "Not a valid pincode")
-                return redirect(request.META.get("HTTP_REFERER"))
+    # try:
+    context = {}
+    user_id = request.user.userprofile.uid
+    user_cart = Cart.objects.get(user_id = user_id)
+    cart_items = CartItems.objects.filter(cart = user_cart)
+    number_in_cart = 0
+    for item in cart_items:
+        number_in_cart += 1
+    context['number_in_cart'] = number_in_cart
+    if request.method == "POST":
+        user = request.user
+        phone_number = request.POST.get('phone')
+        if not is_valid_phone_number(phone_number):
+            messages.error(request, "Not a valid phone number")
+            return redirect(request.META.get("HTTP_REFERER"))
+        phone_number = re.sub(r'\s', '', phone_number)
+        address = request.POST.get('address')
+        if not is_valid_address(address):
+            messages.error(request, "Not a valid address")
+            return redirect(request.META.get("HTTP_REFERER"))
+        city = request.POST.get('city')
+        if not is_valid_city(city):
+            messages.error(request, "Not a valid city name")
+            return redirect(request.META.get("HTTP_REFERER"))
+        district = request.POST.get('district')
+        if not is_valid_district(district):
+            messages.error(request, "Not a valid district name")
+            return redirect(request.META.get("HTTP_REFERER"))
+        state = request.POST.get('state')
+        if not is_valid_state(state):
+            messages.error(request, "Not a valid state name")
+            return redirect(request.META.get("HTTP_REFERER"))
+        pincode = request.POST.get('pincode')
+        if not is_valid_pincode(pincode):
+            messages.error(request, "Not a valid pincode")
+            return redirect(request.META.get("HTTP_REFERER"))
+        pincode = re.sub(r'\s', '', pincode)
 
-            address = Address(user = user, phone_number = phone_number, address = address, city = city, district = district, state = state, pincode = pincode)
-            address.save()
+        address = Address(user = user, phone_number = phone_number, address = address, city = city, district = district, state = state, pincode = pincode)
+        address.save()
 
-            return redirect('checkout')
-        return render(request, 'checkout/addnewaddress.html',context)
-    except:
-        return redirect('/404error/')
+        return redirect('checkout')
+    return render(request, 'checkout/addnewaddress.html',context)
+    # except:
+    #     return redirect('/404error/')
 
 
 def success_page(request):

@@ -83,6 +83,7 @@ class Wallet(BaseModel):
 
     def save(self, *args, **kwargs):
         try:
+            print('------------------------------')
             # Try to retrieve the existing wallet instance
             old_wallet = Wallet.objects.get(pk=self.pk)
 
