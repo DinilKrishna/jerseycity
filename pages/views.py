@@ -8,9 +8,12 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 import random
 from django.core.mail import send_mail
+from django.views.decorators.cache import never_cache
 
 # Create your views here.
 
+
+@never_cache
 def landing_page(request):
     try:
         context = {}
@@ -30,6 +33,7 @@ def landing_page(request):
         return redirect('/404error/')
 
 
+@never_cache
 def login_page(request):
     try:
         if request.user.is_authenticated and not request.user.is_staff:
@@ -40,6 +44,8 @@ def login_page(request):
     except:
         return redirect('/404error/')
 
+
+@never_cache
 def signup_page(request):
     try:
         if request.user.is_authenticated and not request.user.is_staff:
@@ -51,6 +57,7 @@ def signup_page(request):
         return redirect('/404error/')
 
 
+@never_cache
 def home_page(request):
     try:
         context = {}
@@ -107,6 +114,7 @@ def apply_filters(products, category_id, price_range):
         return redirect('/404error/')
 
 
+@never_cache
 def shop_page(request):
     try:
         context = {}
@@ -127,10 +135,8 @@ def shop_page(request):
         categories = Category.objects.filter(is_listed=True)
         sizes = Size.objects.all()
 
-        # Get the search query from the GET parameters
         search_query = request.GET.get('q', '')
 
-        # Filter products based on the search query
         products = Product.objects.filter(
             Q(category__is_listed=True) &
             Q(is_selling=True) &
@@ -138,12 +144,9 @@ def shop_page(request):
             Q(description__icontains=search_query))
         ).order_by('created_at')
 
-        # Apply filters
         products = apply_filters(products, request.GET.get('category_id'), request.GET.get('price_range'))
 
-        # Initialize selected_category as None
         selected_category = None
-        # Get the selected category from the GET parameters
         selected_category_id = request.GET.get('category_id')
         if selected_category_id:
             selected_category = get_object_or_404(Category, pk=selected_category_id)
@@ -178,20 +181,15 @@ def shop_page(request):
         try:
             products = paginator.page(page)
         except PageNotAnInteger:
-            # If the page parameter is not an integer, deliver the first page.
             products = paginator.page(1)
         except EmptyPage:
-            # If the page is out of range (e.g., 9999), deliver the last page of results.
             products = paginator.page(paginator.num_pages)
 
-        # Get the current page number
         current_page = products.number
 
-        # Calculate the range of page numbers to display
         start_page = max(1, current_page - 1)
         end_page = min(paginator.num_pages, current_page + 1)
 
-        # If the last product of the current page is removed, and there are more products, fetch the next page
         if current_page < paginator.num_pages and len(products) <= items_per_page:
             next_page = paginator.page(current_page + 1)
             products.object_list = list(products.object_list)
@@ -199,15 +197,12 @@ def shop_page(request):
             paginator.count += len(products.object_list)
 
         
-
-        # Adjust the start and end page if there are not enough pages to display
         if end_page - start_page < 2:
             if start_page == 1:
                 end_page = min(3, paginator.num_pages)
             else:
                 start_page = max(1, paginator.num_pages - 2)
 
-        # Create a list of page numbers to display
         page_numbers = range(start_page, end_page + 1)
 
         context['categories'] = categories
@@ -222,6 +217,7 @@ def shop_page(request):
         return redirect('/404error/')
 
 
+@never_cache
 def product_details(request, uid):
     try:
         context = {}
@@ -252,9 +248,7 @@ def product_details(request, uid):
             return redirect(f'/products/add_to_cart/{product_obj.uid}/{size_obj.id}')
 
         if request.user.is_authenticated and request.user.is_staff is False:
-            # context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
             context['user'] = profile
-        # context['reviews'] = Review.objects.filter(product = product_obj).exclude(review = "")
         offer_percentage = (1 - (product_obj.selling_price/product_obj.price)) * 100
         context['products'] = product_obj
         context['product_id'] = product_obj.uid
@@ -283,6 +277,7 @@ def get_stock(request, product_id, size_id):
         return JsonResponse(response_data, status=500)
 
 
+@never_cache
 def about_page(request):
     try:
         if request.user.is_authenticated and request.user.is_staff:
@@ -308,6 +303,8 @@ def about_page(request):
     except:
         return redirect('/404error/')
 
+
+@never_cache
 def contact_page(request):
     try:
         if request.user.is_authenticated and request.user.is_staff:

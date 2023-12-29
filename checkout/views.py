@@ -10,11 +10,13 @@ from userauth.decorator import login_required
 from userauth.views import is_valid_address, is_valid_city, is_valid_district, is_valid_phone_number, is_valid_pincode, is_valid_state
 from django.utils import timezone
 import razorpay
+from django.views.decorators.cache import never_cache
 
 # Create your views here.
 
 
 @login_required
+@never_cache
 def checkout(request):
     try:
         uid = request.user.userprofile.uid
@@ -185,6 +187,7 @@ def checkout(request):
         return redirect('/404error/')
 
 
+@never_cache
 def wallet_payment(request):
     try:
         context = {}
@@ -365,7 +368,7 @@ def create_order(request):
         return redirect('/404error/')
 
 
-
+@never_cache
 def add_new_address(request):
     # try:
     context = {}
@@ -414,6 +417,7 @@ def add_new_address(request):
     #     return redirect('/404error/')
 
 
+@never_cache
 def success_page(request):
     try:
         context = {}

@@ -35,7 +35,7 @@ def admin_login_page(request):
     except:
         return redirect('/404error/')
 
-@never_cache
+
 def admin_log_out(request):
     try:
         if request.user.is_authenticated:
@@ -45,6 +45,9 @@ def admin_log_out(request):
     except:
         return redirect('/404error/')
 
+
+@admin_required
+@never_cache
 def admin_dashboard(request):
     try:
         if request.user.is_authenticated and request.user.is_staff:
@@ -104,6 +107,8 @@ def admin_dashboard(request):
         return redirect('/404error/')
 
 
+@admin_required
+@never_cache
 def report(request):
     try:
         context = {}
@@ -133,6 +138,8 @@ def report(request):
         return redirect('/404error/')
 
 
+@admin_required
+@never_cache
 def admin_products(request):
     try:
         if request.user.is_authenticated and request.user.is_staff:
@@ -187,6 +194,8 @@ def admin_products(request):
         return redirect('/404error/')
 
 
+@admin_required
+@never_cache
 def users(request):
     try:
         context = {}
@@ -239,6 +248,9 @@ def users(request):
     except:
         return redirect('/404error/')
 
+
+@admin_required
+@never_cache
 def user_details(request):
     try:
         if request.user.is_authenticated and request.user.is_staff:
@@ -247,6 +259,9 @@ def user_details(request):
     except:
         return redirect('/404error/')
 
+
+@admin_required
+@never_cache
 def add_product_page(request):
     try:
         context = {}
@@ -262,6 +277,7 @@ def add_product_page(request):
         return redirect('/404error/')
 
 
+@never_cache
 @admin_required
 def categories(request):
     try:
@@ -287,6 +303,7 @@ def categories(request):
         return redirect('/404error/')
 
 
+@never_cache
 def admin_login(request):
     try:
         if request.method == "POST":
@@ -369,6 +386,8 @@ def is_valid_stock(stock):
         return False
     
 
+@admin_required
+@never_cache
 def add_product(request):
     try:
         context = {}
@@ -532,7 +551,8 @@ def add_product(request):
         return redirect('/404error/')
 
 
-
+@admin_required
+@never_cache
 def edit_product(request, uid):
     try:
         context = {}
@@ -722,6 +742,8 @@ def edit_product(request, uid):
     except:
         return redirect('/404error/')
 
+
+@never_cache
 @admin_required
 def delete_product(request, uid):
     try:
@@ -735,6 +757,7 @@ def delete_product(request, uid):
         return redirect(reverse('admin_products'))
     except Exception as e:
         return redirect('/404error/')
+
 
 @admin_required
 def block_user(request, uid):
@@ -750,6 +773,8 @@ def block_user(request, uid):
     except Exception as e:
         return redirect('/404error/')
     
+
+@never_cache
 @admin_required
 def edit_category(request, id):
     try:
@@ -853,6 +878,7 @@ def edit_category(request, id):
     except:
         return redirect('/404error/')
 
+
 @admin_required
 def delete_category(request, id):
     try:
@@ -868,6 +894,7 @@ def delete_category(request, id):
         return redirect('/404error/')
     
 
+@never_cache
 @admin_required
 def orders(request):
     try:
@@ -894,6 +921,7 @@ def orders(request):
         return redirect('/404error/')
 
 
+@never_cache
 @admin_required
 def order_info(request, uid):
     try:
@@ -922,6 +950,7 @@ def order_info(request, uid):
         return redirect('/404error/')
 
 
+@never_cache
 @admin_required
 def coupons(request):
     try:
@@ -957,6 +986,8 @@ def coupons(request):
     except:
         return redirect('/404error/')
 
+
+@admin_required
 def unlist_coupon(request, uid):
     try:
         coupon = Coupon.objects.get(uid = uid)
@@ -966,6 +997,8 @@ def unlist_coupon(request, uid):
     except:
         return redirect('/404error/')
 
+
+@admin_required
 def list_coupon(request, uid):
     try:
         coupon = Coupon.objects.get(uid = uid)
@@ -1008,6 +1041,7 @@ def is_valid_discount_percentage(discount_percentage):
         return False
 
 
+@admin_required
 def add_coupon(request):
     try:
         if request.method == 'POST':
@@ -1047,6 +1081,8 @@ def add_coupon(request):
         return redirect('/404error/')
 
 
+@admin_required
+@never_cache
 def edit_coupon(request, uid):
     try:
         context = {}
@@ -1087,6 +1123,8 @@ def edit_coupon(request, uid):
         return redirect('/404error/')
 
 
+@admin_required
+@never_cache
 def product_offers(request):
     try:
         context = {}
@@ -1109,6 +1147,8 @@ def product_offers(request):
         return redirect('/404error/')
 
 
+@admin_required
+@never_cache
 def edit_offer(request, uid):
     try:
         context = {}
@@ -1136,6 +1176,7 @@ def edit_offer(request, uid):
         return redirect('/404error/')
 
 
+@admin_required
 def delete_offer(request, uid):
     try:
         offer = ProductOffer.objects.get(uid = uid)

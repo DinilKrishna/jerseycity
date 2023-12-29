@@ -18,6 +18,7 @@ from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 from checkout.models import Coupon
+from django.views.decorators.cache import never_cache
 
 # Create your views here.
 
@@ -256,6 +257,7 @@ def verify_otp(request, uid):
         return redirect('/404error/')
 
 
+@never_cache
 def forgot_password(request):
     try:
         if request.user.is_staff:
@@ -302,6 +304,7 @@ def forgot_password(request):
         return redirect('/404error/')
 
 
+@never_cache
 def forgot_pass_otp(request):
     try:
         if request.user.is_staff:
@@ -336,6 +339,7 @@ def forgot_pass_otp(request):
         return redirect('/404error/')
 
 
+@never_cache
 def forgot_pass_change(request, uid):
     try:
         user_profile = UserProfile.objects.get(uid = uid)
@@ -359,8 +363,7 @@ def forgot_pass_change(request, uid):
         return redirect('/404error/')
 
 
-
-
+@never_cache
 def otp_login(request):
     try:
         if request.user.is_staff:
@@ -406,6 +409,8 @@ def otp_login(request):
     except:
         return redirect('/404error/')
 
+
+@never_cache
 def otp_login_verify(request):
     try:
         if request.user.is_staff:
@@ -478,6 +483,7 @@ def log_out(request):
         return redirect('/404error/')
 
 
+@never_cache
 @login_required
 def user_profile(request, uid):
     try:
@@ -538,6 +544,7 @@ def validate_image(image):
         return redirect('/404error/')
 
 
+@never_cache
 @login_required
 def change_profile_image(request, uid):
     try:
@@ -587,6 +594,8 @@ def change_profile_image(request, uid):
         return redirect('/404error/')
 
 
+@never_cache
+@login_required
 def edit_profile(request, uid):
     try:
         if request.method == 'POST':
@@ -609,6 +618,7 @@ def edit_profile(request, uid):
         return redirect('/404error/')
 
 
+@never_cache
 @login_required
 def change_password(request, uid):
     try:
@@ -744,6 +754,7 @@ def is_valid_pincode(pincode):
         return redirect('/404error/')
 
 
+@never_cache
 def add_address(request):
     try:
         if request.method == "POST":
@@ -853,6 +864,7 @@ def delete_address(request, uid):
         return redirect('/404error/')
 
 
+@never_cache
 @login_required
 def wishlist(request):
     try:
@@ -884,6 +896,8 @@ def wishlist(request):
     except:
         return redirect('/404error/')
 
+
+@never_cache
 @login_required
 def cart(request):
     try:
@@ -927,6 +941,7 @@ def cart(request):
         return redirect('/404error/')
 
 
+@never_cache
 def order_details(request, uid):
     try:
         context = {}
