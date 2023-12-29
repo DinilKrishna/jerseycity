@@ -12,13 +12,12 @@ def add_to_cart(request):
     try:
         if request.method == 'POST':
             product = request.POST.get('product_uid')
-            print(product)
             size_id = request.POST.get('size_id')
-            print(size_id)
             product_obj = Product.objects.get(uid = product)
             size = Size.objects.get(id = size_id)
             product_variant = Product_Variant.objects.get(product = product_obj, size = size_id)
             cart, created = Cart.objects.get_or_create(user = request.user.userprofile)
+            wishlist = Wishlist.objects.get(user = request.user.userprofile)
             if product_variant.stock < 1:
                 return JsonResponse({'stock' : True})
             
@@ -27,7 +26,12 @@ def add_to_cart(request):
                 product = product_obj,
                 size = size
                 )
-            # messages.success(request, "Added to cart")
+            try:
+                wishlist_item = WishlistItems.objects.get(wishlist=wishlist, product=product_obj)
+                wishlist_item.delete()
+
+            except WishlistItems.DoesNotExist:
+                pass
             
             if not item_created:
                 if cart_item.quantity < product_variant.stock:
